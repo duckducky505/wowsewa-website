@@ -1,17 +1,18 @@
 import { Link } from 'react-router-dom';
 import './Navbar.css'
 
+
 const Navbar = () => {
 return(
-  <nav class="navbar">
-      <div class="container">
-        <div class="logo">
-          <a href="growth.html">
-            <img src="images/logo.png" alt="logo" />
-          </a>
+  <nav className="navbar">
+      <div className="container">
+        <div className="logo">
+          <Link to="/">
+            <img src="src/assets/images/wowLogo.png" alt="logo" />
+          </Link>
         </div>
 
-        <div class="main-menu">
+        <div className="main-menu">
           <ul>
             <li>
               <Link to="/home">Home</Link>
@@ -26,20 +27,20 @@ return(
               <Link to="/services">Our Services</Link>
             </li>
             <li>
-              <a href="#" class="btn btn-dark">
-                <i class="fas fa-user"></i>Log In
+              <a href="#" className="btn btn-dark">
+                <i className="fas fa-user"></i>Log In
               </a>
             </li>
           </ul>
         </div>
 
         {/* <!-- Hamburger button --> */}
-        <button id="hamburger-button" class="hamburger-button">
-          <div class="hamburger-line"></div>
-          <div class="hamburger-line"></div>
-          <div class="hamburger-line"></div>
+        <button id="hamburger-button" className="hamburger-button">
+          <div className="hamburger-line"></div>
+          <div className="hamburger-line"></div>
+          <div className="hamburger-line"></div>
         </button>
-        <div class="mobile-menu">
+        <div className="mobile-menu">
           <ul>
             <li>
               <Link to="/home">Home</Link>
@@ -54,8 +55,8 @@ return(
               <Link to="/services">Our Services</Link>
             </li>
             <li>
-              <a href="#" class="btn btn-dark">
-                <i class="fas fa-user"></i>Log In
+              <a href="#" className="btn btn-dark">
+                <i className="fas fa-user"></i>Log In
               </a>
             </li>
           </ul>

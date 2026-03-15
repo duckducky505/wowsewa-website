@@ -6,6 +6,9 @@ import Home from './pages/Home';
 import AMC from './pages/AMC';
 import Services from './pages/Services';
 import About from './pages/About';
+import PrivacyPolicy from './pages/WowProvacy'
+import TermsAndConditions from './pages/TermsAndConditions'
+
 
 
 
@@ -14,13 +17,14 @@ const App = () => {
     <>
     <BrowserRouter>
         <Navbar/>
-        
             <Routes>
               <Route  path='/' element={<Home/>}/>
               <Route  path='/home' element={<Home/>}/>
-              <Route  path='amc' element={<AMC/>}/>
+              <Route  path='/amc' element={<AMC/>}/>
               <Route  path='/services' element={<Services/>}/>
               <Route  path='/about' element={<About/>}/>
+              <Route path='/wow-privacy' element={<PrivacyPolicy/>}/>
+              <Route path='/terms-and-conditions' element={<TermsAndConditions/>}/>
             </Routes>
         <Footer/>
       </BrowserRouter>
@@ -28,4 +32,4 @@ const App = () => {
   )
 }
 
-export default App
+export default App;

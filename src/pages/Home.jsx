@@ -1,15 +1,19 @@
 import Testimonials from '../components/Testimonials'
-import Pricing from '../components/Pricing'
 import FAQ from '../components/FAQ'
+import StatsBar from '../components/Statsbar'
+import MainBanner from '../components/MainBanner'
+import ServiceHighlights from '../components/ServiceHighlights'
 
 const Home = () => {
     return(
         <>
+            <MainBanner/>
+            <ServiceHighlights/>
             <Testimonials/>
-            <Pricing/>
+            <StatsBar/>
             <FAQ/>
         </>
     )
 } 
 
-export default Home
+export default Home;

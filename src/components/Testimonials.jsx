@@ -1,45 +1,47 @@
 import "./Testimonials.css"
 
 const Testimonials = () => {
-  return(
-    <section class="testimonials bg-dark">
-      <div class="container">
-        <h3 class="testimonials-heading text-xl">
-          Dont just take our word for it, see the success sories from businesses
-          just like yours.
+  return (
+    <section className="testimonials bg-dark">
+      <div className="container">
+        <h3 className="testimonials-heading text-xl">
+          Don't just take our word for it, see how <span className="accent-text">WowSewa</span> is 
+          powering homes and businesses just like yours.
         </h3>
-        <div class="testimonials-grid">
-          <div class="card">
+        <div className="testimonials-grid">
+          <div className="card">
             <p>
-              "Our business has seen significant increase in productivity since
-              we started using the Growth app."
+              "Our office networking was a mess until WowSewa stepped in. They set up a 
+              seamless mesh WiFi and installed our smart boards perfectly. Highly professional 
+              tech support!"
             </p>
             <p>Katherine Smith</p>
-            <p>Capodopera</p>
+            <p>Operations Manager, Capodopera</p>
           </div>
-          <div class="card">
+
+          <div className="card">
             <p>
-              "The dashboards and reporting feature has provided valuable
-              insights into our performance and helped us make data-driven
-              decisions. Its a game changer for us"
+              "The plumbing and appliance maintenance plan has provided valuable peace of mind. 
+              Knowing a reliable expert is just a call away for any leak or repair is 
+              a game changer for us."
             </p>
             <p>David Wilson</p>
-            <p>Slide</p>
+            <p>Property Lead, Slide Properties</p>
           </div>
-          <div class="card">
+
+          <div className="card">
             <p>
-              "As a small business owner its important to have a tool that can
-              help me keep track of everything. The Growth app has been a
-              lifesaver for me, allowing me to manage my contacts, schedule
-              appointments, and track progress all in one place.."
+              "As a small business owner, it's a lifesaver to have one place for everything. 
+              WowSewa manages our laptop repairs, solar geysers, and electrical fixes 
+              all in one place. Truly unmatched service."
             </p>
             <p>Jonathan Lee</p>
-            <p>Red Bolt</p>
+            <p>Founder, Red Bolt Studio</p>
           </div>
         </div>
       </div>
     </section>
-    )
+  )
 }
 
 export default Testimonials;

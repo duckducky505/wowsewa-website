@@ -1,0 +1,91 @@
+/* =========================================
+   AMC PAGE SPECIFIC STYLING
+   ========================================= */
+
+.amc-page { overflow-x: hidden; }
+
+.section-title-center {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+/* Pricing Grid */
+.amc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    align-items: flex-start;
+}
+
+/* Pricing Cards */
+.amc-card {
+    background: #fdfdfd;
+    border: 1px solid #eee;
+    padding: 50px 40px;
+    border-radius: 30px;
+    text-align: center;
+    transition: var(--transition);
+    position: relative;
+}
+
+/* Featured Card (Standard) */
+.amc-card.featured {
+    background: var(--bg-black);
+    color: #fff;
+    transform: scale(1.05);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.2);
+    border: 2px solid var(--primary-lime);
+}
+
+.plan-tag {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    color: #777;
+}
+
+.featured-tag { color: var(--primary-lime); }
+
+.amc-card h3 { font-size: 1.8rem; margin-bottom: 15px; }
+
+.price {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 30px;
+}
+
+.price span { font-size: 1rem; color: #888; }
+
+.plan-features {
+    list-style: none;
+    text-align: left;
+    margin-bottom: 40px;
+}
+
+.plan-features li {
+    margin-bottom: 15px;
+    font-size: 1rem;
+}
+
+.plan-features i { margin-right: 10px; }
+.fa-check { color: var(--primary-lime); }
+.fa-times { color: #ff4d4d; opacity: 0.5; }
+.disabled { opacity: 0.4; text-decoration: line-through; }
+
+/* Buttons inside Plans */
+.btn-outline {
+    border: 2px solid #333;
+    padding: 12px 30px;
+    background: transparent;
+    color: #333;
+}
+
+.featured .btn-outline { border-color: #fff; color: #fff; }
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .amc-card.featured { transform: scale(1); margin: 20px 0; }
+    .amc-grid { padding: 0 20px; }
+}

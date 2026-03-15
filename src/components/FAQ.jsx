@@ -1,5 +1,5 @@
-import './FAQ.css';
 import { useState } from 'react';
+import "./FAQ.css"
 
 const FAQ = () => {
     // track the index of the open FAQ. null means all are closed.

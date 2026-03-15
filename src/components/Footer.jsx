@@ -1,59 +1,63 @@
 import { Link } from 'react-router-dom';
-import './Footer.css'
+import "./Footer.css"
 
 const Footer = () => {
-    return(
-        <footer class="footer bg-black">
-            <div class="container">
-            <div class="footer-grid">
-                <div>
-                <Link to="/home">
-                    <img src="images/logo-white.png" alt="logo" />
-                </Link>
-                <div class="card">
-                    <h4>Subscribe to Newsletter</h4>
-                    <p class="text-sm">
-                    Subscribe now to recieve tips on how to take your business to
-                    the next level.
-                    </p>
-                    <form action="">
-                    <input type="email" id="email" placeholder="Enter your email" />
-                    <button type="submit" class="btn btn-primary btn-block">
-                        Subscribe
-                    </button>
-                    </form>
+    return (
+        <footer className="footer light-bg">
+            <div className="container">
+                <div className="footer-grid">
+                    {/* Brand Column */}
+                    <div className="footer-brand">
+                        <Link to="/home">
+                            <img src="/src/assets/images/wowLogo.png" alt="WowSewa Logo" className="footer-logo" />
+                        </Link>
+                        <p className="brand-tagline">
+                            Elite installation, repair, and maintenance for the modern home and office.
+                        </p>
+                        <div className="social-icons">
+                            <a href="#"><i className="fab fa-facebook"></i></a>
+                            <a href="#"><i className="fab fa-instagram"></i></a>
+                            <a href="#"><i className="fab fa-whatsapp"></i></a>
+                            <a href="#"><i className="fab fa-linkedin"></i></a>
+                        </div>
+                    </div>
+
+                    {/* Quick Links */}
+                    <div className="footer-links">
+                        <h4>Company</h4>
+                        <ul>
+                            <li><Link to="/about">About Us</Link></li>
+                            <li><Link to="/amc">AMC Plans</Link></li>
+                            <li><Link to="/services">Our Services</Link></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4>Legal</h4>
+                        <ul>
+                            <li><Link to="/Wow-privacy">Privacy Policy</Link></li>
+                            <li><Link to="/terms-and-conditions">Terms & Conditions</Link></li>
+                        </ul>
+                    </div>
+
+                    {/* Contact Info */}
+                    <div className="footer-contact">
+                        <h4>Contact</h4>
+                        <ul className="contact-list">
+                            <li><i className="fas fa-envelope"></i> wowsewa@gmail.com</li>
+                            <li><i className="fas fa-phone"></i> 9762424318</li>
+                            <li><i className="fas fa-map-marker-alt"></i> Kathmandu, Nepal</li>
+                        </ul>
+                    </div>
+
                 </div>
-                <i class="fab fa-linkedin"></i>
-                <i class="fab fa-twitter"></i>
+                
+                <div className="footer-bottom">
+                    <p>&copy; 2026 WowSewa Pvt. Ltd. All rights reserved.</p>
                 </div>
-                <div>
-                <h4>Company</h4>
-                <ul>
-                    <li><Link to="/about">About Us</Link></li>
-                    <li><Link to="/amc">AMC</Link></li>
-                    <li><Link to="/services">Our Services</Link></li>
-                </ul>
-                </div>
-                <div>
-                <h4>Resources</h4>
-                <ul>
-                    <li><Link to="#">News</Link></li>
-                    <li><Link to="#">Research</Link></li>
-                    <li><Link to="#">Recent Projects</Link></li>
-                </ul>
-                </div>
-                <div>
-                <h4>Contact</h4>
-                <ul>
-                    <li>wowsewaa@gmail.com</li>
-                    <li>9762424318</li>
-                </ul>
-                </div>
-            </div>
             </div>
         </footer>
     )
 }
 
 export default Footer;
-
