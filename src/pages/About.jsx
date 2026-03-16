@@ -7,8 +7,21 @@ const About = () => {
             <div className="section-hero">
                 <div className="container">
                     <header className="about-header">
+                        <span className="brand-tagline">Reliable. Professional. Technical.</span>
+                
                         <h1 className="text-xxl">Service at the speed of <span className="accent-text">WOW</span>.</h1>
-                        <p className="subtitle">From plumbing to networking, WOWsewa provides elite installation, repair, and maintenance for the modern home and office.</p>
+                        
+                        <p className="subtitle">
+                            WOWsewa is Kathmandu's premier all-in-one technical partner. 
+                            We bridge the gap between <strong>traditional utility</strong> and <strong>modern technology</strong>.
+                        </p>
+
+                        {/* 2. Trust Bar - Icons that prove your quality */}
+                        <div className="trust-bar">
+                            <div className="trust-item"><i className="fas fa-user-shield"></i> Verified Pros</div>
+                            <div className="trust-item"><i className="fas fa-history"></i> On-Time Service</div>
+                            <div className="trust-item"><i className="fas fa-check-circle"></i> Quality Guaranteed</div>
+                        </div>
                     </header>
 
                     <div className="infographic-wrapper">

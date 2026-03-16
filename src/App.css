@@ -8,6 +8,8 @@
     --lime-dark: #88AB00;
     --light-color:#f4f4f6;
     --dark-color:#111;
+    --text-silver: #B3B3B3;
+    
 }
 body{
     font-family: 'Poppins','sans-serrif';
@@ -30,63 +32,6 @@ img{
     max-width: 100%;
 }
 
-
-/* Hero */
-.hero{
-    margin-bottom: 50px;
-}
-
-.hero .container{
-    background: url('../growth/images/hero-bg.png') no-repeat;
-    background-size: contain;
-    background-position: center bottom;
-    height: 550px;
-}
-.hero .hero-content{
-    width: 70%;
-}
-
-.hero .hero-text{
-    width: 70%;
-    margin-bottom: 20px;
-}
-
-/* Video */
-.video{
-    padding: 10px 0 40px;
-}
-
-.video .video-content{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.video .video-preview{
-    margin-bottom: 20px;
-}
-
-/* Testimonials */
-.testimonials{
-    padding: 40px 0;
-}
-
-.testimonials .testimonials-heading{
-    width: 700px;
-    margin-bottom: 40px;
-}
-
-.testimonials .testimonials-grid{
-    display: grid;
-    grid-template-columns: repeat(3,1fr); 
-    /* grid-template-columns: 1fr 1fr 1fr; */ /* same thing*/
-    gap: 30px;
-}
-
-.testimonials .card p:nth-child(2){
-    margin-top: 30px;
-    font-weight: bold
-}
 
 /* Uility classes */
 

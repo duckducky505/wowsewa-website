@@ -75,6 +75,48 @@ body {
     margin-top: 15px;
 }
 
+.brand-tagline {
+    display: block;
+    color: var(--primary-color); 
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 2px;
+    font-size: 0.85rem;
+    margin-bottom: 15px;
+}
+
+.trust-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    margin-top: 30px;
+    flex-wrap: wrap; 
+}
+
+.trust-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.95rem;
+    color: #e0e0e0;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 8px 18px;
+    border-radius: 50px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: var(--transition); /* Using your existing transition variable */
+}
+
+.trust-item i {
+    color: var(--primary-color);
+    font-size: 1rem;
+}
+
+.trust-item:hover {
+    background: rgba(207, 255, 19, 0.1);
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+}
 
 .infographic-wrapper { display: flex; justify-content: center; margin-top: 60px; }
 .image-frame {

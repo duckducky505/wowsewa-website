@@ -6,7 +6,7 @@ import Home from './pages/Home';
 import AMC from './pages/AMC';
 import Services from './pages/Services';
 import About from './pages/About';
-import PrivacyPolicy from './pages/WowProvacy'
+import PrivacyPolicy from './pages/WowPrivacy'
 import TermsAndConditions from './pages/TermsAndConditions'
 
 
