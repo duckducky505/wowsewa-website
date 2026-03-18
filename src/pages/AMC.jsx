@@ -1,7 +1,32 @@
 import React from 'react';
 import './AMC.css';
+import FAQ from '../components/FAQ';
 
 const AMC = () => {
+
+  const AMCFaqData = [
+    {
+        question: "What exactly does 'Unlimited Calls' mean?",
+        answer: "It means you don't pay any labor or visiting charges, no matter how many times you call us. Whether it's a leaky tap or a complete power failure, your service fee is $0."
+    },
+    {
+        question: "Does the AMC cover spare parts?",
+        answer: "The annual fee covers 100% of the labor and expertise. While spare parts are billed separately, AMC members enjoy an exclusive 10% to 15% discount on all materials."
+    },
+    {
+        question: "Can I transfer my AMC if I move houses?",
+        answer: "Yes! If you move within the Kathmandu Valley, we can transfer your remaining contract to your new address after a quick site audit of the new location."
+    },
+    {
+        question: "Is there a limit on the number of appliances covered?",
+        answer: "Our Essential and Standard plans cover all major fixed systems (Plumbing & Electrical). For specific IT and high-end appliance coverage, our Enterprise plan is the best fit."
+    },
+    {
+        question: "Do you offer AMC for offices or restaurants?",
+        answer: "Yes, we have specialized 'Enterprise' packages designed for high-usage environments like offices, banks, and cafes where uptime is critical."
+    }
+];
+
   return (
     <section className="amc-page">
       <div className="section-hero dark-bg">
@@ -33,13 +58,12 @@ const AMC = () => {
                 <li><i className="fas fa-check"></i> 10% Off Spare Parts</li>
                 <li className="disabled"><i className="fas fa-times"></i> IT Support</li>
               </ul>
-              <button className="btn btn-outline">Select Plan</button>
             </div>
 
             {/* Premium Plan (Featured) */}
             <div className="amc-card featured">
               <div className="plan-tag featured-tag">Best Value</div>
-              <h3>Standard</h3>
+              <h3 className='accent-text'>Standard</h3>
               <div className="price">NPR 9,999<span>/year</span></div>
               <ul className="plan-features">
                 <li><i className="fas fa-check"></i> 4 Scheduled Inspections</li>
@@ -47,7 +71,6 @@ const AMC = () => {
                 <li><i className="fas fa-check"></i> Priority Emergency Callouts</li>
                 <li><i className="fas fa-check"></i> Basic IT/WiFi Support</li>
               </ul>
-              <button className="btn btn-primary">Select Plan</button>
             </div>
 
             {/* Enterprise Plan */}
@@ -61,13 +84,11 @@ const AMC = () => {
                 <li><i className="fas fa-check"></i> Full Networking Support</li>
                 <li><i className="fas fa-check"></i> Dedicated Account Pro</li>
               </ul>
-              <button className="btn btn-outline">Select Plan</button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* SECTION 3: WHY AMC? (Dark) */}
       <div className="section-wrapper dark-bg">
         <div className="container">
           <div className="about-grid-intro">
@@ -92,6 +113,7 @@ const AMC = () => {
           </div>
         </div>
       </div>
+      <FAQ data={AMCFaqData} title='Frequently Asked Questions'/>
     </section>
   );
 };

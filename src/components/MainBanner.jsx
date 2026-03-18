@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import './MainBanner.css';
 
 // Import the business card image
-import wowBusinessCard from '../assets/images/businesscard.jpg';
+import logo from '../assets/images/wowLogo2.png';
 
 const MainBanner = () => {
     return (
@@ -33,7 +33,7 @@ const MainBanner = () => {
                 <div className="hero-visual">
                     <div className="hero-image-frame">
                         <img 
-                            src={wowBusinessCard} 
+                            src={logo} 
                             alt="WowSewa Services Overview" 
                             className="hero-img" 
                         />

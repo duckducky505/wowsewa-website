@@ -8,7 +8,6 @@ const StatsBar = () => {
           
           <div className="stat-item">
             <div className="rolling-container">
-              {/* CSS Hook: The 'animate-roll' class triggers the rapid scroll effect */}
               <h2 className="stat-number animate-roll">500+</h2>
             </div>
             <p className="stat-label">Repairs Completed</p>

@@ -8,9 +8,13 @@
     --lime-dark: #88AB00;
     --light-color:#f4f4f6;
     --dark-color:#111;
+    --bg-lighter: #1A1A1C;  
+    --text-main: #FFFFFF;
     --text-silver: #B3B3B3;
-    
-}
+    --surface-card: #242426; 
+    --transition: all 0.3s ease;
+} 
+
 body{
     font-family: 'Poppins','sans-serrif';
     font-size: 16px;
@@ -72,10 +76,28 @@ img{
 .btn:hover{
     opacity: 0.8;
 }
+
+
+.btn-large {
+    padding: 18px 45px;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+
 .btn-primary{
     background: var(--primary-color);
     color: #111;
 }
+
+
+.btn-primary:hover {
+    background-color: #fff;
+    transform: scale(1.05);
+    box-shadow: 0 10px 20px rgba(255, 255, 255, 0.1);
+}
+
 .btn-dark{
     background: var(--dark-color);
     color:#333 ;

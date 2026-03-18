@@ -1,6 +1,11 @@
 .faq {
     padding: 40px 0;
 }
+
+.faq h3{
+    color: var(--lime-dark);
+}
+
 .faq .faq-group {
     border-bottom: 1px solid #ccc;
     padding-bottom: 20px;
@@ -47,4 +52,25 @@
 .faq ul.faq-menu li.active {
     background: var(--primary-color);
     color: #fff;
+}
+
+.faq-group-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, padding 0.3s ease;
+    opacity: 0;
+}
+
+.faq-group-body.open {
+    max-height: 500px; /* Large enough to fit any answer */
+    opacity: 1;
+    padding: 15px 0;
+}
+
+.faq-group-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding: 20px 0;
 }

@@ -9,7 +9,7 @@
 }
 
 .accent-text-dark {
-    color: #88AB00; /* Darker Lime for white background */
+    color: var(--lime-dark); 
     font-weight: 800;
 }
 
@@ -30,7 +30,7 @@
 .highlight-card:hover {
     transform: translateY(-10px);
     box-shadow: 0 20px 40px rgba(0,0,0,0.05);
-    border-color: #88AB00;
+    border-color: var(--lime-dark);
 }
 
 .highlight-icon {
@@ -42,7 +42,7 @@
 .highlight-card h3 {
     font-size: 1.4rem;
     margin-bottom: 15px;
-    color: #111;
+    color: var(--lime-dark);
 }
 
 .highlight-card p {
@@ -65,7 +65,7 @@
 }
 
 .learn-more:hover {
-    color: #88AB00;
+    color: var(--lime-dark);
 }
 
 @media (max-width: 600px) {

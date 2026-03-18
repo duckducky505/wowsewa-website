@@ -31,14 +31,14 @@
 .stat-number {
     font-size: 3rem;
     font-weight: 800;
-    color: var(--primary-lime);
+    color: var(--primary-color);
     letter-spacing: -1px;
     text-shadow: 0 0 15px rgba(207, 255, 19, 0.2);
 }
 
 /* animation */
 .animate-roll {
-    animation: rapidScroll 1.5s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+    animation: rapidScroll 1.5s cubic-bezier(0.23, 1, 0.32, 1) backwards;
 }
 
 @keyframes rapidScroll {

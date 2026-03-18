@@ -32,12 +32,14 @@
 
 .amc-card.featured {
 
-    background: var(--bg-black);
+    background: var(--dark-color);
     color: #fff;
     transform: scale(1.05);
     box-shadow: 0 30px 60px rgba(0,0,0,0.2);
-    border: 2px solid var(--primary-lime);
+    border: 2px solid var(--primary-color);
 }
+
+
 
 .plan-tag {
     font-size: 0.75rem;
@@ -76,7 +78,6 @@
 .fa-times { color: #ff4d4d; opacity: 0.5; }
 .disabled { opacity: 0.4; text-decoration: line-through; }
 
-/* Buttons inside Plans */
 .btn-outline {
     border: 2px solid #333;
     padding: 12px 30px;

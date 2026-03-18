@@ -1,5 +1,6 @@
 import React from 'react';
 import './About.css';
+import Book from '../components/Book';
 
 const About = () => {
     return (
@@ -7,31 +8,22 @@ const About = () => {
             <div className="section-hero">
                 <div className="container">
                     <header className="about-header">
-                        <span className="brand-tagline">Reliable. Professional. Technical.</span>
-                
+                        <span className="tagline">Reliable. Professional. Technical.</span>
                         <h1 className="text-xxl">Service at the speed of <span className="accent-text">WOW</span>.</h1>
-                        
                         <p className="subtitle">
-                            WOWsewa is Kathmandu's premier all-in-one technical partner. 
+                            <span className="accent-text">WowSewa</span> is Kathmandu's premier all-in-one technical partner. 
                             We bridge the gap between <strong>traditional utility</strong> and <strong>modern technology</strong>.
                         </p>
 
-                        {/* 2. Trust Bar - Icons that prove your quality */}
                         <div className="trust-bar">
                             <div className="trust-item"><i className="fas fa-user-shield"></i> Verified Pros</div>
                             <div className="trust-item"><i className="fas fa-history"></i> On-Time Service</div>
                             <div className="trust-item"><i className="fas fa-check-circle"></i> Quality Guaranteed</div>
                         </div>
                     </header>
-
-                    <div className="infographic-wrapper">
-                        <div className="image-frame">
-                            <img src="src/assets/images/businesscard.jpg" alt="WOWsewa Services" className="service-img" />
-                            <div className="glow-overlay"></div>
-                        </div>
-                    </div>
                 </div>
             </div>
+
 
             <div className="section-wrapper light-bg">
                 <div className="container">
@@ -52,39 +44,75 @@ const About = () => {
                 </div>
             </div>
 
-            {/* SECTION 3: SERVICES GRID (Dark Background - Alternating) */}
-            <div className="section-wrapper dark-bg">
+
+            <div className="section-wrapper values-section">
                 <div className="container">
-                    <div className="about-grid-intro">
-                        <h2 className="text-xl">One Company. <span className="accent-text">All Solutions.</span></h2>
-                        <p>We realized that modern living requires a mix of traditional skills and future-tech. WOWsewa was built to master both.</p>
+                    <div className="values-header">
+                        <h2 className="section-label center">Our DNA</h2>
+                        <h2 className="text-xl">The <span className="accent-text">WOW</span> Difference</h2>
                     </div>
-
-                    <div className="services-cards-container">
-                        <div className="service-card">
-                            <div className="icon-box"><i className="fas fa-tools"></i></div>
-                            <h3>Hardware & Appliances</h3>
-                            <p>Laptops, Mobiles, and Home Appliances. We don't just fix; we optimize.</p>
+                    
+                    <div className="values-grid">
+                        <div className="value-item">
+                            <div className="value-number">01</div>
+                            <h4>Technical Mastery</h4>
+                            <p>We don't just "patch" problems. We understand the engineering behind your appliances and IT systems to provide long-term fixes.</p>
                         </div>
-
-                        <div className="service-card">
-                            <div className="icon-box"><i className="fas fa-network-wired"></i></div>
-                            <h3>IT & Networking</h3>
-                            <p>Enterprise-grade networking and smart board setups for home and office.</p>
+                        <div className="value-item">
+                            <div className="value-number">02</div>
+                            <h4>Transparent Pricing</h4>
+                            <p>No hidden costs or "surprise" surcharges. You get an honest estimate before we touch a single screw.</p>
                         </div>
-
-                        <div className="service-card">
-                            <div className="icon-box"><i className="fas fa-solar-panel"></i></div>
-                            <h3>Eco Systems</h3>
-                            <p>Specialized maintenance for Solar Geysers and energy-efficient plumbing.</p>
+                        <div className="value-item">
+                            <div className="value-number">03</div>
+                            <h4>Verified Reliability</h4>
+                            <p>Every technician is background-checked and trained to respect your space, privacy, and time.</p>
                         </div>
-                    </div>
-
-                    <div className="about-footer">
-                        <a href="#" className="btn btn-primary btn-large">Book a Service</a>
+                        <div className="value-item">
+                            <div className="value-number">04</div>
+                            <h4>Emergency Ready</h4>
+                            <p>From burst pipes to crashed servers, we prioritize urgent technical failures to get your life back on track fast.</p>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <div className="section-wrapper dark-bg">
+                <div className="container">
+                    <div className="standards-header">
+                        <h2 className="section-label center">The Gold Standard</h2>
+                        <h2 className="text-xl">Built on <span className="accent-text">Precision.</span></h2>
+                        <p className="light-subtext">Our commitment to technical excellence goes beyond just fixing the surface.</p>
+                    </div>
+
+                   <div className="standards-grid">
+                        <div className="standard-card">
+                            <div className="standard-icon"><i className="fas fa-microchip"></i></div>
+                            <h3>Zero-Compromise Parts</h3>
+                            <p>No generic clones. We source only OEM or certified grade-A components to ensure your tech stays fixed for years, not days.</p>
+                        </div>
+                        
+                        <div className="standard-card">
+                            <div className="standard-icon"><i className="fas fa-shield-alt"></i></div>
+                            <h3>Fortress-Grade Safety</h3>
+                            <p>Beyond basic fixes—we verify grounding, insulation, and data security to protect your home and your privacy during every visit.</p>
+                        </div>
+                        
+                        <div className="standard-card">
+                            <div className="standard-icon"><i className="fas fa-file-invoice"></i></div>
+                            <h3>Total Tech Clarity</h3>
+                            <p>Ditch the jargon. You get a transparent breakdown of the "Why" and the "How," backed by digital logs and upfront, fixed pricing.</p>
+                        </div>
+                        
+                        <div className="standard-card">
+                            <div className="standard-icon"><i className="fas fa-vial"></i></div>
+                            <h3>Extreme Load Testing</h3>
+                            <p>We don’t just "turn it on." We stress-test every repair under real-world conditions to guarantee it won't fail when you need it most.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <Book/>
         </section>
     );
 };
