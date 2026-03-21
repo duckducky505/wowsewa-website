@@ -25,7 +25,7 @@ const About = () => {
             </div>
 
 
-            <div className="section-wrapper light-bg">
+            <div className="section-wrapper bg-light">
                 <div className="container">
                     <div className="founder-layout">
                         <div className="founder-image-container">

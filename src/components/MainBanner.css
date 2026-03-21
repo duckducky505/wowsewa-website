@@ -1,7 +1,5 @@
 .home-hero {
-    padding: 100px 0 140px; /* Large padding for "Hero" feel */
-    background-color: #0D0D0D; /* Pure dark base */
-    color: #fff;
+    padding: 100px 0 140px; 
     overflow: hidden;
     width: 100%;
 }

@@ -3,7 +3,7 @@ import "./Footer.css"
 
 const Footer = () => {
     return (
-        <footer className="footer dark-bg">
+        <footer className="footer bg-darkgreen">
             <div className="container">
                 <div className="footer-grid">
                     {/* Brand Column */}

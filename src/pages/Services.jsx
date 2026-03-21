@@ -108,7 +108,7 @@ const Services = () => {
 
     return (
         <>
-            <section className="services-page bg-black">
+            <section className="services-page bg-dark">
                 <div className="container">
                     <header className="services-header">
                         <h1 className="text-xxl">Our <span className="accent-text">Specialized</span> Services</h1>
@@ -153,21 +153,16 @@ const Services = () => {
                     </div>
 
 
-                        <div className="support-banner booking-banner">
+                    <div className="support-banner booking-banner">
                             <div className="banner-content">
                                 <h2 className="text-black">Need a Professional?</h2>
                                 <p className="text-black-muted">Book your service online in less than 60 seconds. Expert help is just a click away.</p>
                             </div>
-                        <a 
-                            href="https://docs.google.com/forms/..." 
-                            target="_blank" 
-                            rel="noopener noreferrer" 
-                            className="btn btn-primary">
-                        <i className="fas fa-calendar-check"></i> Book a Service
+                        <a href="https://docs.google.com/forms/..." target="_blank" rel="noopener noreferrer"className="btn btn-primary">
+                            <i className="fas fa-calendar-check"></i> Book a Service
                         </a>
                     </div>
                     
-                    {/* Support Banner */}
                     <div className="support-banner">
                         <div className="banner-content">
                             <h2>Don't see what you're looking for?</h2>

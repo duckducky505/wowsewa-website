@@ -4,10 +4,11 @@
     padding: 0;
 }
 :root{
-    --primary-color:#CFFF13;
+    --primary-color:#D1FE17;
+    --bg-color:#074C3A;
     --lime-dark: #88AB00;
-    --light-color:#f4f4f6;
-    --dark-color:#111;
+    --light-color:#F8FAEA;
+    --dark-color:#010a08;
     --bg-lighter: #1A1A1C;  
     --text-main: #FFFFFF;
     --text-silver: #B3B3B3;
@@ -73,6 +74,7 @@ img{
     text-align: center;
     transition: 0.5s;
 }
+
 .btn:hover{
     opacity: 0.8;
 }
@@ -87,13 +89,14 @@ img{
 
 
 .btn-primary{
-    background: var(--primary-color);
-    color: #111;
+    background: var(--bg-color);
+    color: var(--primary-color);
 }
 
 
 .btn-primary:hover {
-    background-color: #fff;
+    background-color: var(--dark-color);
+    color: var(--primary-color);
     transform: scale(1.05);
     box-shadow: 0 10px 20px rgba(255, 255, 255, 0.1);
 }
@@ -102,6 +105,7 @@ img{
     background: var(--dark-color);
     color:#333 ;
 }
+
 .btn-block{
     display: block;
     width: 100%;
@@ -146,6 +150,19 @@ img{
     text-align: center;
 }
 
+.accent-text{
+    color: var(--primary-color);
+    text-shadow: 0 0 15px rgba(207, 255, 19, 0.3);
+}
+
+.accent-text1{
+    color: var(--bg-color);
+}
+
+.accent-text1{
+    color: var(--dark-color);
+}
+
 /* Background uility class */
 .bg-primary{
     background: var(--primary-color);
@@ -154,17 +171,22 @@ img{
 
 .bg-light{
     background: var(--light-color);
-    color: #111;
+    color: var(--dark-color);
 }
 
 .bg-dark{
     background: var(--dark-color);
-    color: #fff;
+    color: var(--text-main);
 }
 
-.bg-black{
-    background:#000;
-    color: #fff;
+.bg-darkgreen{
+    background-color: var(--bg-color);
+    color: var(--primary-color);
+}
+
+.bg-darkgreen1{
+    background-color: var(--bg-color);
+    color: var(--text-main);
 }
 
 /* Hamburger Button */

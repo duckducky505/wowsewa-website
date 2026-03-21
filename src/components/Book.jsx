@@ -1,7 +1,7 @@
 const Book = () => {
     return(
         <>
-            <div className="section-wrapper light-bg final-cta-section">
+            <div className="section-wrapper bg-dark final-cta-section">
                 <div className="container">
                     <div className="cta-box">
                         <h2 className="text-xl">Ready for a <span className="accent-text">WOW</span> Experience?</h2>

@@ -7,7 +7,7 @@ import logo from '../assets/images/wowLogo2.png';
 
 const MainBanner = () => {
     return (
-        <section className="home-hero dark-bg">
+        <section className="home-hero bg-darkgreen">
             <div className="container hero-flex">
                 
                 {/* Text Content (Left Side) */}

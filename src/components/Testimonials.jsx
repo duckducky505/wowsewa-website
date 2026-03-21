@@ -23,7 +23,7 @@ const testimonialData = [
 
 const Testimonials = () => {
   return (
-    <section className="testimonials bg-dark">
+    <section className="testimonials bg-darkgreen">
       <div className="container">
         <h3 className="testimonials-heading text-xl">
           Don't just take our word for it, see how <span className="accent-text">WowSewa</span> is 

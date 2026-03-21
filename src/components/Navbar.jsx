@@ -3,16 +3,14 @@ import { Link } from 'react-router-dom';
 import './Navbar.css';
 
 const Navbar = () => {
-  // State to track if the menu is open or closed
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // Function to toggle menu
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
   return (
-    <nav className="navbar dark-bg">
+    <nav className="navbar bg-dark">
       <div className="container">
         <div className="logo">
           <Link to="/">
