@@ -1,33 +1,40 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { 
+  FaFaucet, 
+  FaBolt, 
+  FaNetworkWired, 
+  FaScrewdriverWrench, 
+  FaArrowRight 
+} from 'react-icons/fa6'; 
 import './ServiceHighlights.css';
 
 const ServiceHighlights = () => {
     const highlights = [
         {
-            icon: "fa-faucet-drip",
+            icon: <FaFaucet />,
             title: "Plumbing",
             desc: "Expert repairs for leaks, pipes, and bathroom fittings."
         },
         {
-            icon: "fa-bolt",
+            icon: <FaBolt />,
             title: "Electrical",
             desc: "Safe wiring, panel repairs, and lighting installations."
         },
         {
-            icon: "fa-network-wired",
+            icon: <FaNetworkWired />,
             title: "IT & Networking",
             desc: "Office networking, WiFi setup, and hardware support."
         },
         {
-            icon: "fa-screwdriver-wrench",
+            icon: <FaScrewdriverWrench />,
             title: "General Repair",
             desc: "AC, Fridges, and various home appliance maintenance."
         }
     ];
 
     return (
-        <section className="highlights-section light-bg">
+        <section className="highlights-section bg-light">
             <div className="container">
                 <div className="section-header">
                     <h2 className="text-xl">Our <span className="accent-text-dark">Expertise</span></h2>
@@ -38,12 +45,12 @@ const ServiceHighlights = () => {
                     {highlights.map((item, index) => (
                         <div key={index} className="highlight-card">
                             <div className="highlight-icon">
-                                <i className={`fas ${item.icon}`}></i>
+                                {item.icon}
                             </div>
                             <h3>{item.title}</h3>
                             <p>{item.desc}</p>
                             <Link to="/services" className="learn-more">
-                                View Details <i className="fas fa-arrow-right"></i>
+                                View Details <FaArrowRight className="icon-right" />
                             </Link>
                         </div>
                     ))}

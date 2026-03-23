@@ -1,5 +1,14 @@
 import { Link } from 'react-router-dom';
-import "./Footer.css"
+import { 
+  FaFacebook, 
+  FaInstagram, 
+  FaWhatsapp, 
+  FaLinkedin, 
+  FaEnvelope, 
+  FaMapMarkerAlt, 
+  FaPhoneAlt
+} from 'react-icons/fa'; // Import all necessary icons
+import "./Footer.css";
 
 const Footer = () => {
     return (
@@ -15,10 +24,10 @@ const Footer = () => {
                             Elite installation, repair, and maintenance for the modern home and office.
                         </p>
                         <div className="social-icons">
-                            <a href="#"><i className="fab fa-facebook"></i></a>
-                            <a href="#"><i className="fab fa-instagram"></i></a>
-                            <a href="#"><i className="fab fa-whatsapp"></i></a>
-                            <a href="#"><i className="fab fa-linkedin"></i></a>
+                            <a href="#" aria-label="Facebook"><FaFacebook size={28}/></a>
+                            <a href="#" aria-label="Instagram"><FaInstagram size={28}/></a>
+                            <a href="#" aria-label="Whatsapp"><FaWhatsapp size={28}/></a>
+                            <a href="#" aria-label="Linkedin"><FaLinkedin size={28}/></a>
                         </div>
                     </div>
 
@@ -32,10 +41,11 @@ const Footer = () => {
                         </ul>
                     </div>
 
-                    <div>
+                    {/* Legal Links */}
+                    <div className="footer-links">
                         <h4>Legal</h4>
                         <ul>
-                            <li><Link to="/Wow-privacy">Privacy Policy</Link></li>
+                            <li><Link to="/wow-privacy">Privacy Policy</Link></li>
                             <li><Link to="/terms-and-conditions">Terms & Conditions</Link></li>
                         </ul>
                     </div>
@@ -44,9 +54,9 @@ const Footer = () => {
                     <div className="footer-contact">
                         <h4>Contact</h4>
                         <ul className="contact-list">
-                            <li><i className="fas fa-envelope"></i> wowsewa@gmail.com</li>
-                            <li><i className="fas fa-phone"></i> 9762424318</li>
-                            <li><i className="fas fa-map-marker-alt"></i> Kathmandu, Nepal</li>
+                            <li><FaEnvelope className="footer-icon" /> wowsewa@gmail.com</li>
+                            <li><FaPhoneAlt className="footer-icon" /> 9762424318</li>
+                            <li><FaMapMarkerAlt className="footer-icon" /> Kathmandu, Nepal</li>
                         </ul>
                     </div>
 
@@ -57,7 +67,7 @@ const Footer = () => {
                 </div>
             </div>
         </footer>
-    )
-}
+    );
+};
 
 export default Footer;

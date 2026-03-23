@@ -21,7 +21,7 @@
     display: block;
     font-weight: 600;
     transition: 0.5s;
-    color: #fff;
+    color: var(--text-main);
 }
 .navbar ul li a:hover {
     color: var(--primary-color);
@@ -53,7 +53,7 @@
     width: 250px;
     height: 100%;
     z-index: 100;
-    background: #fff;
+    background: var(--bg-color);
     box-shadow: 0 0 10px rgba(0,0,0,0.2);
     transition: right 0.3s ease-in-out;
 }

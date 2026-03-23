@@ -1,7 +1,7 @@
 import { useState } from 'react';
+import { FaPlus, FaMinus } from 'react-icons/fa6'; 
 import "./FAQ.css";
 
-// Destructure 'data' and 'title' from props
 const FAQ = ({ data = [], title = "Frequently Asked Questions" }) => {
     const [activeIndex, setActiveIndex] = useState(null);
 
@@ -20,15 +20,19 @@ const FAQ = ({ data = [], title = "Frequently Asked Questions" }) => {
                             <div 
                                 className="faq-group-header" 
                                 onClick={() => toggleFAQ(index)}
-                                style={{ cursor: 'pointer' }}
+                                role="button"
+                                aria-expanded={activeIndex === index}
                             >
                                 <h4 className="text-md">{item.question}</h4>
-                                <i className={`fas ${activeIndex === index ? 'fa-minus' : 'fa-plus'}`}></i>
+                                <div className={`faq-icon ${activeIndex === index ? 'active' : ''}`}>
+                                    {activeIndex === index ? <FaMinus /> : <FaPlus />}
+                                </div>
                             </div>
                             
-                            {/* The active class handles the visibility via CSS */}
                             <div className={`faq-group-body ${activeIndex === index ? 'open' : ''}`}>
-                                <p>{item.answer}</p>
+                                <div className="faq-answer-inner">
+                                    <p>{item.answer}</p>
+                                </div>
                             </div>
                         </div>
                     ))}

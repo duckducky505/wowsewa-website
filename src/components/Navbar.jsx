@@ -1,5 +1,6 @@
-import React, { useState } from 'react'; // Added useState
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { FaUser, FaBars, FaTimes } from 'react-icons/fa'; // Import React Icons
 import './Navbar.css';
 
 const Navbar = () => {
@@ -10,50 +11,52 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="navbar bg-dark">
+    <nav className="navbar bg-darkgreen">
       <div className="container">
         <div className="logo">
           <Link to="/">
-            <img src="src/assets/images/wowLogo.png" alt="logo" />
+            <img src="/src/assets/images/wowLogo.png" alt="WowSewa Logo" />
           </Link>
         </div>
 
-        {/* Desktop Menu */}
         <div className="main-menu">
           <ul>
             <li><Link to="/home">Home</Link></li>
-            <li><Link to="/About">About Us</Link></li>
+            <li><Link to="/about">About Us</Link></li>
             <li><Link to="/amc">AMC</Link></li>
             <li><Link to="/services">Our Services</Link></li>
             <li>
-              <a href="#" className="btn btn-dark">
-                <i className="fas fa-user"></i>Log In
-              </a>
+              <Link to="/login" className="btn btn-dark btn-login-flex">
+                <FaUser className="icon-left" /> Log In
+              </Link>
             </li>
           </ul>
         </div>
 
-        {/* Hamburger Button - Added onClick and dynamic class */}
+        {/* Hamburger Button */}
         <button 
-          className={`hamburger-button ${isMenuOpen ? 'active' : ''}`} 
+          className="hamburger-button" 
           onClick={toggleMenu}
+          aria-label="Toggle Menu"
         >
-          <div className="hamburger-line"></div>
-          <div className="hamburger-line"></div>
-          <div className="hamburger-line"></div>
+          {isMenuOpen ? (
+            <FaTimes size={28} color="var(--primary-color)" />
+          ) : (
+            <FaBars size={28} color="var(--primary-color)" />
+          )}
         </button>
 
-        {/* Mobile Menu - Added dynamic class based on state */}
-        <div className={`mobile-menu ${isMenuOpen ? 'active' : ''} dark-bg`}>
+        {/* Mobile Menu */}
+        <div className={`mobile-menu ${isMenuOpen ? 'active' : ''}`}>
           <ul>
             <li><Link to="/home" onClick={toggleMenu}>Home</Link></li>
-            <li><Link to="/About" onClick={toggleMenu}>About Us</Link></li>
+            <li><Link to="/about" onClick={toggleMenu}>About Us</Link></li>
             <li><Link to="/amc" onClick={toggleMenu}>AMC</Link></li>
             <li><Link to="/services" onClick={toggleMenu}>Our Services</Link></li>
             <li>
-              <a href="#" className="btn btn-dark" onClick={toggleMenu}>
-                <i className="fas fa-user"></i>Log In
-              </a>
+              <Link to="/login" className="btn btn-dark" onClick={toggleMenu}>
+                <FaUser className="icon-left" /> Log In
+              </Link>
             </li>
           </ul>
         </div>

@@ -33,13 +33,11 @@
 .amc-card.featured {
 
     background: var(--dark-color);
-    color: #fff;
+    color: white;
     transform: scale(1.05);
     box-shadow: 0 30px 60px rgba(0,0,0,0.2);
     border: 2px solid var(--primary-color);
 }
-
-
 
 .plan-tag {
     font-size: 0.75rem;
@@ -69,14 +67,36 @@
 }
 
 .plan-features li {
+    display: flex;
+    align-items: center; 
+    gap: 12px;
     margin-bottom: 15px;
     font-size: 1rem;
 }
 
-.plan-features i { margin-right: 10px; }
-.fa-check { color: var(--primary-lime); }
-.fa-times { color: #ff4d4d; opacity: 0.5; }
-.disabled { opacity: 0.4; text-decoration: line-through; }
+/* Icons */
+
+.icon-success {
+    color: var(--primary-lime, #CFFA13);
+    flex-shrink: 0;
+}
+
+.icon-disabled {
+    color: #ff4d4d;
+    opacity: 0.5;
+    flex-shrink: 0;
+}
+
+.icon-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-box svg {
+    font-size: 1.6rem;
+    color: var(--primary-color);
+}
 
 .btn-outline {
     border: 2px solid #333;

@@ -21,15 +21,15 @@ const Home = () => {
             answer: "You can call us at 9762424318 or email us at wowsewa@gmail.com to book an appointment."
         }
     ];
-
+    
     return(
         <>
             <MainBanner/>
+            <StatsBar/>
             <ServiceHighlights/>
             <Testimonials/>
-            <StatsBar/>
             <FAQ data={faqData} title="Frequently Asked Questions" />
-            <Book/>
+            {/* <Book/> */}
         </>
     )
 } 

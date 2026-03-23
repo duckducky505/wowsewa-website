@@ -2,7 +2,7 @@ import './StatsBar.css';
 
 const StatsBar = () => {
   return (
-    <section className="stats-bar dark-bg">
+    <section className="stats-bar bg-dark">
       <div className="container">
         <div className="stats-grid">
           

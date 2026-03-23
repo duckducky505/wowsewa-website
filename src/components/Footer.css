@@ -8,6 +8,7 @@
     display: grid;
     grid-template-columns: 1.8fr 1fr 1fr 1.2fr; 
     gap: 60px;
+    padding: 60px 0;
 }
 
 /* --- BRAND COLUMN --- */
@@ -69,10 +70,11 @@
     transition: var(--transition, all 0.3s ease);
 }
 
-.social-icons a:hover i {
-    color: var(--lime-dark, #88AB00);
+.social-icons a:hover {
+    color: var(--light-color);
     transform: translateY(-3px);
 }
+
 
 .contact-list i {
     font-size: 0.95rem;
@@ -81,13 +83,19 @@
     width: 20px; 
 }
 
+.footer-icon {
+    color: var(--primary-color);
+    font-size: 1rem;
+    flex-shrink: 0; 
+}
+
 .footer-bottom {
     margin-top: 60px;
     padding-top: 25px;
-    border-top: 1px solid #F0F0F0;
+    border-top: 1px solid var(--text-main);
     text-align: center;
     font-size: 0.85rem;
-    color: #999999;
+    color: var(--light-color);
 }
 
 /* test */

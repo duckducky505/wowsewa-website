@@ -12,9 +12,6 @@
     margin-bottom: 80px;
 }
 
-.accent-text {
-    color: var(--primary-color);
-}
 
 /* Category Blocks */
 .service-category-block {
@@ -35,6 +32,13 @@
     color: var(--primary-color);
 }
 
+
+.cat-icon-wrapper {
+    display: flex;
+    align-items: center;
+    color: var(--primary-color);
+    font-size: 1.6rem; /* Adjust category icon size */
+}
 /* Grid for Items */
 .service-items-grid {
     display: grid;
@@ -127,12 +131,13 @@
     display: flex;
     align-items: center;
     gap: 8px;
-
 }
 
-.item-features li i {
+
+.feature-check-icon {
     color: var(--primary-color);
-    font-size: 0.75rem;
+    font-size: 0.8rem;
+    flex-shrink: 0;
 }
 
 
@@ -167,6 +172,10 @@
 
 .item-head {
     margin-top: 5px;
+}
+
+.service-image-box {
+    flex-shrink: 0;
 }
 
 @media (max-width: 768px) {

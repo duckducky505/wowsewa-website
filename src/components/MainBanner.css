@@ -24,7 +24,7 @@
 
 .hero-subtitle {
     font-size: 1.25rem;
-    color: #B3B3B3; 
+    color: var(--text-silver); 
     line-height: 1.7;
     margin-bottom: 45px;
     max-width: 600px;
@@ -40,6 +40,8 @@
     border: 2px solid #fff;
     color: #fff;
     background: transparent;
+
+    align-content: center;
 }
 
 .hero-cta-group .btn-outline:hover {

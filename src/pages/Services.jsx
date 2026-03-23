@@ -1,11 +1,17 @@
 import { Link } from 'react-router-dom';
 import FAQ from '../components/FAQ';
 import './Services.css'
+import { 
+  FaMicrochip, 
+  FaFaucet, 
+  FaBolt, 
+  FaCheck, 
+  FaCalendarCheck 
+} from 'react-icons/fa';
 
 const Services = () => {
 
-
-        const servicesFaqData = [
+    const servicesFaqData = [
         {
             question: "What is Wow Sewa?",
             answer: "Wow Sewa is a comprehensive repair and service company offering a wide range of services for both residential and commercial customers."
@@ -17,13 +23,13 @@ const Services = () => {
         {
             question: "How can I book an appointment?",
             answer: "You can call us at 9762424318 or email us at wowsewa@gmail.com to book an appointment."
-        }];
-
+        }
+    ];
 
     const servicesData = [
     {
         category: "Digital & IT Solutions",
-        icon: "fas fa-microchip",
+        icon: <FaMicrochip />, 
         items: [
             {
                 title: "IT Networking & WiFi",
@@ -32,7 +38,6 @@ const Services = () => {
                 image: "src/assets/images/networking.webp", 
                 features: ["Mesh WiFi Setup", "Router Configuration"]
             },
-
             {
                 title: "Laptop Repair and Servicing",
                 description: "Deep cleaning, thermal paste replacement, and hardware upgrades to boost performance.",
@@ -50,7 +55,7 @@ const Services = () => {
     },
     {
         category: "Plumbing & Water Systems",
-        icon: "fas fa-faucet",
+        icon: <FaFaucet />, 
         items: [
             {
                 title: "Emergency Leak Repair",
@@ -59,7 +64,6 @@ const Services = () => {
                 image: "src/assets/images/leak-repair.webp",
                 features: ["Pipe Soldering", "Drain Unclogging"]
             },
-
             {
                 title: "Solar and Geyser Servicing",
                 description: "Tank descaling, glass tube cleaning, and repair of leaking solar water heaters.",
@@ -67,7 +71,6 @@ const Services = () => {
                 image: "src/assets/images/solar.webp",
                 features: ["Pipe Insulation", "Water Pressure Fix"]
             },
-
             {
                 title: "Sanitary Fitting",
                 description: "Installation of modern commodes, showers, and luxury bathroom fixtures with precision.",
@@ -79,7 +82,7 @@ const Services = () => {
     },
     {
         category: "Electrical & Power",
-        icon: "fas fa-bolt",
+        icon: <FaBolt />, 
         items: [
             {
                 title: "House Rewiring",
@@ -105,13 +108,12 @@ const Services = () => {
         ]
     }];
 
-
     return (
         <>
             <section className="services-page bg-dark">
                 <div className="container">
                     <header className="services-header">
-                        <h1 className="text-xxl">Our <span className="accent-text">Specialized</span> Services</h1>
+                        <h1 className="text-xxl">Our <span className="accent-text-primary">Specialized</span> Services</h1>
                         <p className="subtitle">Precision installation, expert repair, and proactive maintenance for every corner of your life.</p>
                     </header>
 
@@ -119,7 +121,7 @@ const Services = () => {
                         {servicesData.map((cat, index) => (
                             <div className="service-category-block" key={index}>
                                 <h2 className="category-title">
-                                    <i className={cat.icon}></i> {cat.category}
+                                    <span className="cat-icon-wrapper">{cat.icon}</span> {cat.category}
                                 </h2>
                                 
                                 <div className="service-items-grid">
@@ -141,7 +143,7 @@ const Services = () => {
                                             <ul className="item-features">
                                                 {item.features.map((feature, fIndex) => (
                                                     <li key={fIndex}>
-                                                        <i className="fas fa-check"></i> {feature}
+                                                        <FaCheck className="feature-check-icon" /> {feature}
                                                     </li>
                                                 ))}
                                             </ul>
@@ -152,14 +154,13 @@ const Services = () => {
                         ))}
                     </div>
 
-
                     <div className="support-banner booking-banner">
                             <div className="banner-content">
                                 <h2 className="text-black">Need a Professional?</h2>
                                 <p className="text-black-muted">Book your service online in less than 60 seconds. Expert help is just a click away.</p>
                             </div>
-                        <a href="https://docs.google.com/forms/..." target="_blank" rel="noopener noreferrer"className="btn btn-primary">
-                            <i className="fas fa-calendar-check"></i> Book a Service
+                        <a href="https://docs.google.com/forms/..." target="_blank" rel="noopener noreferrer" className="btn btn-primary">
+                            <FaCalendarCheck className="btn-icon-left" /> Book a Service
                         </a>
                     </div>
                     

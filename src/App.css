@@ -89,8 +89,8 @@ img{
 
 
 .btn-primary{
-    background: var(--bg-color);
-    color: var(--primary-color);
+    background: var(--primary-color);
+    color: var(--bg-color);
 }
 
 
@@ -103,7 +103,12 @@ img{
 
 .btn-dark{
     background: var(--dark-color);
-    color:#333 ;
+    color:var(--primary-color) ;
+}
+
+.btn-darkgreen{
+    background-color: var(--bg-color);
+    color: var(--primary-color);
 }
 
 .btn-block{
@@ -150,17 +155,21 @@ img{
     text-align: center;
 }
 
-.accent-text{
+.accent-text-primary{
     color: var(--primary-color);
     text-shadow: 0 0 15px rgba(207, 255, 19, 0.3);
 }
 
-.accent-text1{
-    color: var(--bg-color);
+.accent-text-lime-dark{
+    color: var(--lime-dark);
 }
 
-.accent-text1{
+.accent-text-dark{
     color: var(--dark-color);
+}
+
+.accent-text-white{
+    color: var(--text-main);
 }
 
 /* Background uility class */
@@ -181,7 +190,7 @@ img{
 
 .bg-darkgreen{
     background-color: var(--bg-color);
-    color: var(--primary-color);
+    color: var(--light-color);
 }
 
 .bg-darkgreen1{

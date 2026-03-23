@@ -1,29 +1,37 @@
 import React from 'react';
 import './About.css';
 import Book from '../components/Book';
+import { 
+  FaUserShield, 
+  FaHistory, 
+  FaCheckCircle, 
+  FaMicrochip, 
+  FaShieldAlt, 
+  FaFileInvoice, 
+  FaVial 
+} from 'react-icons/fa'; 
 
 const About = () => {
     return (
-        <section className="about-page">
+        <section className="about-page bg-light">
             <div className="section-hero">
                 <div className="container">
                     <header className="about-header">
                         <span className="tagline">Reliable. Professional. Technical.</span>
-                        <h1 className="text-xxl">Service at the speed of <span className="accent-text">WOW</span>.</h1>
+                        <h1 className="text-xxl">Service at the speed of <span className="accent-text-lime-dark">WOW</span>.</h1>
                         <p className="subtitle">
-                            <span className="accent-text">WowSewa</span> is Kathmandu's premier all-in-one technical partner. 
+                            <span className="accent-text-lime-dark">WowSewa</span> is Kathmandu's premier all-in-one technical partner. 
                             We bridge the gap between <strong>traditional utility</strong> and <strong>modern technology</strong>.
                         </p>
 
                         <div className="trust-bar">
-                            <div className="trust-item"><i className="fas fa-user-shield"></i> Verified Pros</div>
-                            <div className="trust-item"><i className="fas fa-history"></i> On-Time Service</div>
-                            <div className="trust-item"><i className="fas fa-check-circle"></i> Quality Guaranteed</div>
+                            <div className="trust-item"><FaUserShield className="trust-icon" /> Verified Pros</div>
+                            <div className="trust-item"><FaHistory className="trust-icon" /> On-Time Service</div>
+                            <div className="trust-item"><FaCheckCircle className="trust-icon" /> Quality Guaranteed</div>
                         </div>
                     </header>
                 </div>
             </div>
-
 
             <div className="section-wrapper bg-light">
                 <div className="container">
@@ -44,12 +52,11 @@ const About = () => {
                 </div>
             </div>
 
-
             <div className="section-wrapper values-section">
                 <div className="container">
                     <div className="values-header">
-                        <h2 className="section-label center">Our DNA</h2>
-                        <h2 className="text-xl">The <span className="accent-text">WOW</span> Difference</h2>
+                        <h3 className="section-label center">Our DNA</h3>
+                        <h2 className="text-xl">The <span className="accent-text-primary">WOW</span> Difference</h2>
                     </div>
                     
                     <div className="values-grid">
@@ -80,34 +87,42 @@ const About = () => {
             <div className="section-wrapper dark-bg">
                 <div className="container">
                     <div className="standards-header">
-                        <h2 className="section-label center">The Gold Standard</h2>
+                        <div className="section-label center">The Gold Standard</div>
                         <h2 className="text-xl">Built on <span className="accent-text">Precision.</span></h2>
                         <p className="light-subtext">Our commitment to technical excellence goes beyond just fixing the surface.</p>
                     </div>
 
-                   <div className="standards-grid">
+                    <div className="standards-grid">
                         <div className="standard-card">
-                            <div className="standard-icon"><i className="fas fa-microchip"></i></div>
-                            <h3>Zero-Compromise Parts</h3>
-                            <p>No generic clones. We source only OEM or certified grade-A components to ensure your tech stays fixed for years, not days.</p>
+                            <div className="standard-icon"><FaMicrochip /></div>
+                            <div className="standard-info">
+                                <h3>Zero-Compromise Parts</h3>
+                                <p>No generic clones. We source only OEM or certified grade-A components to ensure your tech stays fixed for years.</p>
+                            </div>
                         </div>
                         
                         <div className="standard-card">
-                            <div className="standard-icon"><i className="fas fa-shield-alt"></i></div>
-                            <h3>Fortress-Grade Safety</h3>
-                            <p>Beyond basic fixes—we verify grounding, insulation, and data security to protect your home and your privacy during every visit.</p>
+                            <div className="standard-icon"><FaShieldAlt /></div>
+                            <div className="standard-info">
+                                <h3>Fortress-Grade Safety</h3>
+                                <p>Beyond basic fixes—we verify grounding, insulation, and data security to protect your home and privacy.</p>
+                            </div>
                         </div>
                         
                         <div className="standard-card">
-                            <div className="standard-icon"><i className="fas fa-file-invoice"></i></div>
-                            <h3>Total Tech Clarity</h3>
-                            <p>Ditch the jargon. You get a transparent breakdown of the "Why" and the "How," backed by digital logs and upfront, fixed pricing.</p>
+                            <div className="standard-icon"><FaFileInvoice /></div>
+                            <div className="standard-info">
+                                <h3>Total Tech Clarity</h3>
+                                <p>Ditch the jargon. You get a transparent breakdown of the "Why" and the "How," backed by digital logs.</p>
+                            </div>
                         </div>
                         
                         <div className="standard-card">
-                            <div className="standard-icon"><i className="fas fa-vial"></i></div>
-                            <h3>Extreme Load Testing</h3>
-                            <p>We don’t just "turn it on." We stress-test every repair under real-world conditions to guarantee it won't fail when you need it most.</p>
+                            <div className="standard-icon"><FaVial /></div>
+                            <div className="standard-info">
+                                <h3>Extreme Load Testing</h3>
+                                <p>We don’t just "turn it on." We stress-test every repair under real-world conditions to guarantee durability.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
