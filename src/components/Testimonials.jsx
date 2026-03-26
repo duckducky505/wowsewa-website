@@ -17,16 +17,16 @@ const testimonialData = [
     quote: "I used Wow Sewa for electrical repair service in Kathmandu, and the experience was excellent. The electrician was skilled, polite, and fixed the issue quickly. If you need reliable electrical service in Nepal, Wow Sewa is the best choice.",
     name: "Santos Paudel",
     position: "Founder, Red Bolt Studio",
-    image: "src/assets/images/wowLogo.png"
+    image: "src/assets/images/santospaudel.webp"
   }
 ];
 
 const Testimonials = () => {
   return (
-    <section className="testimonials bg-dark">
+    <section className="testimonials bg-darkgreen">
       <div className="container">
         <h3 className="testimonials-heading text-xl">
-          Don't just take our word for it, see how <span className="accent-text">WowSewa</span> is 
+          Don't just take our word for it, see how <span className="accent-text-primary">WowSewa</span> is 
           powering homes and businesses just like yours.
         </h3>
         

@@ -10,7 +10,7 @@ const FAQ = ({ data = [], title = "Frequently Asked Questions" }) => {
     };
 
     return (
-        <section className="faq bg-light">
+        <section className="faq">
             <div className="container-sm">
                 <h3 className="text-xl text-center">{title}</h3>
                 

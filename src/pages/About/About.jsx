@@ -1,6 +1,6 @@
 import React from 'react';
 import './About.css';
-import Book from '../components/Book';
+import Book from '../../components/Book';
 import { 
   FaUserShield, 
   FaHistory, 
@@ -13,14 +13,14 @@ import {
 
 const About = () => {
     return (
-        <section className="about-page bg-light">
+        <section className="about-page bg-darkgreen">
             <div className="section-hero">
                 <div className="container">
                     <header className="about-header">
                         <span className="tagline">Reliable. Professional. Technical.</span>
-                        <h1 className="text-xxl">Service at the speed of <span className="accent-text-lime-dark">WOW</span>.</h1>
+                        <h1 className="text-xxl">Service at the speed of <span className="accent-text-primary">WOW</span>.</h1>
                         <p className="subtitle">
-                            <span className="accent-text-lime-dark">WowSewa</span> is Kathmandu's premier all-in-one technical partner. 
+                            <span className="accent-text-primary">WowSewa</span> is Kathmandu's premier all-in-one technical partner. 
                             We bridge the gap between <strong>traditional utility</strong> and <strong>modern technology</strong>.
                         </p>
 
@@ -40,9 +40,9 @@ const About = () => {
                             <img src="src/assets/images/founderIMG.png" alt="Mr. Jiwan Joshi" className="founder-img" />
                         </div>
                         <div className="founder-content">
-                            <h2 className="section-label">Meet the Visionary</h2>
+                            <h2 className="section-label accent-text-lime-dark">Meet the Visionary</h2>
                             <h3 className="founder-name">Mr. Jiwan Joshi</h3>
-                            <p className="founder-title">Founder & Head Technician</p>
+                            <p className="founder-title accent-text-lime-dark">Founder & Head Technician</p>
                             <div className="founder-bio">
                                 <p>Founded on the principle of technical excellence, WOWsewa bridges the gap between traditional utility and modern technology. Mr. Joshi established WOWsewa to provide a reliable, "all-in-one" technical solution for the community.</p>
                                 <p>With years of hands-on experience in both industrial hardware and residential systems, his dual expertise ensures that every project meets the highest standards of safety and efficiency.</p>
@@ -52,10 +52,10 @@ const About = () => {
                 </div>
             </div>
 
-            <div className="section-wrapper values-section">
+            <div className="section-wrapper values-section bg-darkgreen">
                 <div className="container">
                     <div className="values-header">
-                        <h3 className="section-label center">Our DNA</h3>
+                        <h3 className="section-label center accent-text-primary">Our DNA</h3>
                         <h2 className="text-xl">The <span className="accent-text-primary">WOW</span> Difference</h2>
                     </div>
                     
@@ -84,12 +84,12 @@ const About = () => {
                 </div>
             </div>
 
-            <div className="section-wrapper dark-bg">
+            <div className="section-wrapper bg-light">
                 <div className="container">
                     <div className="standards-header">
-                        <div className="section-label center">The Gold Standard</div>
-                        <h2 className="text-xl">Built on <span className="accent-text">Precision.</span></h2>
-                        <p className="light-subtext">Our commitment to technical excellence goes beyond just fixing the surface.</p>
+                        <div className="section-label center accent-text-lime-dark">The Gold Standard</div>
+                        <h2 className="text-xl">Built on <span className="accent-text-lime-dark">Precision.</span></h2>
+                        <p>Our commitment to technical excellence goes beyond just fixing the surface.</p>
                     </div>
 
                     <div className="standards-grid">

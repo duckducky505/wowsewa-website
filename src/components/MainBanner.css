@@ -1,13 +1,17 @@
+/* MainBanner.css */
+
 .home-hero {
     padding: 100px 0 140px; 
     overflow: hidden;
     width: 100%;
+    position: relative;
+    background-color: var(--bg-color); 
 }
 
 .hero-flex {
     display: flex;
     align-items: center;
-    gap: 80px; 
+    gap: 60px;
 }
 
 .hero-content {
@@ -15,112 +19,113 @@
 }
 
 .hero-content h1 {
-    font-size: 3.8rem;
+    font-size: 4rem; 
     font-weight: 800;
-    line-height: 1.1;
+    line-height: 1.05; 
     margin-bottom: 25px;
-    letter-spacing: -1px;
+    letter-spacing: -2px;
+    color: #fff;
 }
 
 .hero-subtitle {
     font-size: 1.25rem;
-    color: var(--text-silver); 
-    line-height: 1.7;
+    color: var(--light-color); 
+    line-height: 1.6;
     margin-bottom: 45px;
-    max-width: 600px;
+    max-width: 550px;
 }
 
 /* --- CTA BUTTONS --- */
 .hero-cta-group {
     display: flex;
     gap: 20px;
+    align-items: center;
 }
 
-.hero-cta-group .btn-outline {
-    border: 2px solid #fff;
-    color: #fff;
-    background: transparent;
-
-    align-content: center;
+.btn-large {
+    padding: 18px 38px;
+    font-size: 1.1rem;
+    border-radius: 12px;
+    font-weight: 600;
 }
 
-.hero-cta-group .btn-outline:hover {
-    background: #fff;
-    color: #000;
+.btn-flex {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
 }
 
-.hero-cta-group i {
-    margin-right: 10px;
-}
-
-/* --- VISUAL CONTENT (RIGHT) --- */
+/* --- VISUAL CONTENT --- */
 .hero-visual {
     flex: 1;
     display: flex;
     justify-content: center;
     position: relative;
+    z-index: 2;
 }
 
 .hero-image-frame {
     position: relative;
-    max-width: 550px;
+    max-width: 500px;
     width: 100%;
-    border-radius: 20px;
-    overflow: hidden;
-    border: 1px solid #333;
-    box-shadow: 0 40px 80px rgba(0,0,0,0.6);
-    transition: all 0.5s ease;
-    padding: 10px;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+    transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+    padding: 20px;
 }
 
-
 .hero-image-frame:hover {
-    transform: translateY(-10px) rotate(1deg);
+    transform: translateY(-10px) rotate(-1deg);
+    border-color: var(--primary-color);
 }
 
 .hero-img {
     width: 100%;
     height: auto;
-    display: block;
     object-fit: contain;
 }
 
-/* Subtle Lime Glow behind the card */
 .hero-glow {
     position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(207, 255, 19, 0.08) 0%, transparent 60%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 130%;
+    height: 130%;
+    background: radial-gradient(circle, rgba(209, 254, 23, 0.12) 0%, transparent 70%);
     pointer-events: none;
-    z-index: 1;
+    z-index: -1;
 }
 
 
-
-@media (max-width: 1024px) {
-    .home-hero { padding: 80px 0 100px; }
-    .hero-flex { gap: 50px; }
-    .hero-content h1 { font-size: 3rem; }
+@media (max-width: 1100px) {
+    .hero-content h1 { font-size: 3.4rem; }
 }
 
-@media (max-width: 850px) {
+@media (max-width: 960px) {
     .hero-flex {
-        flex-direction: column-reverse; /* Stack visual ABOVE text on mobile */
+        flex-direction: column; 
         text-align: center;
-        gap: 60px;
+        gap: 40px;
     }
     
-    .hero-content h1 { font-size: 2.8rem; }
+    .hero-content { order: 2; }
+    .hero-visual { 
+        order: 1; 
+        width: 70%;
+        margin: 0 auto;
+    }
+
+
     .hero-subtitle { margin: 0 auto 40px; }
-    
-    .hero-cta-group {
-        justify-content: center;
-    }
+    .hero-cta-group { justify-content: center; }
 }
 
 @media (max-width: 480px) {
-    .hero-content h1 { font-size: 2.2rem; }
-    .hero-cta-group { flex-direction: column; gap: 15px; }
+    .hero-content h1 { font-size: 2.6rem; letter-spacing: -1px; }
+    .hero-cta-group { flex-direction: column; }
+    .hero-cta-group .btn { width: 100%; }
 }

@@ -1,46 +1,46 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { FaArrowLeft } from 'react-icons/fa';
 import './AuthStyles.css';
 
 const Signup = () => {
     return (
-        <div className="auth-container">
-            <div className="auth-sidebar">
-                <h2 className="text-xxl">Join the <span className="accent-text-primary">Elite.</span></h2>
-                <p className="text-md">Create an account to get the fastest plumbing, electrical, and IT services in Kathmandu.</p>
-            </div>
-
-            <div className="auth-form-section">
-                <div className="auth-card">
-                    <div className="auth-header">
-                        <h1 className="text-xl">Create Account</h1>
-                        <p className="text-sm">Join WowSewa today for professional home maintenance.</p>
+        <div className="auth-page-wrapper bg-darkgreen">
+            <div className="container">
+                <Link to="/" className="back-link">
+                    <FaArrowLeft /> Back to Home
+                </Link>
+                
+                <div className="auth-center-card bg-light">
+                    <div className="auth-header text-center">
+                        <h1 className="text-xl">Join the <span className="accent-text-lime-dark">Elite.</span></h1>
+                        <p className="text-sm">Create an account for professional home maintenance.</p>
                     </div>
 
-                    <form>
+                    <form className="auth-form">
                         <div className="form-group">
                             <label>Full Name</label>
-                            <input type="text" placeholder="John Doe" />
+                            <input type="text" placeholder="John Doe" required />
                         </div>
                         <div className="form-group">
                             <label>Email Address</label>
-                            <input type="email" placeholder="name@example.com" />
+                            <input type="email" placeholder="name@example.com" required />
                         </div>
                         <div className="form-group">
                             <label>Phone Number</label>
-                            <input type="tel" placeholder="98XXXXXXXX" />
+                            <input type="tel" placeholder="98XXXXXXXX" required />
                         </div>
                         <div className="form-group">
                             <label>Password</label>
-                            <input type="password" placeholder="Create a strong password" />
+                            <input type="password" placeholder="Create a strong password" required />
                         </div>
-                        <button type="button" className="btn btn-darkgreen btn-block">
+                        <button type="submit" className="btn btn-darkgreen btn-block btn-large">
                             Register Now
                         </button>
                     </form>
 
-                    <div className="auth-footer">
-                        <p>Already a member? <Link to="/login">Login here</Link></p>
+                    <div className="auth-footer text-center">
+                        <p>Already a member? <Link to="/login" className="accent-text-lime-dark">Login here</Link></p>
                     </div>
                 </div>
             </div>

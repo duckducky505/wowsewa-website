@@ -4,7 +4,7 @@ const Book = () => {
             <div className="section-wrapper bg-dark final-cta-section">
                 <div className="container">
                     <div className="cta-box">
-                        <h2 className="text-xl">Ready for a <span className="accent-text">WOW</span> Experience?</h2>
+                        <h2 className="text-xl">Ready for a <span className="accent-text-primary">WOW</span> Experience?</h2>
                         <p className="light-subtext">Join hundreds of homeowners and businesses in Kathmandu who trust our technical expertise.</p>
                         <div className="cta-buttons">
                             <a href="https://docs.google.com/forms/..." className="btn btn-primary btn-large">Book Now</a>

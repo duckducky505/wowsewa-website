@@ -13,6 +13,11 @@
     gap: 30px;
 }
 
+.testimonials-grid .card{
+    background: var(--light-color);
+    color: var(--dark-color);
+}
+
 .testimonial-footer {
     display: flex;
     align-items: center;
@@ -25,12 +30,12 @@
     height: 50px;
     border-radius: 50%; 
     object-fit: cover;
-    border: 2px solid var(--primary-color);
+    border: 2px solid var(--lime-dark);
 }
 
 .author-name {
     font-weight: bold;
-    color: var(--bg-lighter);
+    color: var(--lime-dark);
     margin: 0 ; 
 }
 

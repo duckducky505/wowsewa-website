@@ -1,6 +1,6 @@
 import React from 'react';
 import './AMC.css';
-import FAQ from '../components/FAQ';
+import FAQ from '../../components/FAQ';
 // Import React Icons
 import { 
   FaCheck, 
@@ -37,10 +37,10 @@ const AMC = () => {
 
   return (
     <section className="amc-page">
-      <div className="section-hero bg-light">
+      <div className="section-hero bg-darkgreen">
         <div className="container">
           <header className="amc-header">
-            <h1 className="text-xxl">Zero Stress. <span className="accent-text">Total Maintenance.</span></h1>
+            <h1 className="text-xxl">Zero Stress. <span className="accent-text-primary">Total Maintenance.</span></h1>
             <p className="subtitle">Join the WowSewa AMC and let our experts handle your home and office repairs 24/7. One contract, infinite solutions.</p>
           </header>
         </div>
@@ -100,7 +100,7 @@ const AMC = () => {
       <div className="section-wrapper bg-dark">
         <div className="container">
           <div className="about-grid-intro">
-            <h2 className="text-xl">Why Choose <span className="accent-text">AMC?</span></h2>
+            <h2 className="text-xl">Why Choose <span className="accent-text-primary">AMC?</span></h2>
           </div>
           <div className="services-cards-container">
             <div className="service-card">

@@ -3,7 +3,25 @@
     margin: 0;
     padding: 0;
 }
+
+@font-face {
+  font-family: 'UniNeue';
+  src: url('./assets/fonts/UniNeueRegular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'UniNeue';
+  src: url('./assets/fonts/UniNeueBold.ttf') format('truetype');
+  font-weight: 600; 
+  font-style: normal;
+  font-display: swap;
+}
+
 :root{
+    --font-main:'UniNeue', sans-serif;
     --primary-color:#D1FE17;
     --bg-color:#074C3A;
     --lime-dark: #88AB00;
@@ -17,7 +35,7 @@
 } 
 
 body{
-    font-family: 'Poppins','sans-serrif';
+    font-family: var(--font-main);
     font-size: 16px;
     line-height:1.5;
     background: #fff;
@@ -99,11 +117,17 @@ img{
     color: var(--primary-color);
     transform: scale(1.05);
     box-shadow: 0 10px 20px rgba(255, 255, 255, 0.1);
+
 }
 
 .btn-dark{
     background: var(--dark-color);
     color:var(--primary-color) ;
+}
+
+.btn-dark:hover{
+    background: var(--primary-color);
+    color:var(--dark-color) ;
 }
 
 .btn-darkgreen{
@@ -117,6 +141,10 @@ img{
 }
 
 /* text utility */
+
+h1, h2, h3, h4, .text-xxl, .text-xl, .btn {
+  font-family: var(--font-main);
+}
 
 .text-xxl{
     font-size: 3rem;

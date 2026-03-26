@@ -19,14 +19,14 @@
 }
 
 .about-header .subtitle {
-    color: var(--dark-color);
+    color: var(--text-main);
     font-size: 1.1rem;
     margin-top: 15px;
 }
 
 .tagline {
     display: block;
-    color: var(--lime-dark); 
+    color: var(--primary-color); 
     text-transform: uppercase;
     font-weight: 700;
     letter-spacing: 2px;
@@ -106,7 +106,6 @@
 .section-label { 
     font-size: 0.9rem; 
     text-transform: uppercase;
-    color: var(--lime-dark);
     letter-spacing: 3px; 
     margin-bottom: 10px; 
 }
@@ -241,7 +240,6 @@
 
 
 .values-section {
-    background-color: #1a1a1c;
     border-top: 1px solid #333;
     border-bottom: 1px solid #333;
 }

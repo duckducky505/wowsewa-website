@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import FAQ from '../components/FAQ';
+import FAQ from '../../components/FAQ';
 import './Services.css'
 import { 
   FaMicrochip, 
@@ -110,7 +110,7 @@ const Services = () => {
 
     return (
         <>
-            <section className="services-page bg-dark">
+            <section className="services-page bg-darkgreen">
                 <div className="container">
                     <header className="services-header">
                         <h1 className="text-xxl">Our <span className="accent-text-primary">Specialized</span> Services</h1>

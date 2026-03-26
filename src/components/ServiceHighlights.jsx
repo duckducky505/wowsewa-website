@@ -34,10 +34,10 @@ const ServiceHighlights = () => {
     ];
 
     return (
-        <section className="highlights-section bg-light">
+        <section className="highlights-section bg-light1">
             <div className="container">
                 <div className="section-header">
-                    <h2 className="text-xl">Our <span className="accent-text-dark">Expertise</span></h2>
+                    <h2 className="text-xl">Our <span className="accent-text-lime-dark">Expertise</span></h2>
                     <p>Professional solutions for your home and workspace.</p>
                 </div>
                 

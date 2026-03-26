@@ -18,14 +18,14 @@ const Home = () => {
         },
         {
             question: "How can I book an appointment?",
-            answer: "You can call us at 9762424318 or email us at wowsewa@gmail.com to book an appointment."
+            answer: "You can call us at 9762424318 or email us at wowsewaa@gmail.com to book an appointment."
         }
     ];
     
     return(
         <>
             <MainBanner/>
-            <StatsBar/>
+             
             <ServiceHighlights/>
             <Testimonials/>
             <FAQ data={faqData} title="Frequently Asked Questions" />

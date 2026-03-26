@@ -26,7 +26,7 @@ const Navbar = () => {
             <li><Link to="/amc">AMC</Link></li>
             <li><Link to="/services">Our Services</Link></li>
             <li>
-              <Link to="/login" className="btn btn-dark btn-login-flex">
+              <Link to="/login" className="btn btn-dark">
                 <FaUser className="icon-left" /> Log In
               </Link>
             </li>
