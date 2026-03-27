@@ -1,0 +1,104 @@
+.dashboard-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 260px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 30px 0;
+    z-index: 1000;
+    transition: var(--transition);
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sidebar-logo {
+    padding: 0 25px;
+    margin-bottom: 40px;
+}
+
+.logo-img {
+    height: 50px; 
+    width: auto;
+    object-fit: contain;
+}
+
+.sidebar-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sidebar-btn {
+    width: 100%;
+    padding: 14px 25px;
+    background: transparent;
+    border: none;
+    display: flex;
+    align-items: center;
+    color: var(--text-main);
+    font-family: var(--font-main);
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.sidebar-btn:hover {
+    background: rgba(209, 254, 23, 0.05); 
+}
+
+.sidebar-btn.active {
+    background: rgba(209, 254, 23, 0.1);
+    border-left: 4px solid var(--primary-color);
+    color: var(--primary-color);
+}
+
+.sidebar-icon {
+    color: var(--primary-color);
+    margin-right: 15px;
+    font-size: 1.2rem;
+    display: flex;
+    filter: drop-shadow(0 0 5px rgba(209, 254, 23, 0.2));
+}
+
+.logout {
+    color: #ff8b8b;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 20px;
+}
+
+/* Tablet Responsiveness (Icons only) */
+@media (max-width: 1024px) {
+    .dashboard-sidebar { width: 85px; }
+    .sidebar-text { display: none; }
+    .sidebar-logo { padding: 0; text-align: center; }
+    .sidebar-btn { justify-content: center; padding: 20px 0; }
+    .sidebar-icon { margin-right: 0; font-size: 1.4rem; }
+}
+
+/* Mobile Responsiveness (Drawer) */
+@media (max-width: 768px) {
+    .sidebar-mobile-toggle {
+        display: block;
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 1100;
+        background: var(--bg-color);
+        color: var(--primary-color);
+        border: 1px solid rgba(255,255,255,0.1);
+        padding: 10px;
+        border-radius: 8px;
+    }
+
+    .dashboard-sidebar {
+        left: -100%;
+        width: 260px;
+    }
+
+    .dashboard-sidebar.mobile-active { left: 0; }
+    .sidebar-text { display: block; }
+    .sidebar-icon { margin-right: 15px; }
+    .sidebar-btn { justify-content: flex-start; padding: 16px 25px; }
+}

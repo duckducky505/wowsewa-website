@@ -16,6 +16,7 @@
 .testimonials-grid .card{
     background: var(--light-color);
     color: var(--dark-color);
+    font-size: 1.2rem;
 }
 
 .testimonial-footer {

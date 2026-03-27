@@ -1,8 +1,8 @@
-import Testimonials from '../components/Testimonials'
-import FAQ from '../components/FAQ'
-import StatsBar from '../components/Statsbar'
-import MainBanner from '../components/MainBanner'
-import ServiceHighlights from '../components/ServiceHighlights'
+import Testimonials from '../components/Testimonials/Testimonials'
+import FAQ from '../components/FAQ/FAQ'
+import StatsBar from '../components/Statsbar/Statsbar'
+import MainBanner from '../components/MainBanner/MainBanner'
+import ServiceHighlights from '../components/ServiceHighlights/ServiceHighlights'
 import Book from '../components/Book'
 
 const Home = () => {

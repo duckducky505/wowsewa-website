@@ -19,7 +19,7 @@ const About = () => {
                     <header className="about-header">
                         <span className="tagline">Reliable. Professional. Technical.</span>
                         <h1 className="text-xxl">Service at the speed of <span className="accent-text-primary">WOW</span>.</h1>
-                        <p className="subtitle">
+                        <p className="text-md">
                             <span className="accent-text-primary">WowSewa</span> is Kathmandu's premier all-in-one technical partner. 
                             We bridge the gap between <strong>traditional utility</strong> and <strong>modern technology</strong>.
                         </p>
@@ -44,8 +44,8 @@ const About = () => {
                             <h3 className="founder-name">Mr. Jiwan Joshi</h3>
                             <p className="founder-title accent-text-lime-dark">Founder & Head Technician</p>
                             <div className="founder-bio">
-                                <p>Founded on the principle of technical excellence, WOWsewa bridges the gap between traditional utility and modern technology. Mr. Joshi established WOWsewa to provide a reliable, "all-in-one" technical solution for the community.</p>
-                                <p>With years of hands-on experience in both industrial hardware and residential systems, his dual expertise ensures that every project meets the highest standards of safety and efficiency.</p>
+                                <p className='text-md'>Founded on the principle of technical excellence, WOWsewa bridges the gap between traditional utility and modern technology. Mr. Joshi established WOWsewa to provide a reliable, "all-in-one" technical solution for the community.</p>
+                                <p className="text-md">With years of hands-on experience in both industrial hardware and residential systems, his dual expertise ensures that every project meets the highest standards of safety and efficiency.</p>
                             </div>
                         </div>
                     </div>
@@ -89,7 +89,7 @@ const About = () => {
                     <div className="standards-header">
                         <div className="section-label center accent-text-lime-dark">The Gold Standard</div>
                         <h2 className="text-xl">Built on <span className="accent-text-lime-dark">Precision.</span></h2>
-                        <p>Our commitment to technical excellence goes beyond just fixing the surface.</p>
+                        <p className='text-md'>Our commitment to technical excellence goes beyond just fixing the surface.</p>
                     </div>
 
                     <div className="standards-grid">

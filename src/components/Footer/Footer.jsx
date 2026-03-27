@@ -24,10 +24,10 @@ const Footer = () => {
                             Elite installation, repair, and maintenance for the modern home and office.
                         </p>
                         <div className="social-icons">
-                            <a href="#" aria-label="Facebook"><FaFacebook size={28}/></a>
-                            <a href="#" aria-label="Instagram"><FaInstagram size={28}/></a>
-                            <a href="#" aria-label="Whatsapp"><FaWhatsapp size={28}/></a>
-                            <a href="#" aria-label="Linkedin"><FaLinkedin size={28}/></a>
+                            <a href="#" aria-label="Facebook"><FaFacebook size={26}/></a>
+                            <a href="#" aria-label="Instagram"><FaInstagram size={26}/></a>
+                            <a href="#" aria-label="Whatsapp"><FaWhatsapp size={26}/></a>
+                            <a href="#" aria-label="Linkedin"><FaLinkedin size={26}/></a>
                         </div>
                     </div>
 

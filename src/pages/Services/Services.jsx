@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import FAQ from '../../components/FAQ';
+import FAQ from '../../components/FAQ/FAQ';
 import './Services.css'
 import { 
   FaMicrochip, 
@@ -8,6 +8,7 @@ import {
   FaCheck, 
   FaCalendarCheck 
 } from 'react-icons/fa';
+import StatsBar from '../../components/Statsbar/Statsbar';
 
 const Services = () => {
 
@@ -110,11 +111,12 @@ const Services = () => {
 
     return (
         <>
-            <section className="services-page bg-darkgreen">
+        <StatsBar/>
+            <section className="services-page bg-dark">
                 <div className="container">
                     <header className="services-header">
                         <h1 className="text-xxl">Our <span className="accent-text-primary">Specialized</span> Services</h1>
-                        <p className="subtitle">Precision installation, expert repair, and proactive maintenance for every corner of your life.</p>
+                        <p className="text-md">Precision installation, expert repair, and proactive maintenance for every corner of your life.</p>
                     </header>
 
                     <div className="services-grid-layout">
@@ -126,13 +128,13 @@ const Services = () => {
                                 
                                 <div className="service-items-grid">
                                     {cat.items.map((item, i) => (
-                                        <div className="service-item" key={i}>
+                                        <div className="service-item bg-light" key={i}>
                                             <div className="service-image-box">
                                                 <img src={item.image} alt={item.title} className="card-img" />
                                             </div>
 
                                             <div className="item-head">
-                                                <h3>{item.title}</h3>
+                                                <h3 className='accent-text-dark'>{item.title}</h3>
                                                 {item.tag && (
                                                     <span className={`service-tag ${item.tag === 'Safety First' ? 'tag-red' : ''}`}>
                                                         {item.tag}
@@ -143,7 +145,7 @@ const Services = () => {
                                             <ul className="item-features">
                                                 {item.features.map((feature, fIndex) => (
                                                     <li key={fIndex}>
-                                                        <FaCheck className="feature-check-icon" /> {feature}
+                                                        <FaCheck className="feature-check-icon accent-text-lime-dark" /> {feature}
                                                     </li>
                                                 ))}
                                             </ul>
@@ -154,7 +156,7 @@ const Services = () => {
                         ))}
                     </div>
 
-                    <div className="support-banner booking-banner">
+                    <div className="support-banner bg-dark booking-banner">
                             <div className="banner-content">
                                 <h2 className="text-black">Need a Professional?</h2>
                                 <p className="text-black-muted">Book your service online in less than 60 seconds. Expert help is just a click away.</p>
@@ -164,7 +166,7 @@ const Services = () => {
                         </a>
                     </div>
                     
-                    <div className="support-banner">
+                    <div className="support-banner bg-dark">
                         <div className="banner-content">
                             <h2>Don't see what you're looking for?</h2>
                             <p>We handle custom technical requirements for businesses and homes alike.</p>

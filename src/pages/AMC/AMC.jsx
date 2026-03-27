@@ -1,6 +1,6 @@
 import React from 'react';
 import './AMC.css';
-import FAQ from '../../components/FAQ';
+import FAQ from '../../components/FAQ/FAQ';
 // Import React Icons
 import { 
   FaCheck, 
@@ -41,7 +41,7 @@ const AMC = () => {
         <div className="container">
           <header className="amc-header">
             <h1 className="text-xxl">Zero Stress. <span className="accent-text-primary">Total Maintenance.</span></h1>
-            <p className="subtitle">Join the WowSewa AMC and let our experts handle your home and office repairs 24/7. One contract, infinite solutions.</p>
+            <p className="text-md">Join the WowSewa AMC and let our experts handle your home and office repairs 24/7. One contract, infinite solutions.</p>
           </header>
         </div>
       </div>
@@ -50,8 +50,8 @@ const AMC = () => {
       <div className="section-wrapper bg-light">
         <div className="container">
           <div className="section-title-center">
-            <h2 className="text-xl">Choose Your Plan</h2>
-            <p>Annual packages tailored for every need.</p>
+            <h2 className="text-xxl">Choose Your <span className='accent-text-lime-dark'> Plan </span></h2>
+            <p className='text-md'>Annual packages tailored for every need.</p>
           </div>
 
           <div className="amc-grid">
@@ -97,23 +97,23 @@ const AMC = () => {
         </div>
       </div>
 
-      <div className="section-wrapper bg-dark">
+      <div className="section-wrapper bg-darkgreen">
         <div className="container">
           <div className="about-grid-intro">
             <h2 className="text-xl">Why Choose <span className="accent-text-primary">AMC?</span></h2>
           </div>
           <div className="services-cards-container">
-            <div className="service-card">
+            <div className="service-card bg-light">
                 <div className="icon-box"><FaShieldAlt /></div>
                 <h3>Predictive Repairs</h3>
                 <p>We fix issues before they become expensive breakdowns.</p>
             </div>
-            <div className="service-card">
+            <div className="service-card bg-light">
                 <div className="icon-box"><FaClock /></div>
                 <h3>24/7 Priority</h3>
                 <p>AMC members skip the queue with 30-min response times.</p>
             </div>
-            <div className="service-card">
+            <div className="service-card bg-light">
                 <div className="icon-box"><FaWallet /></div>
                 <h3>Cost Savings</h3>
                 <p>Save up to 40% compared to individual one-time repairs.</p>

@@ -1,8 +1,3 @@
-:root {
-    --surface-dark: #1A1A1C;
-    --item-bg: #222224;
-}
-
 .services-page {
     padding: 100px 0;
 }
@@ -28,16 +23,12 @@
     padding-left: 20px;
 }
 
-.category-title i {
-    color: var(--primary-color);
-}
-
 
 .cat-icon-wrapper {
     display: flex;
     align-items: center;
     color: var(--primary-color);
-    font-size: 1.6rem; /* Adjust category icon size */
+    font-size: 1.6rem; 
 }
 /* Grid for Items */
 .service-items-grid {
@@ -47,7 +38,6 @@
 }
 
 .service-item {
-    background: var(--bg-lighter);
     padding: 35px;
     border-radius: 20px;
     border: 1px solid #333;
@@ -58,7 +48,6 @@
 
 .service-item:hover {
     border-color: var(--primary-color);
-    background: var(--item-bg);
     transform: translateY(-5px);
 }
 
@@ -71,14 +60,13 @@
 }
 
 .item-head h3 {
-    font-size: 1.4rem;
-    color: #fff;
+    font-size: 1.4rem; 
 }
 
 /* Service Tags */
 .service-tag {
     background: rgba(207, 255, 19, 0.1);
-    color: var(--primary-color);
+    color: var(--lime-dark);
     padding: 4px 12px;
     border-radius: 50px;
     font-size: 0.75rem;
@@ -126,8 +114,8 @@
 }
 
 .item-features li {
-    font-size: 0.85rem;
-    color: #eee;
+    font-size: 0.95rem;
+    color: var(--lime-dark);
     display: flex;
     align-items: center;
     gap: 8px;
@@ -135,7 +123,6 @@
 
 
 .feature-check-icon {
-    color: var(--primary-color);
     font-size: 0.8rem;
     flex-shrink: 0;
 }
@@ -145,7 +132,6 @@
 .support-banner {
 
     margin-top: 80px;
-    background: linear-gradient(90deg, #1A1A1C 0%, #0D0D0D 100%);
     padding: 50px;
     border-radius: 25px;
     border: 1px solid #333;

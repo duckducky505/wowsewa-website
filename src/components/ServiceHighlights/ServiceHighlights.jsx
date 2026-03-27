@@ -37,8 +37,8 @@ const ServiceHighlights = () => {
         <section className="highlights-section bg-light1">
             <div className="container">
                 <div className="section-header">
-                    <h2 className="text-xl">Our <span className="accent-text-lime-dark">Expertise</span></h2>
-                    <p>Professional solutions for your home and workspace.</p>
+                    <h2 className="text-xxl">Our <span className="accent-text-lime-dark">Expertise</span></h2>
+                    <p className='text-md'>Professional solutions for your home and workspace.</p>
                 </div>
                 
                 <div className="highlights-grid">

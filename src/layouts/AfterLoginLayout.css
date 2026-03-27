@@ -1,0 +1,29 @@
+.after-login-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+.admin-main-view {
+    flex: 1;
+    /* Exactly match the sidebar width from your Sidebar.css */
+    margin-left: 260px; 
+    padding: 40px;
+    background-color: var(--light-color); /* #F8FAEA from your App.css */
+    min-height: 100vh;
+    transition: margin 0.3s ease;
+}
+
+/* Tablet: Sidebar shrinks, main content expands */
+@media (max-width: 1024px) {
+    .admin-main-view {
+        margin-left: 85px; 
+    }
+}
+
+/* Mobile: Sidebar becomes a drawer, main content takes full screen */
+@media (max-width: 768px) {
+    .admin-main-view {
+        margin-left: 0;
+        padding: 80px 20px 20px;
+    }
+}

@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom';
 import { FaPhoneAlt } from 'react-icons/fa'; 
 import './MainBanner.css';
 
-import logo from '../assets/images/wowLogo2.png';
+import logo from "../../assets/images/wowLogo2.png";
 
 const MainBanner = () => {
-    return (
+    return ( 
         <section className="home-hero bg-darkgreen">
             <div className="container hero-flex">
                 

@@ -9,7 +9,11 @@ import PrivacyPolicy from './pages/TermsAndConditions/WowPrivacy';
 import TermsAndConditions from './pages/TermsAndConditions/TermsAndConditions';
 import Login from './pages/Login';   
 import Signup from './pages/Signup'; 
-import AdminDashboard from './pages/Admin/AdminDashboard';
+import AdminDashboard from './pages/Dashboard/AdminDashboard';
+import Staffs from './pages/Staffs/Staffs';
+import AfterLoginLayout from './layouts/AfterLoginLayout';
+import Users from './pages/Users/Users';
+import Booking from './pages/Booking/Booking';
 
 const App = () => {
   return (
@@ -17,8 +21,15 @@ const App = () => {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
 
+        <Route element={<AfterLoginLayout/>}>
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/staffs" element={<Staffs />} />
+          <Route path="/admin/users" element={<Users />} />
+          <Route path="/admin/booking" element={<Booking />} />
+        </Route>
+
+        
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/home" element={<Home />} />
