@@ -1,29 +1,24 @@
-.after-login-container {
-    display: flex;
-    min-height: 100vh;
-}
-
 .admin-main-view {
     flex: 1;
-    /* Exactly match the sidebar width from your Sidebar.css */
     margin-left: 260px; 
-    padding: 40px;
-    background-color: var(--light-color); /* #F8FAEA from your App.css */
+    padding: 30px;
     min-height: 100vh;
-    transition: margin 0.3s ease;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
 }
 
-/* Tablet: Sidebar shrinks, main content expands */
 @media (max-width: 1024px) {
     .admin-main-view {
         margin-left: 85px; 
+        padding: 20px;
     }
 }
 
-/* Mobile: Sidebar becomes a drawer, main content takes full screen */
+/* Mobile: If your Sidebar is hidden/toggled */
 @media (max-width: 768px) {
     .admin-main-view {
         margin-left: 0;
-        padding: 80px 20px 20px;
+        padding: 80px 15px 20px; /* Extra top padding for the hamburger button */
     }
 }

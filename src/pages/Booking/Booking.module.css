@@ -1,0 +1,126 @@
+.booking-page-wrapper {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    background-color: transparent; /* App.css body handles the background */
+}
+
+.booking-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 2.5rem;
+}
+
+/* Stats Section */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: var(--surface-card); /* Using your dark surface color */
+    padding: 1.5rem;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: var(--transition);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary-color);
+}
+
+.stat-label {
+    color: var(--text-silver);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+.stat-value {
+    color: var(--text-main);
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+
+.icon-wrapper {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+}
+
+/* Table Card */
+.table-card {
+    background: var(--surface-card);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+}
+
+.booking-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.booking-table th {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 1.2rem 1rem;
+    text-align: left;
+    font-size: 0.8rem;
+    color: var(--primary-color);
+    text-transform: uppercase;
+}
+
+.booking-table td {
+    padding: 1.2rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    color: var(--text-main);
+}
+
+.id-cell {
+    font-family: monospace;
+    color: var(--lime-dark);
+    font-weight: 600;
+}
+
+.service-tag {
+    background: rgba(209, 254, 23, 0.1);
+    color: var(--primary-color);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+}
+
+/* Status Badges */
+.badge {
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.pending { background: #4d3800; color: #ffab00; }
+.confirmed { background: #00334d; color: #1890ff; }
+.completed { background: #1b3d1b; color: #52c41a; }
+.urgent { background: #4d1b1b; color: #ff4d4f; }
+
+.table-footer {
+    padding: 1.5rem;
+}
+
+.action-dots {
+    background: none;
+    border: none;
+    color: var(--text-silver);
+    cursor: pointer;
+}

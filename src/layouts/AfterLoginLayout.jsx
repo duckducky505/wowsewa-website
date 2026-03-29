@@ -5,12 +5,14 @@ import './AfterLoginLayout.css';
 
 const AfterLoginLayout = () => {
     return (
-        <div className="after-login-container">
+        <div>
             <Sidebar />
-            <main className="admin-main-view">
-                <Outlet /> 
+            <main className="admin-main-view bg-light">
+                <div>
+                    <Outlet /> 
+                </div>
             </main>
-        </div>
+        </div> 
     );
 };
 
