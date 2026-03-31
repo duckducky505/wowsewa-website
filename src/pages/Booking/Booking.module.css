@@ -109,10 +109,10 @@
     font-weight: 600;
 }
 
-.pending { background: #4d3800; color: #ffab00; }
-.confirmed { background: #00334d; color: #1890ff; }
-.completed { background: #1b3d1b; color: #52c41a; }
-.urgent { background: #4d1b1b; color: #ff4d4f; }
+.icon-wrapper.pending { background: rgba(255, 171, 0, 0.1); color: #ffab00; }
+.icon-wrapper.confirmed { background: rgba(24, 144, 255, 0.1); color: #1890ff; }
+.icon-wrapper.completed { background: rgba(82, 196, 26, 0.1); color: #52c41a; }
+.icon-wrapper.urgent { background: rgba(255, 77, 79, 0.1); color: #ff4d4f; }
 
 .table-footer {
     padding: 1.5rem;

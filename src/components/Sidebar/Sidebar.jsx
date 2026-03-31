@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate,Navigate } from 'react-router-dom';
 import { 
     FaThLarge, FaCalendarCheck, FaWrench, 
     FaUsers, FaHistory, FaCog, FaSignOutAlt, 
@@ -10,15 +10,27 @@ import './Sidebar.css';
 
 const Sidebar = () => {
     const [isMobileOpen, setIsMobileOpen] = useState(false);
+    const navigate = useNavigate(); 
+
+    // const token  = localStorage.getItem("Token");
+
+    // const decodedToken = JSON.parse(atob(token.split(".")[1]));
+    // const role = decodedToken.role || decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+
 
     const menuItems = [
-        { id: 1, label: 'Dashboard', icon: <FaThLarge />, path: '/admin/dashboard' },
-        { id: 2, label: 'Bookings', icon: <FaCalendarCheck />, path: '/admin/booking' },
+        { id: 1, label: 'Dashboard', icon: <FaThLarge />, path : "/admin/dashboard" },
+        { id: 2, label: 'Bookings', icon: <FaCalendarCheck />,  path : "/admin/booking"},
         { id: 3, label: 'Users', icon: <FaWrench />, path: '/admin/users' },
         { id: 4, label: 'Staffs', icon: <FaUsers />, path: '/admin/staffs' },
         { id: 5, label: 'History', icon: <FaHistory />, path: '/history' },
         { id: 6, label: 'Settings', icon: <FaCog />, path: '/settings' },
     ];
+
+    const logoutFunc = () => {
+        localStorage.removeItem("Token");
+        navigate("/login");
+    }
 
     return (
         <>
@@ -54,7 +66,7 @@ const Sidebar = () => {
                     </div>
 
                     <div className="sidebar-bottom">
-                        <button className="sidebar-btn logout">
+                        <button className="sidebar-btn logout" onClick={logoutFunc}>
                             <span className="sidebar-icon"><FaSignOutAlt /></span>
                             <span className="sidebar-text">Logout</span>
                         </button>

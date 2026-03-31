@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { FaArrowLeft } from 'react-icons/fa';
 import './AuthStyles.css';
 
@@ -7,9 +7,12 @@ const Login = () => {
     
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const navigate = useNavigate();
+
 
     const LoginAPI = async(e) => {
             e.preventDefault();
+
         try{
             const response= await fetch("https://localhost:7011/api/Login",{
                 method:"POST",
@@ -22,6 +25,17 @@ const Login = () => {
             if(!response.ok){console.log(Error)}
             const data = await response.json();
             localStorage.setItem("Token",data.token);
+
+            const token  = localStorage.getItem("Token");
+
+            const decodedToken = JSON.parse(atob(token.split(".")[1]));
+            const role = decodedToken.role || decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+
+            if(role === "Admin") {navigate("/admin/dashboard");}
+            
+            else {navigate("/customer/dashboard");}
+
+
         }
         catch(error){console.log(error.message)};
     }

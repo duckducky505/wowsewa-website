@@ -19,6 +19,6 @@
 @media (max-width: 768px) {
     .admin-main-view {
         margin-left: 0;
-        padding: 80px 15px 20px; /* Extra top padding for the hamburger button */
+        padding: 80px 15px 20px; 
     }
 }

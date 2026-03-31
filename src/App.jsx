@@ -9,11 +9,12 @@ import PrivacyPolicy from './pages/TermsAndConditions/WowPrivacy';
 import TermsAndConditions from './pages/TermsAndConditions/TermsAndConditions';
 import Login from './pages/Login';   
 import Signup from './pages/Signup'; 
-import AdminDashboard from './pages/Dashboard/AdminDashboard';
+import Dashboard from './pages/Dashboard/Dashboard';
 import Staffs from './pages/Staffs/Staffs';
 import AfterLoginLayout from './layouts/AfterLoginLayout';
 import Users from './pages/Users/Users';
 import Booking from './pages/Booking/Booking';
+import ProtectedRoute from './routes/ProtectedRoute';
 
 const App = () => {
   return (
@@ -23,10 +24,19 @@ const App = () => {
         <Route path="/signup" element={<Signup />} />
 
         <Route element={<AfterLoginLayout/>}>
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route path="/admin/staffs" element={<Staffs />} />
-          <Route path="/admin/users" element={<Users />} />
-          <Route path="/admin/booking" element={<Booking />} />
+            <Route element={<ProtectedRoute allowedRoles={"Admin"}/>}>
+              {/* Admin */}
+              <Route path="/admin/dashboard" element={<Dashboard userRole="admin" />} />
+              <Route path="/admin/booking" element={<Booking userRole="admin" />} />
+              <Route path="/admin/staffs" element={<Staffs />} />
+              <Route path="/admin/users" element={<Users />} />
+            </Route>
+
+            {/* Customer */}
+            <Route element={<ProtectedRoute allowedRoles={"Customer"}/>}>
+              <Route path="/customer/dashboard" element={<Dashboard userRole="customer" />} />
+              <Route path="/customer/booking" element={<Booking userRole="customer" />} />
+            </Route>
         </Route>
 
         
