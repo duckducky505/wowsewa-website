@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { FaArrowLeft } from 'react-icons/fa';
 import './AuthStyles.css';
 
@@ -14,13 +14,21 @@ const Signup = () => {
 
         e.preventDefault();
 
-        const response = await fetch("https://localhost:",{
-            method:"POST",
-            headers:{
-                "Content-Type":"application/json",
-            },
-            body:JSON.stringify({name,username,password}),
-        });
+        try{
+            const response = await fetch("https://localhost:7011/api/signup/addUser",{
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json",
+                },
+                body:JSON.stringify({name,username,password}),
+            });
+            if(!response.ok){console.log("Couldn't connect to the API.")}
+            return <Navigate to="/login"/>
+        }
+        catch(Error){
+            console.log(Error)
+        }
+        
     }
 
     return (

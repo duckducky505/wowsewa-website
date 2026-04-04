@@ -9,12 +9,14 @@ import PrivacyPolicy from './pages/TermsAndConditions/WowPrivacy';
 import TermsAndConditions from './pages/TermsAndConditions/TermsAndConditions';
 import Login from './pages/Login';   
 import Signup from './pages/Signup'; 
-import Dashboard from './pages/Dashboard/Dashboard';
 import Staffs from './pages/Staffs/Staffs';
-import AfterLoginLayout from './layouts/AfterLoginLayout';
+// import DashboardLayout from './layouts/DashboardLayout';
 import Users from './pages/Users/Users';
-import Booking from './pages/Booking/Booking';
 import ProtectedRoute from './routes/ProtectedRoute';
+import Sidebar from './components/Sidebar/Sidebar';
+import Dashboard from './pages/Dashboard/Dashboard';
+import AfterLoginLayout from './layouts/AfterLoginLayout';
+import Bookings from './pages/Booking/Booking';
 
 const App = () => {
   return (
@@ -23,19 +25,25 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
+        <Route path="/sidebar" element={<Sidebar  />} />
         <Route element={<AfterLoginLayout/>}>
-            <Route element={<ProtectedRoute allowedRoles={"Admin"}/>}>
-              {/* Admin */}
-              <Route path="/admin/dashboard" element={<Dashboard userRole="admin" />} />
-              <Route path="/admin/booking" element={<Booking userRole="admin" />} />
+          <Route path="/dashboard" element={<Dashboard/>} />
+          <Route path="/booking" element={<Bookings/>}/>
+          <Route path="/staffs" element={<Staffs />} />
+          <Route path="/users" element={<Users />} />
+        </Route>
+
+
+        <Route >
+            <Route element={<ProtectedRoute allowedRoles={"admin"}/>}>
+              {/* <Route path="/admin/dashboard" element={<Dashboard/>}/> */}
               <Route path="/admin/staffs" element={<Staffs />} />
               <Route path="/admin/users" element={<Users />} />
             </Route>
 
             {/* Customer */}
-            <Route element={<ProtectedRoute allowedRoles={"Customer"}/>}>
-              <Route path="/customer/dashboard" element={<Dashboard userRole="customer" />} />
-              <Route path="/customer/booking" element={<Booking userRole="customer" />} />
+            <Route element={<ProtectedRoute allowedRoles={"customer"}/>}>
+
             </Route>
         </Route>
 

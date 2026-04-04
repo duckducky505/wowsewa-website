@@ -29,7 +29,7 @@ const Home = () => {
             <ServiceHighlights/>
             <Testimonials/>
             <FAQ data={faqData} title="Frequently Asked Questions" />
-            {/* <Book/> */}
+            <Book/>
         </>
     )
 } 

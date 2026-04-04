@@ -1,83 +1,63 @@
-import React, { useState } from 'react';
-import { NavLink, useNavigate,Navigate } from 'react-router-dom';
+// components/Sidebar/Sidebar.jsx
+import { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom'; // Added Link and useLocation
 import { 
-    FaThLarge, FaCalendarCheck, FaWrench, 
-    FaUsers, FaHistory, FaCog, FaSignOutAlt, 
-    FaBars, FaTimes 
-} from 'react-icons/fa';
-import Logo from "/src/assets/images/wowLogo.png";
-import './Sidebar.css';
+  MdDashboard, MdStore, MdAnalytics, 
+  MdPeople, MdSettings, MdLogout, MdClose 
+} from 'react-icons/md';
+import styles from "./Sidebar.module.css";
 
-const Sidebar = () => {
-    const [isMobileOpen, setIsMobileOpen] = useState(false);
-    const navigate = useNavigate(); 
+const Sidebar = ({ isOpen, toggleSidebar }) => {
+  const location = useLocation(); // Hook to check the current URL path
 
-    // const token  = localStorage.getItem("Token");
+  const topMenu = [
+    { name: 'Dashboard', icon: MdDashboard, path: '/dashboard' },
+    { name: 'Bookings', icon: MdStore, path: '/booking' },
+    { name: 'Users', icon: MdAnalytics, path: '/users' },
+    { name: 'Staffs', icon: MdPeople, path: '/staffs' },
+    { name: 'Settings', icon: MdSettings, path: '/settings' },
+  ];
 
-    // const decodedToken = JSON.parse(atob(token.split(".")[1]));
-    // const role = decodedToken.role || decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+  return (
+    <section className={`${styles.sidebar} ${isOpen ? styles.open : ''}`}>
+      <div className={styles.sidebarHeader}>
+        <Link to="/dashboard" className={styles.brand}>AdminHub</Link>
+        <button className={styles.sidebarCloseBtn} onClick={toggleSidebar}>
+          <MdClose size={28} />
+        </button>
+      </div>
 
+      <ul className={`${styles.sideMenu} ${styles.top}`}>
+        {topMenu.map((item) => {
+          const Icon = item.icon;
+          // Check if current path matches the menu item path for active styling
+          const isActive = location.pathname === item.path;
 
-    const menuItems = [
-        { id: 1, label: 'Dashboard', icon: <FaThLarge />, path : "/admin/dashboard" },
-        { id: 2, label: 'Bookings', icon: <FaCalendarCheck />,  path : "/admin/booking"},
-        { id: 3, label: 'Users', icon: <FaWrench />, path: '/admin/users' },
-        { id: 4, label: 'Staffs', icon: <FaUsers />, path: '/admin/staffs' },
-        { id: 5, label: 'History', icon: <FaHistory />, path: '/history' },
-        { id: 6, label: 'Settings', icon: <FaCog />, path: '/settings' },
-    ];
-
-    const logoutFunc = () => {
-        localStorage.removeItem("Token");
-        navigate("/login");
-    }
-
-    return (
-        <>
-            <button 
-                className={`sidebar-mobile-toggle ${isMobileOpen ? 'open' : ''}`} 
-                onClick={() => setIsMobileOpen(!isMobileOpen)}
-                aria-label="Toggle Menu"
+          return (
+            <li 
+              key={item.name}
+              className={isActive ? styles.active : ''}
+              onClick={toggleSidebar} // Optional: closes sidebar on mobile after clicking
             >
-                {isMobileOpen ? <FaTimes /> : <FaBars />}
-            </button>
+              <Link to={item.path}>
+                <Icon size={24} />
+                <span className={styles.text}>{item.name}</span>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
 
-            {/* Main Sidebar */}
-            <aside className={`sidebar bg-darkgreen ${isMobileOpen ? 'mobile-active' : ''}`}>
-                <div className="sidebar-inner">
-                    <div className="sidebar-top">
-                        <div className="sidebar-logo">
-                            <img src={Logo} alt="WowSewa" className="logo-img" />
-                        </div>
-                        
-                        <nav className="sidebar-menu">
-                            {menuItems.map((item) => (
-                                <NavLink 
-                                    key={item.id} 
-                                    to={item.path} 
-                                    className={({ isActive }) => `sidebar-btn ${isActive ? 'active' : ''}`}
-                                    onClick={() => setIsMobileOpen(false)}
-                                >
-                                    <span className="sidebar-icon">{item.icon}</span>
-                                    <span className="sidebar-text">{item.label}</span>
-                                </NavLink>
-                            ))}
-                        </nav>
-                    </div>
-
-                    <div className="sidebar-bottom">
-                        <button className="sidebar-btn logout" onClick={logoutFunc}>
-                            <span className="sidebar-icon"><FaSignOutAlt /></span>
-                            <span className="sidebar-text">Logout</span>
-                        </button>
-                    </div>
-                </div>
-            </aside>
-
-            {/* Clickable Overlay for Mobile */}
-            {isMobileOpen && <div className="sidebar-overlay" onClick={() => setIsMobileOpen(false)}></div>}
-        </>
-    );
+      <ul className={styles.sideMenu}>
+        <li>
+          <Link to="/login" className={styles.logout}>
+            <MdLogout size={24} />
+            <span className={styles.text}>Logout</span>
+          </Link>
+        </li>
+      </ul>
+    </section>
+  );
 };
 
 export default Sidebar;

@@ -1,82 +1,93 @@
+// pages/Dashboard.jsx
 import React from 'react';
-import { FaWallet, FaClipboardList, FaUsers, FaArrowTrendUp, FaPlus, FaClockRotateLeft } from 'react-icons/fa6';
+import { MdSearch } from 'react-icons/md';
 import styles from './Dashboard.module.css';
 
-const Dashboard = ({ userRole = 'admin' }) => {
-    const isAdmin = userRole === 'admin';
-
-    return (
-        /* Using the global container class we discussed for consistent sidebar spacing */
-        <div className="container-after-login-large">
-            <header className={styles['header-section']}>
-                <div className={styles['welcome-text']}>
-                    <h1 className="text-xl">
-                        {isAdmin ? 'Shubha Prabhat' : 'Namaste'}, <span className="accent-text-primary">KaiZer949</span>
-                    </h1>
-                    <p className="text-silver">
-                        {isAdmin 
-                            ? <>Overview of <span className="accent-text-lime-dark">WowSewa</span> business performance.</>
-                            : <>Manage your home services and active requests.</>
-                        }
-                    </p>
-                </div>
-                
-                {/* Action button changes based on role */}
-                <button className={`btn ${isAdmin ? 'btn-primary' : 'btn-darkgreen'}`}>
-                    {isAdmin ? 'Generate Report' : <><FaPlus /> Book a Service</>}
-                </button>
-            </header>
-
-            <div className={styles['stats-grid']}>
-                {isAdmin ? (
-                    <>
-                        <StatCard title="Total Revenue" value="रु 45,200" trend="+5.4k today" icon={<FaWallet />} />
-                        <StatCard title="Total Bookings" value="128" trend="+12% weekly" icon={<FaClipboardList />} />
-                        <StatCard title="New Customers" value="24" trend="+4 today" icon={<FaUsers />} />
-                    </>
-                ) : (
-                    <>
-                        <StatCard title="Total Spent" value="रु 8,500" trend="3 services" icon={<FaWallet />} />
-                        <StatCard title="Active Requests" value="02" trend="1 arriving soon" icon={<FaClockRotateLeft />} />
-                        <StatCard title="Reward Points" value="450" trend="Gold Member" icon={<FaArrowTrendUp />} />
-                    </>
-                )}
-            </div>
-
-            <div className={`${styles['main-card']} card bg-light`}>
-                <div className={styles['card-header']}>
-                    <h3 className="text-md font-bold accent-text-dark">
-                        {isAdmin ? 'Recent Service Activity' : 'My Recent Bookings'}
-                    </h3>
-                    <button className="btn btn-outline-dark">
-                        {isAdmin ? 'View All Requests' : 'View History'}
-                    </button>
-                </div>
-                
-                <div className={styles['activity-list']}>
-                    <div className={styles['empty-state']}>
-                        <div className={styles['pulse-dot']}></div>
-                        <p className="text-silver">
-                            {isAdmin 
-                                ? 'Waiting for incoming service logs...' 
-                                : 'No active services at the moment.'}
-                        </p>
-                    </div>
-                </div>
-            </div>
+const Dashboard = () => {
+  return (
+    <main className={`styles.dashboardMain`}>
+      <div className={styles.headTitle}>
+        <div className={styles.left}>
+          <h1>Dashboard</h1>
+          <ul className={styles.breadcrumb}>
+            <li><a href="#">Dashboard</a></li>
+            <li><span className={styles.divider}>›</span></li>
+            <li><a className={styles.activeLink} href="#">Home</a></li>
+          </ul>
         </div>
-    );
+        <a href="#" className={styles.btnDownload}>Download PDF</a>
+      </div>
+
+      <ul className={styles.boxInfo}>
+        <li>
+          <div className={styles.iconContainer}><span style={{ fontSize: '42px' }}>📅</span></div>
+          <div className={styles.text}>
+            <h3>1020</h3>
+            <p>New Order</p>
+          </div>
+        </li>
+        <li>
+          <div className={styles.iconContainer}><span style={{ fontSize: '42px' }}>👥</span></div>
+          <div className={styles.text}>
+            <h3>2834</h3>
+            <p>Visitors</p>
+          </div>
+        </li>
+        <li>
+          <div className={styles.iconContainer}><span style={{ fontSize: '42px' }}>💰</span></div>
+          <div className={styles.text}>
+            <h3>$2543</h3>
+            <p>Total Sales</p>
+          </div>
+        </li>
+      </ul>
+
+      <div className={styles.tableData}>
+        <div className={styles.orderCard}>
+          <div className={styles.cardHead}>
+            <h3>Recent Orders</h3>
+            <div className={styles.tableOps}>
+              <MdSearch size={22} style={{ cursor: 'pointer' }} />
+              <span>Filter</span>
+            </div>
+          </div>
+          <table className={styles.ordersTable}>
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Date Order</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[1, 2, 3, 4, 5].map((i) => {
+                // Logic to determine status class
+                const statusType = i % 3 === 0 ? 'completed' : i % 3 === 1 ? 'pending' : 'process';
+                const statusText = i % 3 === 0 ? 'Completed' : i % 3 === 1 ? 'Pending' : 'Process';
+                
+                return (
+                  <tr key={i}>
+                    <td>
+                      <div className={styles.userProfile}>
+                        <img src="https://via.placeholder.com/36" alt="user" />
+                        <p>John Doe</p>
+                      </div>
+                    </td>
+                    <td>01-10-2021</td>
+                    <td>
+                      <span className={`${styles.statusBadge} ${styles[statusType]}`}>
+                        {statusText}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  );
 };
-
-const StatCard = ({ title, value, trend, icon }) => (
-    <div className={`${styles['stat-card']} bg-darkgreen`}>
-        <div className={styles['stat-icon']}>{icon}</div>
-        <div className={styles['stat-info']}>
-            <p className="text-sm text-silver">{title}</p>
-            <h2 className="text-lg accent-text-white">{value}</h2>
-            <span className={styles['trend-text']}><FaArrowTrendUp /> {trend}</span>
-        </div>
-    </div>
-);
 
 export default Dashboard;

@@ -7,13 +7,19 @@ const ProtectedRoute = ({allowedRoles}) => {
     if(token == null) return <Navigate to= "/login"/>
 
     const decodedToken = JSON.parse(atob(token.split(".")[1]));
-    const role = decodedToken.role || decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+    const role = decodedToken.role || decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"].toLowerCase();
+    const expireTime = decodedToken.exp; 
+
+    if(Date.now()/1000 > expireTime) {
+        localStorage.removeItem("Token");
+        return <Navigate to="/login"/>
+    }
 
     if(allowedRoles.includes(role)){
         return <Outlet/>
     }
     else {
-        return <Navigate to={role === "Admin" ? "/admin/dashboard" : "/customer/dashboard"} replace />;
+        return <Navigate to={role === "admin" ? `/${role}/dashboard` : `/${role}/dashboard`} replace />;
     }
 
 }
