@@ -1,39 +1,18 @@
 import './StatsBar.css';
 
-const StatsBar = () => {
+const StatsBar = ({ stats, bgColor, numberColor, labelColor }) => {
   return (
-    <section className="stats-bar bg-darkgreen">
-      <div className="container">
+    <section className="stats-bar bg-darkgreen"> 
+      <div className={`container`}>
         <div className="stats-grid">
-          
-          <div className="stat-item">
-            <div className="rolling-container">
-              <h2 className="stat-number animate-roll">500+</h2>
+          {stats.map((item, index) => (
+            <div className={`stat-item ${bgColor}`} key={index}>
+              <div className="rolling-container">
+                <h2 className={`text-xxl ${numberColor} animate-roll`}>{item.number}</h2>
+              </div>
+              <p className={`text-md ${labelColor}`}>{item.label}</p>
             </div>
-            <p className="stat-label">Repairs Completed</p>
-          </div>
-
-          <div className="stat-item">
-            <div className="rolling-container">
-              <h2 className="stat-number animate-roll">15+</h2>
-            </div>
-            <p className="stat-label">Expert Technicians</p>
-          </div>
-
-          <div className="stat-item">
-            <div className="rolling-container">
-              <h2 className="stat-number animate-roll">4.9/5</h2>
-            </div>
-            <p className="stat-label">Customer Rating</p>
-          </div>
-
-          <div className="stat-item">
-            <div className="rolling-container">
-              <h2 className="stat-number animate-roll">30</h2>
-            </div>
-            <p className="stat-label">Min Response Time</p>
-          </div>
-
+          ))}
         </div>
       </div>
     </section>

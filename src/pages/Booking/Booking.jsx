@@ -1,10 +1,12 @@
 // pages/Bookings/Bookings.jsx
 import React, { useState } from 'react';
-import { MdEdit, MdDelete, MdAdd, MdSearch } from 'react-icons/md';
-import styles from './Booking.module.css';
+import { MdEdit, MdDelete, MdSearch } from 'react-icons/md';
+import { FaCalendarPlus, FaClipboardList, FaCheckCircle, FaHourglassHalf, FaSpinner } from 'react-icons/fa';
+import './Booking.css'; 
+import Statsbar from "../../components/Statsbar/Statsbar"
+
 
 const Bookings = () => {
-  // Mock data for bookings
   const [bookings, setBookings] = useState([
     { id: "BK-101", service: "Full Car Wash", date: "2024-03-20", status: "Completed" },
     { id: "BK-102", service: "Engine Detailing", date: "2024-03-21", status: "Pending" },
@@ -18,36 +20,52 @@ const Bookings = () => {
     }
   };
 
+  const bookingStats = [
+    { 
+      number: bookings.length, 
+      label: "Total Bookings" 
+    },
+    { 
+      number: "1", 
+      label: "In Process" 
+    },
+    { 
+      number: "2", 
+      label: "Pending Approval" 
+    }
+  ];
+
   return (
-    <main className={styles.bookingsMain}>
-      <div className={styles.headTitle}>
-        <div className={styles.left}>
-          <h1>Bookings</h1>
-          <ul className={styles.breadcrumb}>
-            <li><a href="#">Dashboard</a></li>
-            <li><span className={styles.divider}>›</span></li>
-            <li><a className={styles.activeLink} href="#">Bookings</a></li>
-          </ul>
+    <div className="in-app-container">
+      <header className="in-app-header">
+        <div>
+          <h1 className="text-xl accent-text-white">Service <span className="accent-text-primary">Bookings</span></h1>
+          <p className="text-md accent-text-white">Manage and track customer service requests.</p>
         </div>
         <button className="btn btn-primary">
-          <span><MdAdd size={10}/>New Booking</span>
+          <FaCalendarPlus /> New Booking
         </button>
+      </header>
+
+      <Statsbar stats={bookingStats} bgColor={"bg-light"} numberColor={"accent-text-lime-dark"} />
+
+      <div className="bookings-controls">
+        <div className="search-box">
+          <MdSearch className="search-icon" size={20} />
+          <input type="text" placeholder="Search by ID or Service..." />
+        </div>
+        <select className="filter-select">
+          <option value="">All Services</option>
+          <option value="wash">Car Wash</option>
+          <option value="detail">Detailing</option>
+        </select>
       </div>
 
-      <div className={styles.tableContainer}>
-        <div className={styles.tableHeader}>
-          <h3>Booking List</h3>
-          <div className={styles.searchBox}>
-            <MdSearch size={20} />
-            <input type="text" placeholder="Search ID..." />
-          </div>
-        </div>
-
-        <table className={styles.bookingTable}>
+      <div className="table-card bg-text-main">
+        <table className="table-universal">
           <thead>
             <tr>
-              <th>Booking ID</th>
-              <th>Service</th>
+              <th>Booking Detail</th>
               <th>Date Booked</th>
               <th>Status</th>
               <th>Actions</th>
@@ -56,34 +74,30 @@ const Bookings = () => {
           <tbody>
             {bookings.map((booking) => (
               <tr key={booking.id}>
-                <td className={styles.bookingId}>{booking.id}</td>
-                <td>{booking.service}</td>
+                <td>
+                    <div className="booking-details">
+                      <span className="service-name">{booking.service}</span>
+                      <span className="booking-id-sub">ID: #{booking.id}</span>
+                  </div>
+                </td>
                 <td>{booking.date}</td>
                 <td>
-                  <span className={`${styles.statusBadge} ${styles[booking.status.toLowerCase()]}`}>
+                  <span className={`status-pill ${booking.status.toLowerCase()}`}>
                     {booking.status}
                   </span>
                 </td>
-                <td>
-                  <div className={styles.actions}>
-                    <button className={styles.editBtn} title="Edit">
-                      <MdEdit size={18} />
+                <td className='action-btns'>
+                    <button className="btn btn-primary" title="Edit"><MdEdit /></button>
+                    <button className="btn btn-dark" onClick={() => handleDelete(booking.id)} title="Delete">
+                        <MdDelete />
                     </button>
-                    <button 
-                      className={styles.deleteBtn} 
-                      title="Delete"
-                      onClick={() => handleDelete(booking.id)}
-                    >
-                      <MdDelete size={18} />
-                    </button>
-                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-    </main>
+    </div>
   );
 };
 

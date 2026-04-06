@@ -1,92 +1,94 @@
-// pages/Dashboard.jsx
+// pages/Dashboard/Dashboard.jsx
 import React from 'react';
-import { MdSearch } from 'react-icons/md';
-import styles from './Dashboard.module.css';
+import { MdSearch, MdTrendingUp, MdEventAvailable, MdAttachMoney } from 'react-icons/md';
+import { FaCar, FaUserCheck, FaClock } from 'react-icons/fa';
+import './Dashboard.css';
+import Statsbar from "../../components/Statsbar/Statsbar"
 
 const Dashboard = () => {
+
+  const dashboardStats = [
+  { 
+    number: "$1,240", 
+    label: "Daily Revenue" 
+  },
+  { 
+    number: "12", 
+    label: "Active Bookings" 
+  },
+  { 
+    number: "8", 
+    label: "Staff On-Duty" 
+  }
+];
+
   return (
-    <main className={`styles.dashboardMain`}>
-      <div className={styles.headTitle}>
-        <div className={styles.left}>
-          <h1>Dashboard</h1>
-          <ul className={styles.breadcrumb}>
-            <li><a href="#">Dashboard</a></li>
-            <li><span className={styles.divider}>›</span></li>
-            <li><a className={styles.activeLink} href="#">Home</a></li>
-          </ul>
+    <div className="in-app-container">
+      <header className="in-app-header">
+        <div>
+          <h1 className="text-xl accent-text-white">Business <span className="accent-text-primary">Overview</span></h1>
+          <p className='accent-text-white text-md'>Welcome back! Here is what's happening today.</p>
         </div>
-        <a href="#" className={styles.btnDownload}>Download PDF</a>
-      </div>
+        <button className="btn btn-primary">
+          <MdTrendingUp /> View Reports
+        </button>
+      </header>
 
-      <ul className={styles.boxInfo}>
-        <li>
-          <div className={styles.iconContainer}><span style={{ fontSize: '42px' }}>📅</span></div>
-          <div className={styles.text}>
-            <h3>1020</h3>
-            <p>New Order</p>
-          </div>
-        </li>
-        <li>
-          <div className={styles.iconContainer}><span style={{ fontSize: '42px' }}>👥</span></div>
-          <div className={styles.text}>
-            <h3>2834</h3>
-            <p>Visitors</p>
-          </div>
-        </li>
-        <li>
-          <div className={styles.iconContainer}><span style={{ fontSize: '42px' }}>💰</span></div>
-          <div className={styles.text}>
-            <h3>$2543</h3>
-            <p>Total Sales</p>
-          </div>
-        </li>
-      </ul>
+      <Statsbar stats={dashboardStats} bgColor={"bg-dark"} numberColor={"accent-text-primary"} labelColor={"accent-text-white"}/>
 
-      <div className={styles.tableData}>
-        <div className={styles.orderCard}>
-          <div className={styles.cardHead}>
-            <h3>Recent Orders</h3>
-            <div className={styles.tableOps}>
-              <MdSearch size={22} style={{ cursor: 'pointer' }} />
-              <span>Filter</span>
+
+      <div className="dashboard-grid-layout">
+        <div className="dashboard-card-wrapper">
+          <div className="card-header">
+            <h3>Service Performance</h3>
+          </div>
+          <div className="service-performance-list">
+            <div className="perf-item">
+              <div className="perf-info">
+                <div className="perf-icon wash"><FaCar /></div>
+                <div>
+                  <p className="perf-name">Full Car Wash</p>
+                  <p className="perf-sub">45 orders this week</p>
+                </div>
+              </div>
+              <span className="perf-trend positive">+12%</span>
+            </div>
+            <div className="perf-item">
+              <div className="perf-info">
+                <div className="perf-icon detailing"><MdEventAvailable /></div>
+                <div>
+                  <p className="perf-name">Engine Detailing</p>
+                  <p className="perf-sub">12 orders this week</p>
+                </div>
+              </div>
+              <span className="perf-trend">+5%</span>
             </div>
           </div>
-          <table className={styles.ordersTable}>
-            <thead>
-              <tr>
-                <th>User</th>
-                <th>Date Order</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[1, 2, 3, 4, 5].map((i) => {
-                // Logic to determine status class
-                const statusType = i % 3 === 0 ? 'completed' : i % 3 === 1 ? 'pending' : 'process';
-                const statusText = i % 3 === 0 ? 'Completed' : i % 3 === 1 ? 'Pending' : 'Process';
-                
-                return (
-                  <tr key={i}>
-                    <td>
-                      <div className={styles.userProfile}>
-                        <img src="https://via.placeholder.com/36" alt="user" />
-                        <p>John Doe</p>
-                      </div>
-                    </td>
-                    <td>01-10-2021</td>
-                    <td>
-                      <span className={`${styles.statusBadge} ${styles[statusType]}`}>
-                        {statusText}
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+        </div>
+
+        {/* Right Column: Quick Summary / Notifications */}
+        <div className="dashboard-card-wrapper">
+          <div className="card-header">
+            <h3>Upcoming Appointments</h3>
+          </div>
+          <div className="upcoming-list">
+            {[
+              { time: "10:30 AM", user: "Mike Ross", service: "Ceramic Coating" },
+              { time: "11:45 AM", user: "Harvey Specter", service: "Interior Polish" },
+              { time: "02:15 PM", user: "Rachel Zane", service: "Full Wash" }
+            ].map((item, idx) => (
+              <div key={idx} className="upcoming-item">
+                <div className="time-badge"><FaClock /> {item.time}</div>
+                <div className="upcoming-details">
+                  <p className="user-name">{item.user}</p>
+                  <p className="service-sub">{item.service}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-    </main>
+    </div>
   );
 };
 

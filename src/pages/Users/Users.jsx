@@ -26,13 +26,13 @@ const Users = () => {
     }, []);
 
     return (
-        <div className={styles['staff-container']}>
+        <div className='in-app-container'>
             <header className={styles['staff-header']}>
                 <div className={styles['header-left']}>
-                    <h1 className="text-xl">Platform <span className="accent-text-primary">Users</span></h1>
-                    <p className="text-silver">Manage registered customers and their account status.</p>
+                    <h1 className="text-xl accent-text-white">Platform <span className="accent-text-primary">Users</span></h1>
+                    <p className="text-md accent-text-white">Manage registered customers and their account status.</p>
                 </div>
-                <button className={`btn btn-primary ${styles['add-staff-btn']}`}>
+                <button className="btn btn-primary">
                     <FaUserPlus /> Add Customer
                 </button>
             </header>
@@ -44,9 +44,9 @@ const Users = () => {
                 </div>
             </div>
 
-            <div className={`${styles['staff-table-wrapper']} ${styles.card}`}>
+            <div className="table-card bg-text-main">
                 {loading ? <Loader /> : (
-                    <table className={styles['staff-table']}>
+                    <table className='table-universal'>
                         <thead>
                             <tr>
                                 <th>User</th>
@@ -59,18 +59,15 @@ const Users = () => {
                             {users.map((user) => (
                                 <tr key={user.guidId}>
                                     <td>
-                                        <div className={styles['user-info']}>
-                                            <div className={styles['user-avatar']}><FaUserCircle /></div>
                                             <div className={styles['user-details']}>
                                                 <span className={styles['user-name']}>{user.name}</span>
                                                 <span className={styles['user-id']}>{user.username}</span>
                                             </div>
-                                        </div>
                                     </td>
                                     <td>{user.location || 'N/A'}</td>
                                     <td>{user.joinedDate || '2026-03'}</td>
                                     <td>
-                                        <div className={styles['action-btns']}>
+                                        <div className='action-btns'>
                                             <button className={`${styles['action-btn']} ${styles.edit}`} title="Edit User"><FaEdit /></button>
                                             <button className={`${styles['action-btn']} ${styles.delete}`} title="Delete User"><FaTrash /></button>
                                         </div>

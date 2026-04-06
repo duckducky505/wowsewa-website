@@ -2,16 +2,16 @@
     display: flex;
     width: 100%;
     min-height: 100vh;
-    background-color: var(--light-color);
+    background-color: var(--bg-color);
 }
 
 .main-content {
     flex-grow: 1;
     min-height: 100vh;
-    background: var(--light-color);
+    background: var(--bg-color);
     position: relative;
     transition: all 0.3s ease;
-    padding: 60px 50px; 
+    padding: 20px 30px; 
 }
 
 @media (min-width: 769px) {

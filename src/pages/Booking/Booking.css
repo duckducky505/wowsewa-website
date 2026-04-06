@@ -1,0 +1,85 @@
+.bookings-controls {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    margin: 25px 0;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.search-box {
+    flex-grow: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-icon {
+    position: absolute;
+    left: 15px;
+    color: #999;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 12px 15px 12px 45px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    font-family: inherit;
+}
+
+.filter-select {
+    padding: 0 15px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    color: #444;
+}
+
+
+
+.service-name {
+    display: block;
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+.booking-id-sub {
+    font-size: 0.75rem;
+    color: #999;
+}
+
+/* Status Pills */
+.status-pill {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.status-pill.completed { background: #e6ffed; color: #22c55e; }
+.status-pill.pending { background: #fff4e5; color: #ffab00; }
+.status-pill.process { background: #f0f7ff; color: #007bff; }
+
+/* Action Buttons */
+.action-btns {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.action-btn.edit { background: #f0f7ff; color: #007bff; }
+.action-btn.delete { background: #fff5f5; color: #ff4d4d; }
+
+.action-btn:hover {
+    opacity: 0.7;
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .bookings-header { flex-direction: column; text-align: center; gap: 20px; }
+    .bookings-controls { flex-direction: column; }
+    .bookings-table thead { display: none; }
+    .bookings-table tr { display: block; margin-bottom: 20px; border: 1px solid #eee; border-radius: 12px; }
+    .bookings-table td { display: flex; justify-content: space-between; align-items: center; text-align: right; }
+}

@@ -4,18 +4,12 @@
 }
 
 .staff-header {
-    display: flex;
+    display: flex; 
     justify-content: space-between;
     align-items: flex-end; 
     margin-bottom: 30px;
 }
 
-.add-staff-btn {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: 600;
-}
 
 .staff-stats {
     display: grid;

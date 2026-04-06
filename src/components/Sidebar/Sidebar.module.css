@@ -30,20 +30,26 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 15px 0 0; 
-  height: 60px;
+  padding: 10px 15px; 
+  height: 80px; 
 }
 
 .brand {
-  font-size: 24px;
-  font-weight: 700;
+  flex: 1;
   height: 100%;
   display: flex;
   align-items: center;
-  /* Neon Lime for the Logo */
-  color: var(--primary-color);
-  padding: 0 24px;
   text-decoration: none;
+  overflow: hidden; 
+}
+
+.logoImg {
+  width: auto;
+  max-width: 100%; 
+  height: auto;
+  max-height: 60px; 
+  object-fit: contain; 
+  display: block;
 }
 
 .sideMenu {
@@ -65,8 +71,7 @@
   height: 100%;
   display: flex;
   align-items: center;
-  /* Silver text for inactive links */
-  color: var(--text-silver);
+  color: var(--text-main);
   background-color: transparent;
   padding: 0 20px;
   text-decoration: none;
@@ -77,12 +82,12 @@
 
 .sideMenu li a:hover {
   color: var(--primary-color);
-  background: rgba(209, 254, 23, 0.05); 
+  background: var(--bg-color); 
+  transition: var(--transition);
 }
 
 /* Active State */
 .active a {
-  /* Updated: Neon Lime background with the dark black text */
   background: var(--primary-color) !important; 
   color: var(--dark-color) !important;
   box-shadow: 0 8px 20px rgba(209, 254, 23, 0.2);
@@ -100,7 +105,8 @@
   border: none;
   color: var(--primary-color);
   cursor: pointer;
-  margin-right: 10px;
+  margin-left: 10px;
+  flex-shrink: 0; /* Ensures button doesn't squish */
 }
 
 @media (min-width: 769px) {

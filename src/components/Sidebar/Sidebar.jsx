@@ -1,6 +1,6 @@
 // components/Sidebar/Sidebar.jsx
-import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom'; // Added Link and useLocation
+import { Link, useLocation } from 'react-router-dom';
+import WowSewaLogo from '../../assets/images/wowLogo.png';
 import { 
   MdDashboard, MdStore, MdAnalytics, 
   MdPeople, MdSettings, MdLogout, MdClose 
@@ -8,7 +8,7 @@ import {
 import styles from "./Sidebar.module.css";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
-  const location = useLocation(); // Hook to check the current URL path
+  const location = useLocation();
 
   const topMenu = [
     { name: 'Dashboard', icon: MdDashboard, path: '/dashboard' },
@@ -21,7 +21,10 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   return (
     <section className={`${styles.sidebar} ${isOpen ? styles.open : ''}`}>
       <div className={styles.sidebarHeader}>
-        <Link to="/dashboard" className={styles.brand}>AdminHub</Link>
+        <Link to="/dashboard" className={styles.brand}>
+          {/* Logo added here */}
+          <img src={WowSewaLogo} alt="WowSewa Logo" className={styles.logoImg} />
+        </Link>
         <button className={styles.sidebarCloseBtn} onClick={toggleSidebar}>
           <MdClose size={28} />
         </button>
@@ -30,17 +33,16 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       <ul className={`${styles.sideMenu} ${styles.top}`}>
         {topMenu.map((item) => {
           const Icon = item.icon;
-          // Check if current path matches the menu item path for active styling
           const isActive = location.pathname === item.path;
 
           return (
             <li 
               key={item.name}
-              className={isActive ? styles.active : ''}
-              onClick={toggleSidebar} // Optional: closes sidebar on mobile after clicking
+              className={`${styles.menuItem} ${isActive ? styles.active : ''}`}
+              onClick={isOpen ? toggleSidebar : undefined}
             >
               <Link to={item.path}>
-                <Icon size={24} />
+                <Icon size={24} />  
                 <span className={styles.text}>{item.name}</span>
               </Link>
             </li>

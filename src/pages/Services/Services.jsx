@@ -12,6 +12,13 @@ import StatsBar from '../../components/Statsbar/Statsbar';
 
 const Services = () => {
 
+    const serviceStats = [
+        { number: "500+", label: "Repairs Completed" },
+        { number: "15+", label: "Expert Technicians" },
+        { number: "4.9/5", label: "Customer Rating" },
+        { number: "30", label: "Min Response Time" }
+    ];
+
     const servicesFaqData = [
         {
             question: "What is Wow Sewa?",
@@ -111,7 +118,7 @@ const Services = () => {
 
     return (
         <>
-        <StatsBar/>
+        <StatsBar stats={serviceStats} bgColor={"bg-light"} numberColor={"accent-text-lime-dark"} labelColor={"accent-text-dark"} />
             <section className="services-page bg-dark">
                 <div className="container">
                     <header className="services-header">

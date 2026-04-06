@@ -1,7 +1,11 @@
 .stats-bar {
-    padding: 60px 0;
-    border-bottom: 1px solid #2A2A2C;
+    padding: 30px 0;
     overflow: hidden;
+}
+
+.stats-bar .container{
+    border-radius: 20px;
+    padding: 12px 0;
 }
 
 .stats-grid {
@@ -16,6 +20,8 @@
     text-align: center;
     flex: 1;
     min-width: 200px;
+    padding: 8px 0;
+    border-radius: 20px;
 }
 
 
@@ -27,13 +33,7 @@
     align-items: center;
 }
 
-.stat-number {
-    font-size: 3rem;
-    font-weight: 800;
-    color: var(--primary-color);
-    letter-spacing: -1px;
-    text-shadow: 0 0 15px rgba(207, 255, 19, 0.2);
-}
+
 
 /* animation */
 .animate-roll {
