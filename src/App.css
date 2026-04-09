@@ -111,6 +111,11 @@ img{
     letter-spacing: 1px;
 }
 
+.btn-sm{
+    padding:10px 12px;
+    font-size: 0.9rem;
+}
+
 
 .btn-primary{
     background: var(--primary-color);
@@ -141,6 +146,11 @@ img{
     color: var(--primary-color);
 }
 
+.btn-warn{
+    background-color: var(--dark-color);
+    color: crimson;
+}
+
 .btn-block{
     display: block;
     width: 100%;
@@ -148,7 +158,7 @@ img{
 
 /* text utility */
 
-h1, h2, h3, h4, .text-xxl, .text-xl, .btn {
+h1, h2, h3, h4, .text-xxl, .text-xl,.text-lg,.text-md,.text-sm .btn {
   font-family: var(--font-main);
 }
 
@@ -255,17 +265,20 @@ h1, h2, h3, h4, .text-xxl, .text-xl, .btn {
 }
 
 .table-universal th {
-  text-align: center;
-  padding-bottom: 15px;
-  border-bottom: 1px solid #ddd;
-  font-size: 14px;
+    background: #f8fafc;
+    color: #64748b;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 15px;
+    text-transform: uppercase;
+    text-align: left;
 }
 
+
 .table-universal td {
-  padding: 16px 0;
-  font-size: 14px;
-  border-bottom: 1px solid rgba(0,0,0,0.05);
-  text-align: center;
+    padding: 15px;
+    border-bottom: 1px solid #f1f5f9;
+    text-align: left;
 }
 
 .table-card-head {
@@ -273,6 +286,11 @@ h1, h2, h3, h4, .text-xxl, .text-xl, .btn {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 20px;
+}
+
+.table-btns-flex{
+    display: flex;
+    gap: 10px;
 }
 
 
@@ -407,4 +425,46 @@ h1, h2, h3, h4, .text-xxl, .text-xl, .btn {
         font-size: 2rem;
     }
 
+}
+
+
+
+
+/* remove maybe?? table responsiveness*/
+
+@media (max-width: 850px) {
+    .table-universal thead {
+        display: none; 
+    }
+
+    .table-universal tr {
+        display: block;
+        margin-bottom: 20px;
+        border-bottom: 2px solid var(--primary-color); 
+        padding: 10px 0;
+    }
+
+    .table-universal td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        text-align: right;
+        padding: 10px 20px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .table-universal td::before {
+        content: attr(data-label);
+        font-weight: 700;
+        color: #94a3b8;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        margin-right: 15px;
+    }
+
+    .table-universal td:last-child {
+        border-bottom: none;
+        justify-content: center; 
+        padding-top: 15px;
+    }
 }

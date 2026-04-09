@@ -1,104 +1,181 @@
-// pages/Bookings/Bookings.jsx
 import React, { useState } from 'react';
 import { MdEdit, MdDelete, MdSearch } from 'react-icons/md';
-import { FaCalendarPlus, FaClipboardList, FaCheckCircle, FaHourglassHalf, FaSpinner } from 'react-icons/fa';
+import { FaCalendarPlus, FaHashtag } from 'react-icons/fa';
+
+import { PopupModal } from '../../components/Popup/PopupModal'; 
+
 import './Booking.css'; 
 import Statsbar from "../../components/Statsbar/Statsbar"
-
+import Loader from '../../components/Loader/Loading'; 
+import { fetchHook } from '../../hooks/fetchHook';
+import { fetchAPI } from '../../utils/fetchAPI'; 
 
 const Bookings = () => {
-  const [bookings, setBookings] = useState([
-    { id: "BK-101", service: "Full Car Wash", date: "2024-03-20", status: "Completed" },
-    { id: "BK-102", service: "Engine Detailing", date: "2024-03-21", status: "Pending" },
-    { id: "BK-103", service: "Interior Cleaning", date: "2024-03-22", status: "Process" },
-    { id: "BK-104", service: "Ceramic Coating", date: "2024-03-23", status: "Pending" },
-  ]);
+    const { data: bookings, loading } = fetchHook("https://localhost:7011/api/Booking/getBookings");
 
-  const handleDelete = (id) => {
-    if (window.confirm(`Are you sure you want to delete ${id}?`)) {
-      setBookings(bookings.filter(booking => booking.id !== id));
-    }
-  };
+    const [openEdit, setOpenEdit] = useState(false);
+    const [openDelete, setOpenDelete] = useState(false);
+    const [selectedBooking, setSelectedBooking] = useState(null);
 
-  const bookingStats = [
-    { 
-      number: bookings.length, 
-      label: "Total Bookings" 
-    },
-    { 
-      number: "1", 
-      label: "In Process" 
-    },
-    { 
-      number: "2", 
-      label: "Pending Approval" 
-    }
-  ];
+    const onOpenEditModal = (item) => {
+        setSelectedBooking(item);
+        setOpenEdit(true);
+    };
 
-  return (
-    <div className="in-app-container">
-      <header className="in-app-header">
-        <div>
-          <h1 className="text-xl accent-text-white">Service <span className="accent-text-primary">Bookings</span></h1>
-          <p className="text-md accent-text-white">Manage and track customer service requests.</p>
+    const onOpenDeleteModal = (item) => {
+        setSelectedBooking(item);
+        setOpenDelete(true);
+    };
+
+    const onCloseModals = () => {
+        setOpenEdit(false);
+        setOpenDelete(false);
+        setSelectedBooking(null);
+    };
+
+    const handleDeleteConfirm = async () => {
+        const id = selectedBooking?.bookingId || selectedBooking?.id;
+        const success = await fetchAPI(`https://localhost:7011/api/Booking/delete/${id}`, "DELETE");
+        if (success) {
+            alert("Booking deleted successfully!");
+            onCloseModals();
+        }
+    };
+
+    if (loading) return <div className="in-app-container"><Loader /></div>;
+
+    const safeBookings = bookings || [];
+
+    const bookingStats = [
+        { number: safeBookings.length, label: "Total Bookings" },
+        { number: "1", label: "In Process" },
+        { number: "2", label: "Pending Approval" }
+    ];
+
+    return (
+        <div className="in-app-container">
+            <header className="in-app-header">
+                <div className="header-text">
+                    <h1 className="text-xl accent-text-white">Service <span className="accent-text-primary">Bookings</span></h1>
+                    <p className="text-md accent-text-white">Manage and track customer service requests.</p>
+                </div>
+                <button className="btn btn-primary">
+                    <FaCalendarPlus /> New Booking
+                </button>
+            </header>
+
+            <Statsbar stats={bookingStats} bgColor={"bg-light"} numberColor={"accent-text-lime-dark"} />
+
+            <div className="bookings-controls">
+                <div className="search-box">
+                    <MdSearch className="search-icon" size={20} />
+                    <input type="text" placeholder="Search by Code, Customer or Service..." />
+                </div>
+                <div className="filter-group">
+                    <select className="filter-select">
+                        <option value="">All Services</option>
+                        <option value="wash">Car Wash</option>
+                        <option value="detail">Detailing</option>
+                    </select>
+                </div>
+            </div>
+
+            <div className="table-card bg-text-main">
+                <table className="table-universal">
+                    <thead>
+                        <tr>
+                            <th>Booking Code</th>
+                            <th>Customer</th>
+                            <th>Service Detail</th>
+                            <th>Date Booked</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {safeBookings.length > 0 ? (
+                            safeBookings.map((item) => (
+                                <tr key={item.bookingId || item.id}>
+                                    <td data-label="Code">
+                                        <div className="booking-code-wrapper">
+                                            <span className="code-badge">
+                                                <FaHashtag size={10} /> {item.bookingCode || item.bookingId}
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td data-label="Customer">
+                                        <span className="customer-name">{item.user?.name || 'Walk-in'}</span>
+                                    </td>
+                                    <td data-label="Service">
+                                        <div className="booking-details">
+                                            <span className="service-name">{item.bookedServiceFor}</span>
+                                            <span className="booking-id-sub">ID: #{item.bookingId}</span>
+                                        </div>
+                                    </td>
+                                    <td data-label="Date">
+                                        {item.createdDate || 'Pending'}
+                                    </td>
+                                    <td data-label="Status">
+                                        <span className={`status-pill ${(item.bookingStatus || "N/A").toLowerCase()}`}>
+                                            {item.bookingStatus}
+                                        </span>
+                                    </td>
+                                    <td data-label="Actions">
+                                        <div className='table-btns-flex'>
+                                            <button className="btn btn-primary btn-sm" onClick={() => onOpenEditModal(item)}>
+                                                Edit
+                                            </button>
+                                            <button className="btn btn-warn btn-sm" onClick={() => onOpenDeleteModal(item)}>
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="6" className="text-center">No bookings found.</td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
+
+            <PopupModal open={openDelete} onClose={onCloseModals} title="Confirm Delete" >
+                <p>Are you sure you want to delete booking <b>{selectedBooking?.bookingCode || selectedBooking?.bookingId}</b>?</p>
+                <div className="modal-btns">
+                    <button className="btn btn-dark" onClick={onCloseModals}>Cancel</button>
+                    <button className="btn btn-danger" onClick={handleDeleteConfirm}>Delete anyway</button>
+                </div>
+            </PopupModal>
+
+            <PopupModal 
+                open={openEdit} 
+                onClose={onCloseModals} 
+                title="Edit Booking"
+            >
+                <form className="modal-form" onSubmit={(e) => e.preventDefault()}>
+                    <label>Customer</label>
+                    <input type="text" defaultValue={selectedBooking?.user?.name} disabled />
+                    
+                    <label>Service</label>
+                    <input type="text" defaultValue={selectedBooking?.bookedServiceFor} />
+                    
+                    <label>Status</label>
+                    <select defaultValue={selectedBooking?.bookingStatus}>
+                        <option value="Pending">Pending</option>
+                        <option value="InProcess">In Process</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+
+                    <div className="modal-btns">
+                        <button type="button" className="btn btn-dark" onClick={onCloseModals}>Cancel</button>
+                        <button type="submit" className="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </PopupModal>
         </div>
-        <button className="btn btn-primary">
-          <FaCalendarPlus /> New Booking
-        </button>
-      </header>
-
-      <Statsbar stats={bookingStats} bgColor={"bg-light"} numberColor={"accent-text-lime-dark"} />
-
-      <div className="bookings-controls">
-        <div className="search-box">
-          <MdSearch className="search-icon" size={20} />
-          <input type="text" placeholder="Search by ID or Service..." />
-        </div>
-        <select className="filter-select">
-          <option value="">All Services</option>
-          <option value="wash">Car Wash</option>
-          <option value="detail">Detailing</option>
-        </select>
-      </div>
-
-      <div className="table-card bg-text-main">
-        <table className="table-universal">
-          <thead>
-            <tr>
-              <th>Booking Detail</th>
-              <th>Date Booked</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {bookings.map((booking) => (
-              <tr key={booking.id}>
-                <td>
-                    <div className="booking-details">
-                      <span className="service-name">{booking.service}</span>
-                      <span className="booking-id-sub">ID: #{booking.id}</span>
-                  </div>
-                </td>
-                <td>{booking.date}</td>
-                <td>
-                  <span className={`status-pill ${booking.status.toLowerCase()}`}>
-                    {booking.status}
-                  </span>
-                </td>
-                <td className='action-btns'>
-                    <button className="btn btn-primary" title="Edit"><MdEdit /></button>
-                    <button className="btn btn-dark" onClick={() => handleDelete(booking.id)} title="Delete">
-                        <MdDelete />
-                    </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default Bookings;
