@@ -14,9 +14,10 @@ import Staffs from './pages/Staffs/Staffs';
 import Users from './pages/Users/Users';
 import ProtectedRoute from './routes/ProtectedRoute';
 import Sidebar from './components/Sidebar/Sidebar';
-import Dashboard from './pages/Dashboard/Dashboard';
+import Dashboard from './pages/Dashboard/AdminDashboard';
 import AfterLoginLayout from './layouts/AfterLoginLayout';
 import Bookings from './pages/Booking/Booking';
+import CustomerDashboard from './pages/Dashboard/CustomerDashboard';
 
 const App = () => {
   return (
@@ -24,26 +25,31 @@ const App = () => {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-
-        <Route path="/sidebar" element={<Sidebar  />} />
-        <Route element={<AfterLoginLayout/>}>
+        
+        {/* <Route element={<AfterLoginLayout/>}>
           <Route path="/dashboard" element={<Dashboard/>} />
           <Route path="/booking" element={<Bookings/>}/>
           <Route path="/staffs" element={<Staffs />} />
           <Route path="/users" element={<Users />} />
-        </Route>
+        </Route> */}
 
 
         <Route >
             <Route element={<ProtectedRoute allowedRoles={"admin"}/>}>
-              {/* <Route path="/admin/dashboard" element={<Dashboard/>}/> */}
-              <Route path="/admin/staffs" element={<Staffs />} />
-              <Route path="/admin/users" element={<Users />} />
+              <Route element={<AfterLoginLayout/>}>
+                  <Route path = "/" element={<Dashboard/>}/>
+                  <Route path="/admin/dashboard" element={<Dashboard/>} />
+                  <Route path="/admin/booking" element={<Bookings/>}/>
+                  <Route path="/admin/staffs" element={<Staffs />} />
+                  <Route path="/admin/users" element={<Users />} />
+                </Route>
             </Route>
 
             {/* Customer */}
             <Route element={<ProtectedRoute allowedRoles={"customer"}/>}>
-
+              <Route element={<AfterLoginLayout/>}>
+                <Route path="/customer/dashboard" element={<CustomerDashboard/>} />
+              </Route>
             </Route>
         </Route>
 

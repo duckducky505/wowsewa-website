@@ -1,28 +1,53 @@
-// components/Sidebar/Sidebar.jsx
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import WowSewaLogo from '../../assets/images/wowLogo.png';
 import { 
   MdDashboard, MdStore, MdAnalytics, 
-  MdPeople, MdSettings, MdLogout, MdClose 
+  MdPeople, MdSettings, MdLogout, MdClose, MdHistory 
 } from 'react-icons/md';
 import styles from "./Sidebar.module.css";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const location = useLocation();
+  const navigate = useNavigate();
 
-  const topMenu = [
-    { name: 'Dashboard', icon: MdDashboard, path: '/dashboard' },
-    { name: 'Bookings', icon: MdStore, path: '/booking' },
-    { name: 'Users', icon: MdAnalytics, path: '/users' },
-    { name: 'Staffs', icon: MdPeople, path: '/staffs' },
-    { name: 'Settings', icon: MdSettings, path: '/settings' },
-  ];
+  const token = localStorage.getItem("Token");
+  let role = "";
+  
+  if (token) {
+    try {
+      const decodedToken = JSON.parse(atob(token.split(".")[1]));
+      role = (decodedToken.role || decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"]).toLowerCase();
+    } catch (e) {
+      console.error("Error decoding token", e);
+    }
+  }
+
+  const menuConfig = {
+    admin: [
+      { name: 'Dashboard', icon: MdDashboard, path: '/admin/dashboard' },
+      { name: 'Bookings', icon: MdStore, path: '/admin/booking' },
+      { name: 'Users', icon: MdAnalytics, path: '/admin/users' },
+      { name: 'Staffs', icon: MdPeople, path: '/admin/staffs' },
+      { name: 'Settings', icon: MdSettings, path: 'admin/settings' },
+    ],
+    customer: [
+      { name: 'Dashboard', icon: MdDashboard, path: '/customer/dashboard' },
+      { name: 'My Bookings', icon: MdHistory, path: '/customer/my-bookings' }, // Customers usually want history
+      { name: 'Settings', icon: MdSettings, path: '/customer/settings' },
+    ]
+  };
+
+  const correctMenu = menuConfig[role] || [];
+
+  const handleLogout = () => {
+    localStorage.removeItem("Token");
+    navigate("/login");
+  };
 
   return (
     <section className={`${styles.sidebar} ${isOpen ? styles.open : ''}`}>
       <div className={styles.sidebarHeader}>
-        <Link to="/dashboard" className={styles.brand}>
-          {/* Logo added here */}
+        <Link to={`/${role}/dashboard`} className={styles.brand}>
           <img src={WowSewaLogo} alt="WowSewa Logo" className={styles.logoImg} />
         </Link>
         <button className={styles.sidebarCloseBtn} onClick={toggleSidebar}>
@@ -31,7 +56,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       </div>
 
       <ul className={`${styles.sideMenu} ${styles.top}`}>
-        {topMenu.map((item) => {
+        {correctMenu.map((item) => {
           const Icon = item.icon;
           const isActive = location.pathname === item.path;
 
@@ -52,10 +77,10 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
       <ul className={styles.sideMenu}>
         <li>
-          <Link to="/login" className={styles.logout}>
+          <div className={`${styles.logout} ${styles.menuItem}`} onClick={handleLogout} style={{ cursor: 'pointer' }}>
             <MdLogout size={24} />
             <span className={styles.text}>Logout</span>
-          </Link>
+          </div>
         </li>
       </ul>
     </section>

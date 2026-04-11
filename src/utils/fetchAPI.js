@@ -1,17 +1,25 @@
-export const fetchAPI = async(url, method, body = null) => {
-
+export const fetchAPI = async (url, method, body = null) => {
     const sideBody = {
-        method : method,
-        headers:{
-            "Content-Type":"application/json"
-        }
-    }
+        method: method,
+        headers: { "Content-Type": "application/json" }
+    };
     
-    if(body) sideBody.body = JSON.stringify(body);
+    if (body) sideBody.body = JSON.stringify(body);
 
     const response = await fetch(url, sideBody);
 
-    if(!response.ok){console.log("Error fetching from the api");}
-    const data = await response.json();
-    return data;
-}
+    if (!response.ok) {
+        console.error("API Error Status:", response.status);
+        return null;
+    }
+
+    const rawData = await response.text();
+
+    if (!rawData) return true;
+
+    try {
+        return JSON.parse(rawData);
+    } catch (e) {
+        return rawData;
+    }
+};

@@ -12,10 +12,17 @@ import { fetchAPI } from '../../utils/fetchAPI';
 
 const Bookings = () => {
     const { data: bookings, loading } = fetchHook("https://localhost:7011/api/Booking/getBookings");
+    const { data: bookedServiceFor} = fetchHook("https://localhost:7011/api/Booking/getBookedService")
+    const { data: bookingStatus} = fetchHook("https://localhost:7011/api/Booking/getBookingStatus")
 
     const [openEdit, setOpenEdit] = useState(false);
     const [openDelete, setOpenDelete] = useState(false);
     const [selectedBooking, setSelectedBooking] = useState(null);
+
+    const [updatebookingStatus, setUpdatedBookingStatus] = useState(null);
+    const [updateBookedServiceFor, setUpdatedBookedServiceFor] = useState(null);
+
+
 
     const onOpenEditModal = (item) => {
         setSelectedBooking(item);
@@ -33,7 +40,31 @@ const Bookings = () => {
         setSelectedBooking(null);
     };
 
-    const handleDeleteConfirm = async () => {
+    //Add Function
+   
+
+    //Update Function
+
+    const updateBookingChanges = async () => {
+
+        const payload = {
+            bookingStatus : updatebookingStatus || selectedBooking.bookingStatus,
+            bookedServiceFor : updateBookedServiceFor || selectedBooking.bookedServiceFor
+        }
+
+        const id = selectedBooking?.bookingId;
+
+        const callFetchAPI = await fetchAPI(`https://localhost:7011/api/Booking/updateBookingDetails/${id}`, "PATCH",payload);
+        if(callFetchAPI) {
+            alert("Booking updated successfully");
+            window.location.reload();
+        }
+    }
+
+
+    //Delete Function
+
+     const handleDeleteConfirm = async () => {
         const id = selectedBooking?.bookingId || selectedBooking?.id;
         const success = await fetchAPI(`https://localhost:7011/api/Booking/delete/${id}`, "DELETE");
         if (success) {
@@ -41,6 +72,8 @@ const Bookings = () => {
             onCloseModals();
         }
     };
+
+
 
     if (loading) return <div className="in-app-container"><Loader /></div>;
 
@@ -86,7 +119,7 @@ const Bookings = () => {
                         <tr>
                             <th>Booking Code</th>
                             <th>Customer</th>
-                            <th>Service Detail</th>
+                            <th>Service</th>
                             <th>Date Booked</th>
                             <th>Status</th>
                             <th>Actions</th>
@@ -109,7 +142,6 @@ const Bookings = () => {
                                     <td data-label="Service">
                                         <div className="booking-details">
                                             <span className="service-name">{item.bookedServiceFor}</span>
-                                            <span className="booking-id-sub">ID: #{item.bookingId}</span>
                                         </div>
                                     </td>
                                     <td data-label="Date">
@@ -152,25 +184,40 @@ const Bookings = () => {
             <PopupModal 
                 open={openEdit} 
                 onClose={onCloseModals} 
-                title="Edit Booking"
-            >
+                title="Edit Booking">
                 <form className="modal-form" onSubmit={(e) => e.preventDefault()}>
-                    <label>Customer</label>
+                    <label>Customer Name</label>
                     <input type="text" defaultValue={selectedBooking?.user?.name} disabled />
                     
                     <label>Service</label>
-                    <input type="text" defaultValue={selectedBooking?.bookedServiceFor} />
+                    <select defaultValue={selectedBooking?.bookedServiceFor} onChange={(e) => setUpdatedBookedServiceFor(e.target.value)}>
+                        {bookedServiceFor.length > 0 ? (
+                                bookedServiceFor.map((bookedServiceFor,index) => (
+                                    <option key={index} value={bookedServiceFor.name || bookedServiceFor}>
+                                        {bookedServiceFor.name || bookedServiceFor}
+                                    </option>
+                                ))
+                            ) : (
+                                <option disabled>Loading services...</option>
+                        )}
+                    </select>
                     
                     <label>Status</label>
-                    <select defaultValue={selectedBooking?.bookingStatus}>
-                        <option value="Pending">Pending</option>
-                        <option value="InProcess">In Process</option>
-                        <option value="Completed">Completed</option>
+                    <select defaultValue={selectedBooking?.bookingStatus} onChange={(e) => setUpdatedBookingStatus(e.target.value)}>
+                        {bookingStatus.length > 0 ? (
+                                bookingStatus.map((bookingStatus,index) => (
+                                    <option key={index} value={bookingStatus.name || bookingStatus}>
+                                        {bookingStatus.name || bookingStatus}
+                                    </option>
+                                ))
+                            ) : (
+                                <option disabled>Loading roles...</option>
+                        )}
                     </select>
 
                     <div className="modal-btns">
                         <button type="button" className="btn btn-dark" onClick={onCloseModals}>Cancel</button>
-                        <button type="submit" className="btn btn-primary">Save Changes</button>
+                        <button type="submit" className="btn btn-primary" onClick={updateBookingChanges}>Save Changes</button>
                     </div>
                 </form>
             </PopupModal>

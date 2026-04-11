@@ -68,7 +68,7 @@
 
 .status-pill.completed { background: #e6ffed; color: #22c55e; }
 .status-pill.pending { background: #fff4e5; color: #ffab00; }
-.status-pill.process { background: #f0f7ff; color: #007bff; }
+.status-pill.inprocess { background: #f0f7ff; color: #007bff; }
 
 /* Booking Code UI */
 .code-badge {
