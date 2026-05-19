@@ -1,160 +1,222 @@
 .amc-page {
+    background: var(--light-color);
+    color: #0d0d0d;
     overflow-x: hidden;
 }
 
-.section-title-center {
-    text-align: center;
-    margin-bottom: 60px;
+.amc-page .eyebrow {
+    color: var(--bg-color);
+}
+.amc-page .eyebrow::before {
+    background: var(--bg-color);
+}
+.amc-page .ds-head h2 {
+    color: #0d0d0d;
+}
+.amc-page .ds-head p {
+    color: rgba(1, 10, 8, 0.6);
 }
 
-/* Pricing Grid */
+
+/* Plans */
+.amc-plans {
+    background: var(--light-color);
+}
+
 .amc-grid {
-
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 30px;
-    align-items: flex-start;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    align-items: center;
 }
-
-/* Pricing Cards */
 
 .amc-card {
-    background: #fdfdfd;
-    border: 1px solid #eee;
-    padding: 50px 40px;
-    border-radius: 30px;
-    text-align: center;
-    transition: var(--transition);
     position: relative;
+    padding: 44px 36px;
+    background: #ffffff;
+    border: 1px solid #e3e5d6;
+    border-radius: var(--r-lg);
+    text-align: center;
+    transition: transform .35s var(--ease), border-color .3s ease, box-shadow .35s ease;
 }
 
-/* Featured Card (Standard) */
-
-.amc-card.featured {
-
-    background: var(--dark-color);
-    color: white;
-    transform: scale(1.05);
-    box-shadow: 0 30px 60px rgba(0,0,0,0.2);
-    border: 2px solid var(--primary-color);
+.amc-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--bg-color);
+    box-shadow: 0 18px 40px rgba(7, 76, 58, 0.14);
 }
 
-.plan-tag {
-    font-size: 0.75rem;
+.amc-card--featured {
+    background: var(--bg-color);
+    border: 1px solid var(--bg-color);
+    box-shadow: 0 26px 56px rgba(7, 76, 58, 0.32);
+    transform: scale(1.04);
+}
+
+.amc-card--featured:hover {
+    transform: scale(1.04) translateY(-6px);
+}
+
+.amc-card__tag {
+    display: inline-block;
+    font-size: 0.72rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-bottom: 20px;
-    color: #777;
-
+    letter-spacing: 0.16em;
+    color: #888;
+    margin-bottom: 18px;
 }
 
-.featured-tag { color: var(--primary-lime); }
-.amc-card h3 { font-size: 1.8rem; margin-bottom: 15px; }
+.amc-card--featured .amc-card__tag {
+    color: var(--bg-color);
+    background: var(--primary-color);
+    padding: 5px 14px;
+    border-radius: var(--r-pill);
+}
 
-.price {
-    font-size: 2.5rem;
+.amc-card__name {
+    font-size: 1.7rem;
     font-weight: 800;
+    color: #0d0d0d;
+    margin-bottom: 14px;
+}
+
+.amc-card--featured .amc-card__name {
+    color: #fff;
+}
+
+.amc-card__price {
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: var(--bg-color);
     margin-bottom: 30px;
 }
 
-.price span { font-size: 1rem; color: #888; }
-
-.plan-features {
-    list-style: none;
-    text-align: left;
-    margin-bottom: 40px;
+.amc-card--featured .amc-card__price {
+    color: var(--primary-color);
 }
 
-.plan-features li {
-    display: flex;
-    align-items: center; 
-    gap: 12px;
-    margin-bottom: 15px;
+.amc-card__cur {
     font-size: 1rem;
-}
-
-/* Icons */
-
-.icon-success {
-    color: var(--primary-lime, #CFFA13);
-    flex-shrink: 0;
-}
-
-.icon-disabled {
-    color: #ff4d4d;
-    opacity: 0.5;
-    flex-shrink: 0;
-}
-
-.icon-box {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.icon-box svg {
-    font-size: 1.6rem;
-    color: var(--lime-dark);
-}
-
-/* services */
-
-.services-cards-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 25px;
-}
-
-.service-card {
-    padding: 40px 30px;
-    border-radius: 24px;
-    border: 1px solid #333;
-    transition: var(--transition);
-}
-
-.service-card:hover {
-    border-color: var(--primary-color);
-    transform: translateY(-8px);
-    box-shadow: 0 15px 35px rgba(207, 255, 19, 0.1);
-}
-
-.icon-box {
-    width: 55px;
-    height: 55px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 25px;
-}
-
-
-.service-card h3 {
-    font-size: 1.4rem;
-    margin-bottom: 12px;
+    color: #888;
     font-weight: 600;
 }
 
-.service-card p {
+.amc-card__per {
     font-size: 0.95rem;
-    line-height: 1.6;
+    color: #aaa;
+    font-weight: 500;
 }
 
-/*  */
+.amc-card--featured .amc-card__cur,
+.amc-card--featured .amc-card__per {
+    color: rgba(248, 250, 234, 0.7);
+}
 
-.btn-outline {
-    border: 2px solid #333;
-    padding: 12px 30px;
-    background: transparent;
+.amc-card__features {
+    list-style: none;
+    text-align: left;
+    margin: 0 0 32px;
+    padding: 0;
+}
+
+.amc-card__features li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+    font-size: 0.98rem;
     color: #333;
 }
 
-.featured .btn-outline { border-color: #fff; color: #fff; }
-
-/* Responsive adjustments */
-@media (max-width: 992px) {
-    .amc-card.featured { transform: scale(1); margin: 20px 0; }
-    .amc-grid { padding: 0 20px; }
+.amc-card__features li svg {
+    color: var(--bg-color);
+    flex-shrink: 0;
 }
 
+.amc-card__features li.is-off {
+    color: #b0b0b0;
+}
+
+.amc-card__features li.is-off svg {
+    color: #e0556b;
+}
+
+.amc-card--featured .amc-card__features li {
+    color: rgba(248, 250, 234, 0.92);
+}
+
+.amc-card--featured .amc-card__features li svg {
+    color: var(--primary-color);
+}
+
+.amc-card--featured .amc-card__features li.is-off {
+    color: rgba(248, 250, 234, 0.5);
+}
+
+/* Benefits */
+.amc-benefits {
+    background: #f0f2df;
+    border-top: 1px solid #e1e3d2;
+}
+
+.amc-benefits__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 22px;
+}
+
+.amc-benefit {
+    padding: 36px 30px;
+    background: #ffffff;
+    border: 1px solid #e3e5d6;
+    border-radius: var(--r-md);
+    text-align: center;
+    transition: transform .35s var(--ease), border-color .3s ease, box-shadow .3s ease;
+}
+
+.amc-benefit:hover {
+    transform: translateY(-6px);
+    border-color: var(--bg-color);
+    box-shadow: 0 16px 36px rgba(7, 76, 58, 0.12);
+}
+
+.amc-benefit__icon {
+    display: grid;
+    place-items: center;
+    width: 58px;
+    height: 58px;
+    margin: 0 auto 22px;
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    background: var(--bg-color);
+    border-radius: 16px;
+}
+
+.amc-benefit h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #0d0d0d;
+    margin-bottom: 10px;
+}
+
+.amc-benefit p {
+    color: #555;
+    font-size: 0.98rem;
+    line-height: 1.65;
+}
+
+@media (max-width: 992px) {
+    .amc-card--featured {
+        transform: scale(1);
+    }
+    .amc-card--featured:hover {
+        transform: translateY(-6px);
+    }
+}
+
+@media (max-width: 600px) {
+    .amc-card {
+        padding: 38px 28px;
+    }
+}

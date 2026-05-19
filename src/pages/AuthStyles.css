@@ -1,59 +1,94 @@
-/* AuthStyles.css */
+/* AuthStyles — dark glass auth */
 
 .auth-page-wrapper {
+    position: relative;
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 40px 20px;
+    overflow: hidden;
+    background:
+        radial-gradient(90% 70% at 50% 0%, rgba(7, 76, 58, 0.85) 0%, transparent 60%),
+        var(--dark-color);
+}
+
+.auth-glow {
+    position: absolute;
+    top: -180px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 620px;
+    height: 480px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(209, 254, 23, 0.16) 0%, transparent 65%);
+    pointer-events: none;
+}
+
+.auth-page-wrapper .container {
     position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
 }
 
 .back-link {
     position: absolute;
-    top: 40px;
-    left: 40px;
-    color: var(--light-color);
+    top: 36px;
+    left: 36px;
     display: flex;
     align-items: center;
     gap: 10px;
+    color: var(--text-soft);
     font-weight: 600;
+    font-size: 0.95rem;
     transition: var(--transition);
-    z-index: 10;
+    z-index: 2;
 }
 
 .back-link:hover {
     color: var(--primary-color);
-    transform: translateX(-5px);
+    transform: translateX(-4px);
 }
 
 .auth-center-card {
     width: 100%;
-    max-width: 450px;
-    margin: 0 auto;
-    padding: 50px 40px;
-    border-radius: 20px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    max-width: 440px;
+    padding: 48px 40px;
+    border-radius: var(--r-lg);
+    background: rgba(248, 250, 234, 0.04);
+    border: 1px solid var(--line-strong);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow: var(--shadow-soft);
 }
 
 .auth-header h1 {
+    font-size: 1.85rem;
+    font-weight: 800;
+    color: #fff;
     margin-bottom: 10px;
-    color: var(--dark-color); 
+}
+
+.auth-header .accent-text-primary {
+    color: var(--primary-color);
 }
 
 .auth-header p {
-    color: #666; /* Grayish text for subtitle */
-    margin-bottom: 35px;
+    color: var(--text-soft);
+    font-size: 0.95rem;
+    margin-bottom: 34px;
 }
 
 .auth-form .form-group {
     margin-bottom: 20px;
+    text-align: left;
 }
 
 .auth-form label {
     display: block;
-    color: var(--dark-color); /* Dark labels */
-    font-size: 0.9rem;
+    color: var(--light-color);
+    font-size: 0.88rem;
     font-weight: 600;
     margin-bottom: 8px;
 }
@@ -61,61 +96,65 @@
 .auth-form input {
     width: 100%;
     padding: 14px 18px;
-    border-radius: 10px;
-    border: 2px solid #ddd; /* Light border for light mode */
-    background: #fff;
-    color: var(--dark-color);
+    border-radius: var(--r-sm);
+    border: 1px solid var(--line-strong);
+    background: rgba(1, 10, 8, 0.4);
+    color: var(--light-color);
     font-family: inherit;
+    font-size: 0.98rem;
     transition: var(--transition);
+}
+
+.auth-form input::placeholder {
+    color: var(--text-faint);
 }
 
 .auth-form input:focus {
     outline: none;
-    border-color: var(--lime-dark);
-    background: #fff;
-    box-shadow: 0 0 10px rgba(136, 171, 0, 0.1);
+    border-color: var(--primary-color);
+    background: rgba(1, 10, 8, 0.6);
+    box-shadow: 0 0 0 3px rgba(209, 254, 23, 0.12);
 }
 
-.auth-form input::placeholder {
-    color: #aaa;
+.auth-center-card .btn-large {
+    text-transform: none;
+    letter-spacing: 0;
+    margin-top: 6px;
 }
 
 .auth-footer {
-    margin-top: 30px;
+    margin-top: 26px;
     font-size: 0.95rem;
-    color: #555;
+    color: var(--text-soft);
 }
 
-.auth-footer a {
+.auth-link {
+    color: var(--primary-color);
     font-weight: 700;
-    text-decoration: none;
     margin-left: 5px;
 }
 
-.auth-footer a:hover {
+.auth-link:hover {
     text-decoration: underline;
 }
 
-/* Specific button tweak for this card */
-.auth-center-card .btn-large {
-    text-transform: none; /* Keeps it modern */
-    letter-spacing: 0;
-}
-
-/* Responsive adjustments */
-@media (max-width: 600px) {
-    .auth-center-card {
-        padding: 40px 25px;
-        max-width: 100%;
-    }
-    
-    .back-link {
-        top: 20px;
-        left: 20px;
-        font-size: 0.9rem;
-    }
-
+@media (max-width: 560px) {
     .auth-page-wrapper {
-        padding: 10px;
+        align-items: flex-start;
+        padding-top: 84px;
+    }
+    .auth-page-wrapper .container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .back-link {
+        position: static;
+        margin: 0 auto 22px;
+        justify-content: center;
+        font-size: 0.92rem;
+    }
+    .auth-center-card {
+        padding: 38px 26px;
+        margin: 0 auto;
     }
 }

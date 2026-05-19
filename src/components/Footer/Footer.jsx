@@ -12,7 +12,7 @@ import "./Footer.css";
 
 const Footer = () => {
     return (
-        <footer className="footer bg-darkgreen">
+        <footer className="footer">
             <div className="container">
                 <div className="footer-grid">
                     {/* Brand Column */}

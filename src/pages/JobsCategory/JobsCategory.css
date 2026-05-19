@@ -1,0 +1,105 @@
+@charset "UTF-8";
+/* JobsCategory — light admin (Sass source of truth)
+   Shared table/control/pill styles come from App.css (.in-app-container) */
+.jc-page .jc-stat-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.jc-page .jc-stat {
+  background: #ffffff;
+  border: 1px solid #e6e9ee;
+  border-radius: 14px;
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-shadow: 0 6px 18px rgba(22, 32, 43, 0.05);
+}
+
+.jc-page .jc-stat__num {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #16202b;
+}
+
+.jc-page .jc-stat__lbl {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8a94a3;
+}
+
+.jc-page .jc-job {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.jc-page .jc-job__icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  color: #16202b;
+  background: var(--primary-color, #d1fe17);
+}
+
+.jc-page .jc-job__text {
+  display: flex;
+  flex-direction: column;
+}
+
+.jc-page .jc-job__title {
+  font-weight: 700;
+  color: #16202b;
+}
+
+.jc-page .jc-job__desc {
+  font-size: 0.8rem;
+  color: #8a94a3;
+  max-width: 340px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jc-page .jc-cat-tag {
+  display: inline-block;
+  background: #eef1f5;
+  border: 1px solid #e2e6ec;
+  color: #4b5563;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 5px 14px;
+  border-radius: 100px;
+}
+
+.jc-page .status-pill.draft {
+  background: rgba(46, 143, 224, 0.14);
+  color: #2e8fe0;
+}
+
+.jc-page .status-pill.inactive {
+  background: #eef1f5;
+  color: #8a94a3;
+}
+
+.jc-page .modal-form textarea {
+  resize: vertical;
+}
+
+@media (max-width: 720px) {
+  .jc-page .jc-stat-row {
+    grid-template-columns: 1fr;
+  }
+  .jc-page .jc-job__desc {
+    max-width: 200px;
+  }
+}/*# sourceMappingURL=JobsCategory.css.map */

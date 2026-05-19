@@ -1,190 +1,166 @@
 import { Link } from 'react-router-dom';
 import FAQ from '../../components/FAQ/FAQ';
-import './Services.css'
-import { 
-  FaMicrochip, 
-  FaFaucet, 
-  FaBolt, 
-  FaCheck, 
-  FaCalendarCheck 
-} from 'react-icons/fa';
 import StatsBar from '../../components/Statsbar/Statsbar';
+import MainBanner from '../../components/MainBanner/MainBanner';
+import './Services.css';
+import {
+  FaMicrochip,
+  FaFaucet,
+  FaBolt,
+  FaCheck,
+  FaCalendarCheck,
+  FaArrowRight,
+} from 'react-icons/fa';
+
+const serviceStats = [
+  { number: '500+', label: 'Repairs Completed' },
+  { number: '15+', label: 'Expert Technicians' },
+  { number: '4.9', label: 'Customer Rating' },
+  { number: '30m', label: 'Response Time' },
+];
+
+const servicesFaqData = [
+  { question: 'What is Wow Sewa?', answer: 'Wow Sewa is a comprehensive repair and service company offering a wide range of services for both residential and commercial customers.' },
+  { question: 'What services do we provide?', answer: 'We provide electrical installation, plumbing, computer/laptop repair and servicing, and general installation and maintenance of home appliances.' },
+  { question: 'How can I book an appointment?', answer: 'Call us at 9762424318 or email wowsewaa@gmail.com to book an appointment.' },
+];
+
+const servicesData = [
+  {
+    category: 'Digital & IT Solutions',
+    icon: <FaMicrochip />,
+    items: [
+      { title: 'IT Networking & WiFi', description: 'Complete LAN/WAN setup and WiFi dead-zone elimination for homes and offices.', tag: 'Popular', image: 'src/assets/images/networking.webp', features: ['Mesh WiFi Setup', 'Router Config'] },
+      { title: 'Laptop Repair & Servicing', description: 'Deep cleaning, thermal paste replacement and hardware upgrades to boost performance.', tag: null, image: 'src/assets/images/laptopservicing.webp', features: ['OS Setup', 'Screen & Hinge Fix'] },
+      { title: 'CCTV Camera Installation', description: 'Complete security surveillance setup with remote mobile viewing and DVR/NVR config.', tag: 'Security', image: 'src/assets/images/cctv.webp', features: ['Night Vision', 'IP Camera Mapping'] },
+    ],
+  },
+  {
+    category: 'Plumbing & Water Systems',
+    icon: <FaFaucet />,
+    items: [
+      { title: 'Emergency Leak Repair', description: 'Rapid response for burst pipes, hidden leaks and high-pressure system failures.', tag: '24/7', image: 'src/assets/images/leak-repair.webp', features: ['Pipe Soldering', 'Drain Unclogging'] },
+      { title: 'Solar & Geyser Servicing', description: 'Tank descaling, glass-tube cleaning and repair of leaking solar water heaters.', tag: null, image: 'src/assets/images/solar.webp', features: ['Pipe Insulation', 'Pressure Fix'] },
+      { title: 'Sanitary Fitting', description: 'Installation of modern commodes, showers and luxury bathroom fixtures with precision.', tag: null, image: 'src/assets/images/sanitary-fitting.webp', features: ['Tap Install', 'PPR/CPVC Mapping'] },
+    ],
+  },
+  {
+    category: 'Electrical & Power',
+    icon: <FaBolt />,
+    items: [
+      { title: 'House Rewiring', description: 'Full house rewiring and circuit-breaker panel upgrades to ensure fire safety.', tag: 'Safety', image: 'src/assets/images/home-rewiring.webp', features: ['MCB Install', 'Short-Circuit Fix'] },
+      { title: 'AC & Fridge Maintenance', description: 'Gas refilling, filter cleaning and compressor repair for all major cooling brands.', tag: 'Popular', image: 'src/assets/images/ac-repair.webp', features: ['Deep Cleaning', 'Gas Leak Fix'] },
+      { title: 'Inverter & UPS Setup', description: 'Backup power solutions and battery maintenance to keep your home running in outages.', tag: null, image: 'src/assets/images/inverter.webp', features: ['Battery Check', 'Load Balancing'] },
+    ],
+  },
+];
+
+const ServiceCard = ({ item, index }) => (
+  <article
+    className="sp-card reveal-up"
+    style={{ animationDelay: `${index * 0.08}s` }}
+  >
+    <div className="sp-card__image-wrap">
+      <img src={item.image} alt={item.title} className="sp-card__img" loading="lazy" />
+      {item.tag && <span className="sp-card__tag">{item.tag}</span>}
+    </div>
+    <div className="sp-card__body">
+      <h3 className="sp-card__title">{item.title}</h3>
+      <p className="sp-card__desc">{item.description}</p>
+      <ul className="sp-card__features">
+        {item.features.map((f) => (
+          <li key={f} className="sp-card__feature">
+            <FaCheck className="sp-card__check" /> {f}
+          </li>
+        ))}
+      </ul>
+    </div>
+    <div className="sp-card__footer">
+      <a
+        href="https://docs.google.com/forms/..."
+        target="_blank"
+        rel="noopener noreferrer"
+        className="sp-card__cta"
+      >
+        Book Now <FaArrowRight className="sp-card__cta-icon" />
+      </a>
+    </div>
+  </article>
+);
 
 const Services = () => {
+  return (
+    <main className="services-page">
+      <MainBanner
+        badge="What We Do"
+        title={<>Our <span className="accent-text-primary">specialized</span> services</>}
+        subtitle="Precision installation, expert repair and proactive maintenance — for every corner of your home and business."
+        compact
+      />
 
-    const serviceStats = [
-        { number: "500+", label: "Repairs Completed" },
-        { number: "15+", label: "Expert Technicians" },
-        { number: "4.9/5", label: "Customer Rating" },
-        { number: "30", label: "Min Response Time" }
-    ];
+      <StatsBar stats={serviceStats} />
 
-    const servicesFaqData = [
-        {
-            question: "What is Wow Sewa?",
-            answer: "Wow Sewa is a comprehensive repair and service company offering a wide range of services for both residential and commercial customers."
-        },
-        {
-            question: "What services do we provide?",
-            answer: "We provide services mostly related to electrical problems and installation, plumbing-related, computer/laptop repair and servicing, any kind of electrical services and general installation and maintainence of home appliances."
-        },
-        {
-            question: "How can I book an appointment?",
-            answer: "You can call us at 9762424318 or email us at wowsewa@gmail.com to book an appointment."
-        }
-    ];
+      {/* Categories */}
+      <section className="sp-body">
+        <div className="container">
+          {servicesData.map((cat) => (
+            <div className="sp-category" key={cat.category}>
+              <div className="sp-category__header">
+                <span className="sp-category__icon">{cat.icon}</span>
+                <h2 className="sp-category__title">{cat.category}</h2>
+                <span className="sp-category__count">
+                  {cat.items.length} services
+                </span>
+              </div>
+              <div className="sp-category__grid">
+                {cat.items.map((item, i) => (
+                  <ServiceCard key={item.title} item={item} index={i} />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
 
-    const servicesData = [
-    {
-        category: "Digital & IT Solutions",
-        icon: <FaMicrochip />, 
-        items: [
-            {
-                title: "IT Networking & WiFi",
-                description: "Complete LAN/WAN setup and WiFi dead-zone elimination for homes and offices.",
-                tag: "Business Favorite",
-                image: "src/assets/images/networking.webp", 
-                features: ["Mesh WiFi Setup", "Router Configuration"]
-            },
-            {
-                title: "Laptop Repair and Servicing",
-                description: "Deep cleaning, thermal paste replacement, and hardware upgrades to boost performance.",
-                image: "src/assets/images/laptopservicing.webp", 
-                features: ["Windows/OS Setup", "Hinges & Screen Fix"]
-            },
-            {
-                title: "CCTV Camera Installation",
-                description: "Complete security surveillance setup with remote mobile viewing and DVR/NVR config.",
-                tag: "Security",
-                image: "src/assets/images/cctv.webp",
-                features: ["Night Vision Setup", "IP Camera Mapping"]
-            }
-        ]
-    },
-    {
-        category: "Plumbing & Water Systems",
-        icon: <FaFaucet />, 
-        items: [
-            {
-                title: "Emergency Leak Repair",
-                description: "Rapid response for burst pipes, hidden leaks, and high-pressure system failures.",
-                tag: "24/7 Service",
-                image: "src/assets/images/leak-repair.webp",
-                features: ["Pipe Soldering", "Drain Unclogging"]
-            },
-            {
-                title: "Solar and Geyser Servicing",
-                description: "Tank descaling, glass tube cleaning, and repair of leaking solar water heaters.",
-                tag: "Eco-Friendly",
-                image: "src/assets/images/solar.webp",
-                features: ["Pipe Insulation", "Water Pressure Fix"]
-            },
-            {
-                title: "Sanitary Fitting",
-                description: "Installation of modern commodes, showers, and luxury bathroom fixtures with precision.",
-                tag: null,
-                image: "src/assets/images/sanitary-fitting.webp",
-                features: ["Tap Installation", "PPR/CPVC Mapping"]
-            }
-        ]
-    },
-    {
-        category: "Electrical & Power",
-        icon: <FaBolt />, 
-        items: [
-            {
-                title: "House Rewiring",
-                description: "Full house rewiring and circuit breaker panel upgrades to ensure fire safety.",
-                tag: "Safety First",
-                image: "src/assets/images/home-rewiring.webp",
-                features: ["MCB Installation", "Short Circuit Fix"]
-            },
-            {
-                title: "AC & Fridge Maintenance",
-                description: "Gas refilling, filter cleaning, and compressor repair for all major cooling brands.",
-                tag: "Hot Seller",
-                image: "src/assets/images/ac-repair.webp",
-                features: ["AC Deep Cleaning", "Fridge Gas Leak Fix"]
-            },
-            {
-                title: "Inverter & UPS Setup",
-                description: "Backup power solutions and battery maintenance to keep your home running during outages.",
-                tag: null,
-                image: "src/assets/images/inverter.webp",
-                features: ["Battery Health Check", "Load Balancing"]
-            }
-        ]
-    }];
+      {/* CTA banners */}
+      <section className="sp-banners">
+        <div className="container">
+          <div className="sp-banner sp-banner--lime">
+            <div className="sp-banner__content">
+              <p className="sp-banner__label">Fast Booking</p>
+              <h2 className="sp-banner__title">Need a professional?</h2>
+              <p className="sp-banner__sub">
+                Book your service online in less than 60 seconds.
+              </p>
+            </div>
+            <a
+              href="https://docs.google.com/forms/..."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-darkgreen btn-large"
+            >
+              <FaCalendarCheck /> Book a Service
+            </a>
+          </div>
 
-    return (
-        <>
-        <StatsBar stats={serviceStats} bgColor={"bg-light"} numberColor={"accent-text-lime-dark"} labelColor={"accent-text-dark"} />
-            <section className="services-page bg-dark">
-                <div className="container">
-                    <header className="services-header">
-                        <h1 className="text-xxl">Our <span className="accent-text-primary">Specialized</span> Services</h1>
-                        <p className="text-md">Precision installation, expert repair, and proactive maintenance for every corner of your life.</p>
-                    </header>
+          <div className="sp-banner sp-banner--green">
+            <div className="sp-banner__content">
+              <p className="sp-banner__label">Custom Work</p>
+              <h2 className="sp-banner__title">Don&apos;t see what you need?</h2>
+              <p className="sp-banner__sub">
+                We handle custom requirements for businesses and homes alike.
+              </p>
+            </div>
+            <Link to="/about" className="btn btn-primary btn-large">
+              Talk to Us <FaArrowRight />
+            </Link>
+          </div>
+        </div>
+      </section>
 
-                    <div className="services-grid-layout">
-                        {servicesData.map((cat, index) => (
-                            <div className="service-category-block" key={index}>
-                                <h2 className="category-title">
-                                    <span className="cat-icon-wrapper">{cat.icon}</span> {cat.category}
-                                </h2>
-                                
-                                <div className="service-items-grid">
-                                    {cat.items.map((item, i) => (
-                                        <div className="service-item bg-light" key={i}>
-                                            <div className="service-image-box">
-                                                <img src={item.image} alt={item.title} className="card-img" />
-                                            </div>
-
-                                            <div className="item-head">
-                                                <h3 className='accent-text-dark'>{item.title}</h3>
-                                                {item.tag && (
-                                                    <span className={`service-tag ${item.tag === 'Safety First' ? 'tag-red' : ''}`}>
-                                                        {item.tag}
-                                                    </span>
-                                                )}
-                                            </div>
-                                            <p>{item.description}</p>
-                                            <ul className="item-features">
-                                                {item.features.map((feature, fIndex) => (
-                                                    <li key={fIndex}>
-                                                        <FaCheck className="feature-check-icon accent-text-lime-dark" /> {feature}
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="support-banner bg-dark booking-banner">
-                            <div className="banner-content">
-                                <h2 className="text-black">Need a Professional?</h2>
-                                <p className="text-black-muted">Book your service online in less than 60 seconds. Expert help is just a click away.</p>
-                            </div>
-                        <a href="https://docs.google.com/forms/..." target="_blank" rel="noopener noreferrer" className="btn btn-primary">
-                            <FaCalendarCheck className="btn-icon-left" /> Book a Service
-                        </a>
-                    </div>
-                    
-                    <div className="support-banner bg-dark">
-                        <div className="banner-content">
-                            <h2>Don't see what you're looking for?</h2>
-                            <p>We handle custom technical requirements for businesses and homes alike.</p>
-                        </div>
-                        <a className="btn btn-primary" href="https://docs.google.com/forms/..." target="_blank">Custom Request</a>
-                    </div>
-                </div>
-            </section>
-            <FAQ data={servicesFaqData}/>
-        </>
-    );
-} 
+      <FAQ data={servicesFaqData} title="Frequently Asked Questions" />
+    </main>
+  );
+};
 
 export default Services;

@@ -1,128 +1,139 @@
-import React from 'react';
 import './AMC.css';
 import FAQ from '../../components/FAQ/FAQ';
-// Import React Icons
-import { 
-  FaCheck, 
-  FaTimes, 
-  FaShieldAlt, 
-  FaClock, 
-  FaWallet 
+import MainBanner from '../../components/MainBanner/MainBanner';
+import {
+  FaCheck,
+  FaTimes,
+  FaShieldAlt,
+  FaClock,
+  FaWallet,
+  FaArrowRight,
 } from 'react-icons/fa';
 
-const AMC = () => {
-
-  const AMCFaqData = [
-    {
-        question: "What exactly does 'Unlimited Calls' mean?",
-        answer: "It means you don't pay any labor or visiting charges, no matter how many times you call us. Whether it's a leaky tap or a complete power failure, your service fee is $0."
-    },
-    {
-        question: "Does the AMC cover spare parts?",
-        answer: "The annual fee covers 100% of the labor and expertise. While spare parts are billed separately, AMC members enjoy an exclusive 10% to 15% discount on all materials."
-    },
-    {
-        question: "Can I transfer my AMC if I move houses?",
-        answer: "Yes! If you move within the Kathmandu Valley, we can transfer your remaining contract to your new address after a quick site audit of the new location."
-    },
-    {
-        question: "Is there a limit on the number of appliances covered?",
-        answer: "Our Essential and Standard plans cover all major fixed systems (Plumbing & Electrical). For specific IT and high-end appliance coverage, our Enterprise plan is the best fit."
-    },
-    {
-        question: "Do you offer AMC for offices or restaurants?",
-        answer: "Yes, we have specialized 'Enterprise' packages designed for high-usage environments like offices, banks, and cafes where uptime is critical."
-    }
+const AMCFaqData = [
+  { question: "What exactly does 'Unlimited Calls' mean?", answer: "It means you don't pay any labour or visiting charges, no matter how many times you call us. Whether it's a leaky tap or a complete power failure, your service fee is zero." },
+  { question: 'Does the AMC cover spare parts?', answer: 'The annual fee covers 100% of the labour and expertise. Spare parts are billed separately, but AMC members enjoy an exclusive 10–15% discount on all materials.' },
+  { question: 'Can I transfer my AMC if I move houses?', answer: 'Yes! If you move within the Kathmandu Valley, we can transfer your remaining contract to your new address after a quick site audit.' },
+  { question: 'Is there a limit on appliances covered?', answer: 'Essential and Standard plans cover all major fixed systems (plumbing & electrical). For IT and high-end appliance coverage, the Enterprise plan is the best fit.' },
+  { question: 'Do you offer AMC for offices or restaurants?', answer: "Yes — our Enterprise packages are designed for high-usage environments like offices, banks and cafes where uptime is critical." },
 ];
 
-  return (
-    <section className="amc-page">
-      <div className="section-hero bg-darkgreen">
-        <div className="container">
-          <header className="amc-header">
-            <h1 className="text-xxl">Zero Stress. <span className="accent-text-primary">Total Maintenance.</span></h1>
-            <p className="text-md">Join the WowSewa AMC and let our experts handle your home and office repairs 24/7. One contract, infinite solutions.</p>
-          </header>
-        </div>
-      </div>
+const plans = [
+  {
+    tag: 'Basic',
+    name: 'Essential',
+    price: '4,999',
+    featured: false,
+    features: [
+      { ok: true, t: '2 Scheduled Inspections' },
+      { ok: true, t: 'Unlimited Plumbing Fixes' },
+      { ok: true, t: '10% Off Spare Parts' },
+      { ok: false, t: 'IT Support' },
+    ],
+  },
+  {
+    tag: 'Best Value',
+    name: 'Standard',
+    price: '9,999',
+    featured: true,
+    features: [
+      { ok: true, t: '4 Scheduled Inspections' },
+      { ok: true, t: 'Full Electrical & Plumbing' },
+      { ok: true, t: 'Priority Emergency Callouts' },
+      { ok: true, t: 'Basic IT / WiFi Support' },
+    ],
+  },
+  {
+    tag: 'Advanced',
+    name: 'Enterprise',
+    price: '19,999',
+    featured: false,
+    features: [
+      { ok: true, t: 'Monthly Tech Audits' },
+      { ok: true, t: 'Solar & AC Maintenance' },
+      { ok: true, t: 'Full Networking Support' },
+      { ok: true, t: 'Dedicated Account Pro' },
+    ],
+  },
+];
 
-      {/* SECTION 2: PLANS (White) */}
-      <div className="section-wrapper bg-light">
+const benefits = [
+  { icon: <FaShieldAlt />, t: 'Predictive Repairs', d: 'We fix issues before they become expensive breakdowns.' },
+  { icon: <FaClock />, t: '24/7 Priority', d: 'AMC members skip the queue with 30-minute response times.' },
+  { icon: <FaWallet />, t: 'Cost Savings', d: 'Save up to 40% compared to individual one-time repairs.' },
+];
+
+const AMC = () => {
+  return (
+    <div className="amc-page">
+      <MainBanner
+        badge="Annual Maintenance Contract"
+        title={<>Zero stress. <span className="accent-text-primary">Total maintenance.</span></>}
+        subtitle="Join the WowSewa AMC and let our experts handle your home and office repairs around the clock. One contract, infinite solutions."
+        compact
+      />
+
+      <section className="amc-plans section-ec">
         <div className="container">
-          <div className="section-title-center">
-            <h2 className="text-xxl">Choose Your <span className='accent-text-lime-dark'> Plan </span></h2>
-            <p className='text-md'>Annual packages tailored for every need.</p>
+          <div className="ds-head">
+            <span className="eyebrow eyebrow--center">Pricing</span>
+            <h2>Choose your <span className="accent-text-primary">plan</span></h2>
+            <p>Annual packages tailored for every need.</p>
           </div>
 
           <div className="amc-grid">
-            {/* Essential Plan */}
-            <div className="amc-card">
-              <div className="plan-tag">Basic</div>
-              <h3>Essential</h3>
-              <div className="price">NPR 4,999<span>/year</span></div>
-              <ul className="plan-features">
-                <li><FaCheck className="icon-success" /> 2 Scheduled Inspections</li>
-                <li><FaCheck className="icon-success" /> Unlimited Plumbing Fixes</li>
-                <li><FaCheck className="icon-success" /> 10% Off Spare Parts</li>
-                <li className="disabled"><FaTimes className="icon-disabled" /> IT Support</li>
-              </ul>
-            </div>
-
-            {/* Premium Plan (Featured) */}
-            <div className="amc-card featured">
-              <div className="plan-tag featured-tag">Best Value</div>
-              <h3 className='accent-text-primary'>Standard</h3>
-              <div className="price">NPR 9,999<span>/year</span></div>
-              <ul className="plan-features">
-                <li><FaCheck className="icon-success" /> 4 Scheduled Inspections</li>
-                <li><FaCheck className="icon-success" /> Full Electrical & Plumbing</li>
-                <li><FaCheck className="icon-success" /> Priority Emergency Callouts</li>
-                <li><FaCheck className="icon-success" /> Basic IT/WiFi Support</li>
-              </ul>
-            </div>
-
-            {/* Enterprise Plan */}
-            <div className="amc-card">
-              <div className="plan-tag">Advanced</div>
-              <h3>Enterprise</h3>
-              <div className="price">NPR 19,999<span>/year</span></div>
-              <ul className="plan-features">
-                <li><FaCheck className="icon-success" /> Monthly Tech Audits</li>
-                <li><FaCheck className="icon-success" /> Solar & AC Maintenance</li>
-                <li><FaCheck className="icon-success" /> Full Networking Support</li>
-                <li><FaCheck className="icon-success" /> Dedicated Account Pro</li>
-              </ul>
-            </div>
+            {plans.map((p) => (
+              <div
+                key={p.name}
+                className={`amc-card ${p.featured ? 'amc-card--featured' : ''}`}
+              >
+                <span className="amc-card__tag">{p.tag}</span>
+                <h3 className="amc-card__name">{p.name}</h3>
+                <div className="amc-card__price">
+                  <span className="amc-card__cur">NPR</span> {p.price}
+                  <span className="amc-card__per">/year</span>
+                </div>
+                <ul className="amc-card__features">
+                  {p.features.map((f) => (
+                    <li key={f.t} className={f.ok ? '' : 'is-off'}>
+                      {f.ok ? <FaCheck /> : <FaTimes />} {f.t}
+                    </li>
+                  ))}
+                </ul>
+                <a
+                  href="https://docs.google.com/forms/..."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`btn btn-block ${p.featured ? 'btn-primary' : 'btn-outline-green'}`}
+                >
+                  Get Started <FaArrowRight />
+                </a>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
+      </section>
 
-      <div className="section-wrapper bg-darkgreen">
+      <section className="amc-benefits section-ec">
         <div className="container">
-          <div className="about-grid-intro">
-            <h2 className="text-xl">Why Choose <span className="accent-text-primary">AMC?</span></h2>
+          <div className="ds-head">
+            <span className="eyebrow eyebrow--center">Why AMC</span>
+            <h2>Why choose an <span className="accent-text-primary">AMC?</span></h2>
           </div>
-          <div className="services-cards-container">
-            <div className="service-card bg-light">
-                <div className="icon-box"><FaShieldAlt /></div>
-                <h3>Predictive Repairs</h3>
-                <p>We fix issues before they become expensive breakdowns.</p>
-            </div>
-            <div className="service-card bg-light">
-                <div className="icon-box"><FaClock /></div>
-                <h3>24/7 Priority</h3>
-                <p>AMC members skip the queue with 30-min response times.</p>
-            </div>
-            <div className="service-card bg-light">
-                <div className="icon-box"><FaWallet /></div>
-                <h3>Cost Savings</h3>
-                <p>Save up to 40% compared to individual one-time repairs.</p>
-            </div>
+          <div className="amc-benefits__grid">
+            {benefits.map((b) => (
+              <div className="amc-benefit" key={b.t}>
+                <div className="amc-benefit__icon">{b.icon}</div>
+                <h3>{b.t}</h3>
+                <p>{b.d}</p>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
-      <FAQ data={AMCFaqData} title='Frequently Asked Questions'/>
-    </section>
+      </section>
+
+      <FAQ data={AMCFaqData} title="Frequently Asked Questions" />
+    </div>
   );
 };
 
