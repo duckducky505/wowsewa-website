@@ -1,0 +1,125 @@
+/* ==========================================================================
+   FAQ — scoped styles
+   Builds on app.css WITHOUT modifying it: reuses .container, .bg-main and
+   .accent-text-main, plus the app.css color variables and UniNeue fonts.
+   Because each @font-face is font-weight:normal / font-style:normal, weight &
+   italic come from the family NAME (UniNeue / UniNeue-Bold / UniNeue-Heavy /
+   UniNeue-Italic). Every rule is scoped under .faq — no style leakage.
+   ========================================================================== */
+.faq {
+  padding: 92px 0;
+  font-family: "UniNeue", "Poppins", sans-serif;
+}
+
+/* ---- header ------------------------------------------------------------- */
+.faq .faq-head {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 40px;
+  align-items: end;
+  margin-bottom: 44px;
+}
+.faq .faq-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: "UniNeue", monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.72rem;
+  color: var(--primary-color);
+  margin-bottom: 18px;
+}
+.faq .faq-eyebrow .ln { width: 34px; height: 2px; background: currentColor; display: inline-block; }
+.faq .faq-title {
+  margin: 0;
+  font-family: "UniNeue-Heavy", sans-serif;
+  font-size: clamp(2.8rem, 6vw, 4.6rem);
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+  color: var(--light-color);
+}
+.faq .accent-text-main { color: var(--primary-color); }   /* keep "answered." lime */
+.faq .faq-lead {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  max-width: 38ch;
+  color: rgba(248, 250, 234, 0.66);
+}
+
+/* ---- accordion ---------------------------------------------------------- */
+.faq .faq-list { border-top: 1px solid rgba(248, 250, 234, 0.12); }
+.faq .faq-item {
+  border-bottom: 1px solid rgba(248, 250, 234, 0.12);
+  border-radius: 14px;
+  transition: background 0.2s, border-color 0.2s;
+}
+.faq .faq-item.is-open {
+  background: rgba(248, 250, 234, 0.05);
+  border: 1px solid rgba(248, 250, 234, 0.14);
+}
+
+.faq .faq-q {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 24px 1fr auto;
+  align-items: center;
+  gap: 18px;
+  padding: 24px 22px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+  font-family: inherit;
+}
+.faq .faq-no {
+  font-family: "UniNeue", monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  color: var(--primary-color);
+}
+.faq .faq-qt {
+  font-family: "UniNeue-Bold", sans-serif;
+  font-size: clamp(1.05rem, 1.7vw, 1.4rem);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  color: var(--light-color);
+}
+.faq .faq-ico {
+  display: inline-grid;
+  place-items: center;
+  color: rgba(248, 250, 234, 0.7);
+}
+.faq .faq-item.is-open .faq-qt,
+.faq .faq-item.is-open .faq-ico { color: var(--primary-color); }
+
+/* answer — animated open/close */
+.faq .faq-a {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.35s ease, opacity 0.3s ease;
+}
+.faq .faq-item.is-open .faq-a { max-height: 340px; opacity: 1; }
+.faq .faq-a p {
+  margin: 0;
+  padding: 0 22px 26px 64px;          /* aligns under the question text */
+  font-size: 0.96rem;
+  line-height: 1.6;
+  color: rgba(248, 250, 234, 0.62);
+  max-width: 70ch;
+}
+
+/* ---- responsive --------------------------------------------------------- */
+@media (max-width: 900px) {
+  .faq .faq-head { grid-template-columns: 1fr; gap: 22px; align-items: start; }
+}
+@media (max-width: 560px) {
+  .faq { padding: 64px 0; }
+  .faq .faq-q { padding: 20px 16px; gap: 12px; grid-template-columns: 20px 1fr auto; }
+  .faq .faq-a p { padding: 0 16px 22px 48px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .faq .faq-item, .faq .faq-a { transition: none; }
+}

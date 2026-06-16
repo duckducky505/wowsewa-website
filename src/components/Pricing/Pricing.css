@@ -1,0 +1,219 @@
+/* ==========================================================================
+   Pricing — scoped styles
+   Builds on app.css WITHOUT modifying it: reuses the global .container, .btn,
+   .btn-block, .btn-dark classes and derives its palette from app.css tokens.
+   Uses ONLY the company UniNeue fonts. Because each @font-face is declared
+   font-style:normal / font-weight:normal, weight/italic is selected via the
+   family NAME (UniNeue / UniNeue-Bold / UniNeue-Heavy / UniNeue-Italic).
+   Every rule is scoped under .pricing, so there is no style leakage.
+   ========================================================================== */
+
+.pricing {
+  --lime:       var(--primary-color);     /* #D1FE17 */
+  --green:      var(--background-color);   /* #074C3A */
+  --cream:      var(--light-color);        /* #F8FAEA */
+  --green-deep: #053a2c;                   /* darker green (component-only) */
+  --card:       rgba(248, 250, 234, 0.05);
+  --line:       rgba(248, 250, 234, 0.14);
+
+  background: var(--green);
+  color: var(--cream);
+  padding: 100px 0;
+  font-family: "UniNeue", "Poppins", sans-serif;
+}
+
+/* ---- Section header ----------------------------------------------------- */
+.pricing .pricing-head {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 40px;
+  align-items: end;
+  margin-bottom: 54px;
+}
+.pricing .pricing-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+  font-family: "UniNeue";
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.74rem;
+  color: var(--lime);
+}
+.pricing .pricing-eyebrow .ln {
+  display: inline-block;
+  width: 34px;
+  height: 2px;
+  background: currentColor;
+}
+.pricing .pricing-title {
+  margin: 0;
+  font-family: "UniNeue";        /* display, upright */
+  font-weight: 400;                     /* the face supplies the weight */
+  font-size: clamp(2.3rem, 4.4vw, 3.9rem);
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  color: var(--cream);
+}
+/* accent word ("nothing") — real italic face + lime */
+.pricing .pricing-title .it {
+  font-family: "UniNeue-Italic";
+  color: var(--lime);
+}
+.pricing .pricing-lead {
+  color: color-mix(in oklab, var(--cream) 72%, transparent);
+  font-size: 1.05rem;
+  max-width: 44ch;
+}
+
+/* ---- Cards grid --------------------------------------------------------- */
+.pricing .pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+  margin-top: 0;
+}
+
+.pricing .pcard {
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  padding: 30px;
+}
+.pricing .pcard.featured {
+  background: var(--lime);
+  color: var(--green-deep);
+  border-color: var(--lime);
+}
+
+/* tier row */
+.pricing .ptier {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px 12px;
+}
+.pricing .ptier h3 {
+  font-family: "UniNeue-Bold";
+  font-size: 1.18rem;
+  color: var(--cream);
+  white-space: nowrap;
+}
+.pricing .featured .ptier h3 { color: var(--green-deep); }
+
+.pricing .ptag {
+  flex: 0 0 auto;
+  font-family: "UniNeue";
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.66rem;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--lime) 50%, transparent);
+  color: var(--lime);
+  white-space: nowrap;
+}
+.pricing .featured .ptag {
+  background: var(--green-deep);
+  border-color: var(--green-deep);
+  color: var(--lime);
+}
+
+/* price */
+.pricing .price-amt {
+  font-family: "UniNeue-Bold";
+  font-size: 3rem;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  margin-top: 22px;
+  color: var(--cream);
+}
+.pricing .featured .price-amt { color: var(--green-deep); }
+.pricing .price-amt .cur {
+  font-size: 1.4rem;
+  vertical-align: super;
+  opacity: 0.7;
+  margin-right: 2px;
+}
+.pricing .price-amt small {
+  font-family: "UniNeue";
+  font-size: 0.82rem;
+  opacity: 0.6;
+  margin-left: 6px;
+}
+
+/* description */
+.pricing .pdesc {
+  margin: 16px 0;
+  font-size: 0.94rem;
+  color: color-mix(in oklab, var(--cream) 72%, transparent);
+}
+.pricing .featured .pdesc { color: rgba(5, 58, 44, 0.8); }
+
+/* feature list */
+.pricing .pfeats {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0 0 26px;
+}
+.pricing .pfeats li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.93rem;
+}
+.pricing .ck {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--green-deep);
+  color: var(--lime);
+  font-family: "UniNeue-Bold";
+  font-size: 0.7rem;
+}
+
+/* buttons — extend global .btn */
+.pricing .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  margin-top: auto;
+  padding: 15px 22px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  font-family: "UniNeue-Bold";
+  font-size: 0.95rem;
+  transition: 0.25s;
+}
+.pricing .btn:hover { opacity: 1; }
+.pricing .btn-ghost {
+  color: var(--cream);
+  border-color: rgba(248, 250, 234, 0.3);
+}
+.pricing .btn-ghost:hover {
+  border-color: var(--lime);
+  color: var(--lime);
+}
+.pricing .btn-dark {
+  background: var(--green-deep);
+  color: var(--cream);
+  border-color: var(--green-deep);
+}
+.pricing .btn .arr { font-size: 1.15rem; line-height: 1; }
+
+/* ---- Responsive --------------------------------------------------------- */
+@media (max-width: 900px) {
+  .pricing .pricing-head { grid-template-columns: 1fr; }
+  .pricing .pricing-grid { grid-template-columns: 1fr; }
+}

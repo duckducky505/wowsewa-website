@@ -1,0 +1,202 @@
+/* ==========================================================================
+   About page — extends app.css (uses its :root vars, .container, .bg-* and
+   .btn helpers) and the UniNeue brand fonts. All rules scoped under .about.
+   ========================================================================== */
+.about { font-family: "UniNeue", "Poppins", sans-serif; }
+
+/* shared eyebrow + breadcrumb */
+.about-eyebrow {
+  display: inline-flex; align-items: center; gap: 12px;
+  font-family: "UniNeue", monospace;
+  font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--primary-color);
+  margin-bottom: 18px;
+}
+.about-eyebrow-line { width: 34px; height: 1px; background: currentColor; }
+.about-eyebrow.on-light { color: var(--background-color); }
+
+.about-crumbs {
+  display: flex; gap: 8px; align-items: center;
+  font-family: "UniNeue", monospace;
+  font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
+  color: rgba(248, 250, 234, 0.55);
+  margin-bottom: 36px;
+}
+.about-crumbs a { color: inherit; }
+.about-crumbs .sep { opacity: 0.4; }
+.about-crumbs .cur { color: var(--primary-color); }
+
+/* ── HERO ── */
+.about-hero { padding: 28px 0 0; }
+.about-hero-grid {
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 60px;
+  align-items: end; padding-bottom: 68px;
+}
+@media (max-width: 900px) { .about-hero-grid { grid-template-columns: 1fr; gap: 34px; } }
+.about-hero-title {
+  font-family: "UniNeue-Heavy", sans-serif;
+  font-size: clamp(54px, 9vw, 118px);
+  line-height: 0.94; letter-spacing: -0.04em;
+  color: var(--light-color); margin: 0;
+}
+.about-hero-copy p { color: rgba(248, 250, 234, 0.8); line-height: 1.6; max-width: 46ch; }
+.about-hero-stats { display: flex; gap: 44px; margin-top: 34px; flex-wrap: wrap; }
+.about-stat-val {
+  font-family: "UniNeue-Heavy", sans-serif;
+  font-size: clamp(34px, 4vw, 46px); letter-spacing: -0.03em;
+  color: var(--light-color); line-height: 1;
+}
+.about-stat-label {
+  font-family: "UniNeue", monospace;
+  font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: rgba(248, 250, 234, 0.55); margin-top: 8px;
+}
+
+/* trades band */
+.about-trades {
+  background: #053a2c;
+  border-top: 1px solid rgba(248, 250, 234, 0.08);
+  border-bottom: 1px solid rgba(248, 250, 234, 0.08);
+}
+.about-trades-row {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  padding: 16px 0;
+  font-family: "UniNeue", monospace;
+  font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--light-color);
+}
+.about-trades-row .tdot { color: var(--primary-color); }
+
+/* ── DRIVES US ── */
+.about-drives { padding: 90px 0; }
+.about-drives-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
+@media (max-width: 900px) { .about-drives-grid { grid-template-columns: 1fr; gap: 36px; } }
+.about-drives h2 {
+  font-family: "UniNeue-Heavy", sans-serif;
+  font-size: clamp(34px, 4.6vw, 58px); line-height: 1.0; letter-spacing: -0.03em;
+  color: #032118; margin: 0;
+}
+.about-drives-lead { color: rgba(3, 33, 24, 0.7); line-height: 1.6; margin-top: 20px; max-width: 48ch; }
+.about-values { display: grid; grid-template-columns: 1fr 1fr; gap: 26px 28px; margin-top: 38px; }
+@media (max-width: 560px) { .about-values { grid-template-columns: 1fr; } }
+.about-value { display: flex; gap: 14px; align-items: flex-start; }
+.about-value-icon {
+  flex: 0 0 auto; width: 44px; height: 44px; border-radius: 12px;
+  background: var(--background-color); color: var(--primary-color);
+  display: grid; place-items: center;
+}
+.about-value h4 { font-family: "UniNeue-Bold", sans-serif; font-size: 1.05rem; color: #032118; margin: 0 0 4px; }
+.about-value p { font-size: 0.9rem; line-height: 1.5; color: rgba(3, 33, 24, 0.65); margin: 0; }
+
+/* ── MEET THE VISIONARY ── */
+.about-vision { padding: 100px 0; }
+.about-vision-head { margin-bottom: 48px; }
+.about-vision-head h2 {
+  font-family: "UniNeue-Heavy", sans-serif;
+  font-size: clamp(40px, 5vw, 64px); line-height: 0.98; letter-spacing: -0.03em;
+  color: var(--light-color); margin: 0;
+}
+.about-vision-grid { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 56px; align-items: start; }
+@media (max-width: 900px) { .about-vision-grid { grid-template-columns: 1fr; gap: 36px; } }
+.about-founder-name {
+  font-family: "UniNeue-Heavy", sans-serif;
+  font-size: clamp(34px, 4vw, 52px); letter-spacing: -0.03em;
+  color: var(--light-color); margin: 0; line-height: 1;
+}
+.about-founder-role {
+  font-family: "UniNeue", monospace;
+  font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--primary-color); margin-top: 10px;
+}
+.about-divider { border: 0; border-top: 1px dashed rgba(248, 250, 234, 0.2); margin: 24px 0; }
+.about-quote {
+  font-family: "UniNeue-Italic", sans-serif;
+  color: var(--primary-color);
+  font-size: clamp(22px, 2.4vw, 30px); line-height: 1.25; letter-spacing: -0.01em;
+}
+.about-bio p { color: rgba(248, 250, 234, 0.72); line-height: 1.65; margin-top: 18px; max-width: 60ch; }
+.about-author { display: flex; align-items: center; gap: 14px; margin-top: 30px; }
+.about-author-avatar {
+  width: 50px; height: 50px; border-radius: 14px;
+  background: var(--primary-color); color: var(--dark-color);
+  display: grid; place-items: center;
+  font-family: "UniNeue-Heavy", sans-serif; font-size: 17px; line-height: 0.85; text-align: center;
+}
+.about-author-name {
+  font-family: "UniNeue-Bold", sans-serif; font-size: 0.78rem; letter-spacing: 0.04em;
+  text-transform: uppercase; color: rgba(248, 250, 234, 0.85);
+}
+.about-author-sub { font-family: "UniNeue", monospace; font-size: 11px; color: rgba(248, 250, 234, 0.5); }
+.about-founder-btns { display: flex; gap: 12px; margin-top: 30px; flex-wrap: wrap; }
+
+/* pill buttons (extend app.css .btn / .btn-primary) */
+.about .btn-primary { display: inline-flex; align-items: center; gap: 10px; border-radius: 999px; }
+.about-btn-outline {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 14px 24px; border-radius: 999px;
+  border: 1px solid rgba(248, 250, 234, 0.25);
+  color: var(--light-color);
+  font-family: "UniNeue-Bold", sans-serif; font-size: 15px;
+  transition: background 0.2s;
+}
+.about-btn-outline:hover { background: rgba(248, 250, 234, 0.08); }
+
+/* ── JOURNEY ── */
+.about-journey { padding: 90px 0; }
+.about-journey h2 {
+  font-family: "UniNeue-Heavy", sans-serif;
+  font-size: clamp(34px, 4.6vw, 58px); line-height: 1.0; letter-spacing: -0.03em;
+  color: #032118; margin: 0 0 44px;
+}
+.about-journey-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+@media (max-width: 900px) { .about-journey-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 520px) { .about-journey-grid { grid-template-columns: 1fr; } }
+.about-jcard { border-radius: 24px; padding: 26px; min-height: 230px; display: flex; flex-direction: column; }
+.about-jcard:nth-child(1) { background: #074C3A; color: var(--light-color); }
+.about-jcard:nth-child(2) { background: #032118; color: var(--light-color); }
+.about-jcard:nth-child(3) { background: var(--primary-color); color: var(--dark-color); }
+.about-jcard:nth-child(4) { background: #074C3A; color: var(--light-color); }
+.about-jcard-year { font-family: "UniNeue-Heavy", sans-serif; font-size: 40px; letter-spacing: -0.03em; line-height: 1; margin-bottom: auto; }
+.about-jcard h4 { font-family: "UniNeue-Bold", sans-serif; font-size: 1.1rem; margin: 24px 0 8px; }
+.about-jcard p { font-size: 0.86rem; line-height: 1.5; opacity: 0.82; margin: 0; }
+
+/* ── CTA ── */
+.about-cta { padding: 110px 0; }
+.about-cta .about-eyebrow { justify-content: center; }
+.about-cta-title {
+  font-family: "UniNeue-Heavy", sans-serif;
+  font-size: clamp(48px, 8vw, 108px); line-height: 0.92; letter-spacing: -0.04em;
+  color: var(--light-color); margin: 0;
+}
+.about-cta-sub { margin: 24px auto 0; max-width: 440px; color: rgba(248, 250, 234, 0.68); line-height: 1.55; }
+.about-cta-btns { display: flex; gap: 12px; justify-content: center; margin-top: 34px; flex-wrap: wrap; }
+
+/* ── DROP-IMAGE ZONES (placeholder now, fills with object-fit:cover when you add a src) ── */
+.about-drop { position: relative; border-radius: 24px; overflow: hidden; }
+.about-media-wide { min-height: 480px; }
+.about-media-tall { min-height: 540px; }
+.about-drop-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.about-drop-ph {
+  min-height: inherit; height: 100%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 8px; text-align: center;
+  background: #e7ecd8;
+  border: 1px dashed rgba(7, 76, 58, 0.35);
+  border-radius: 24px;
+  color: #4a6b40; cursor: pointer;
+}
+.about-drop-ph .ic { opacity: 0.5; }
+.about-drop-label { font-size: 13px; opacity: 0.78; }
+.about-drop-sub { font-size: 12px; opacity: 0.55; }
+.about-drop.on-dark .about-drop-ph {
+  background: #0c2a20;
+  border-color: rgba(248, 250, 234, 0.18);
+  color: rgba(248, 250, 234, 0.45);
+}
+.about-drop-tag {
+  position: absolute; left: 16px; bottom: 16px; z-index: 2;
+  display: inline-flex; align-items: center;
+  padding: 8px 14px; border-radius: 999px;
+  background: var(--primary-color); color: var(--dark-color);
+  font-family: "UniNeue-Bold", monospace; font-size: 11px; letter-spacing: 0.04em;
+}

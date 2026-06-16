@@ -1,0 +1,160 @@
+/* ==========================================================================
+   Working (How it works) — scoped styles
+   Builds on app.css WITHOUT modifying it: reuses the global .container and
+   .bg-light classes and the app.css color variables. Uses ONLY the company
+   UniNeue fonts. Because each @font-face is declared font-style:normal /
+   font-weight:normal, weight/italic is selected via the family NAME
+   (UniNeue / UniNeue-Bold / UniNeue-Heavy / UniNeue-Italic).
+   Every rule is scoped under .working, so there is no style leakage.
+   ========================================================================== */
+
+.working {
+  --lime:       var(--primary-color);     /* #D1FE17 */
+  --green:      var(--background-color);   /* #074C3A */
+  --cream:      var(--light-color);        /* #F8FAEA */
+  --dark:       var(--dark-color);         /* #010a08 */
+  --green-deep: #053a2c;
+
+  padding: 100px 0;            /* background + base color come from .bg-light */
+  font-family: "UniNeue", "Poppins", sans-serif;
+}
+
+/* ---- Section header ----------------------------------------------------- */
+.working .wc-eyebrow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-bottom: 30px;
+  color: var(--green);
+}
+.working .section-num {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: "UniNeue";
+  letter-spacing: 0.1em;
+  font-size: 0.74rem;
+}
+.working .section-num .ln { display: inline-block; width: 34px; height: 2px; background: currentColor; }
+.working .wc-eyebrow .mono {
+  font-family: "UniNeue";
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.74rem;
+  color: color-mix(in oklab, var(--green) 75%, transparent);
+}
+
+.working .wc-title {
+  margin: 0;
+  font-family: "UniNeue-Heavy";          /* bold display for this section */
+  font-weight: 400;                       /* the face supplies the weight */
+  font-size: clamp(2.6rem, 5vw, 4.3rem);
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+  color: var(--dark);
+}
+/* accent word ("an hour.") — real italic face, green (readable on cream) */
+.working .wc-title .it {
+  font-family: "UniNeue-Italic";
+  color: var(--green);
+}
+
+.working .wc-head {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 40px;
+  align-items: end;
+  margin-bottom: 54px;
+}
+.working .lead {
+  color: color-mix(in oklab, var(--green) 68%, transparent);
+  font-size: 1.02rem;
+  max-width: 40ch;
+}
+
+/* ---- Step cards --------------------------------------------------------- */
+.working .wc-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+.working .wc-step {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border-radius: 24px;
+  padding: 30px;
+  min-height: 360px;
+}
+.working .wc-step.s1 { background: var(--green); color: var(--cream); }
+.working .wc-step.s2 { background: var(--dark);  color: var(--cream); }
+.working .wc-step.s3 { background: var(--lime);  color: var(--green-deep); }
+
+/* giant faint corner number */
+.working .wc-no {
+  position: absolute;
+  top: 16px;
+  right: 24px;
+  font-family: "UniNeue-Heavy";
+  font-size: clamp(5.5rem, 8vw, 7.5rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+.working .s1 .wc-no, .working .s2 .wc-no { color: rgba(248, 250, 234, 0.07); }
+.working .s3 .wc-no { color: rgba(5, 58, 44, 0.13); }
+
+.working .wc-label {
+  font-family: "UniNeue";
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.72rem;
+}
+.working .s1 .wc-label { color: var(--lime); opacity: 0.7; }
+.working .s2 .wc-label { color: var(--lime); }
+.working .s3 .wc-label { color: var(--green-deep); opacity: 0.75; }
+
+.working .wc-step h3 {
+  margin-top: 12px;
+  font-family: "UniNeue-Bold";
+  font-size: 1.55rem;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+.working .s1 h3, .working .s2 h3 { color: var(--cream); }
+.working .s3 h3 { color: var(--green-deep); }
+
+.working .wc-step p {
+  margin-top: 14px;
+  font-size: 0.93rem;
+  line-height: 1.5;
+}
+.working .s1 p, .working .s2 p { color: color-mix(in oklab, var(--cream) 70%, transparent); }
+.working .s3 p { color: rgba(5, 58, 44, 0.82); }
+
+/* footer: dashed divider + illustration line */
+.working .wc-foot { margin-top: auto; }
+.working .wc-divider { margin-bottom: 22px; border-top: 1px dashed; }
+.working .s1 .wc-divider, .working .s2 .wc-divider { border-color: rgba(209, 254, 23, 0.3); }
+.working .s3 .wc-divider { border-color: rgba(5, 58, 44, 0.25); }
+
+.working .wc-illu {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: "UniNeue-Bold";
+  font-size: 0.78rem;
+}
+.working .s1 .wc-illu { color: var(--cream); }
+.working .s2 .wc-illu { color: var(--lime); }
+.working .s3 .wc-illu { color: var(--green-deep); }
+.working .wc-illu svg { flex: 0 0 auto; }
+
+/* ---- Responsive --------------------------------------------------------- */
+@media (max-width: 900px) {
+  .working .wc-head { grid-template-columns: 1fr; }
+  .working .wc-steps { grid-template-columns: 1fr; }
+  .working .wc-step { min-height: 300px; }
+}

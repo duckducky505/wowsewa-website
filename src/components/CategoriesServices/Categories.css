@@ -1,0 +1,85 @@
+/* Categories ("Other services") — section styles (split out of IT.css).
+   Depends only on the app.css :root variables + .container/.text-xl helpers. */
+
+.it-section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 30px;
+  margin-bottom: 42px;
+  flex-wrap: wrap;
+}
+.it-section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: "UniNeue", monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary-color);
+  margin-bottom: 14px;
+}
+.it-section-label-line { width: 32px; height: 1px; background: var(--primary-color); }
+.it-section-lead {
+  max-width: 360px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: rgba(248, 250, 234, 0.68);
+}
+
+.it-others { padding: 90px 0; }
+.it-others-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-top: 38px;
+}
+@media (max-width: 900px) { .it-others-grid { grid-template-columns: repeat(2, 1fr); } }
+.it-ocard {
+  border-radius: 18px;
+  padding: 22px;
+  min-height: 168px;
+  background: rgba(248, 250, 234, 0.05);
+  border: 1px solid rgba(248, 250, 234, 0.11);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 18px;
+  text-decoration: none;
+  color: var(--light-color);
+  transition: background 0.25s, color 0.25s, transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.it-ocard:hover {
+  transform: translateY(-4px);
+  background: var(--primary-color);
+  color: var(--dark-color);
+  border-color: var(--primary-color);
+}
+.it-ocard-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: rgba(209, 254, 23, 0.14);
+  color: var(--primary-color);
+  display: grid;
+  place-items: center;
+  transition: background 0.25s, color 0.25s;
+}
+.it-ocard:hover .it-ocard-icon {
+  background: var(--dark-color);
+  color: var(--primary-color);
+}
+.it-ocard h4 {
+  font-family: "UniNeue-Bold", sans-serif;
+  font-size: 17px;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 0 0 4px;
+}
+.it-ocard-count {
+  font-family: "UniNeue", monospace;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  opacity: 0.55;
+}

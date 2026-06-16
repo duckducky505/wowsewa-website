@@ -1,0 +1,69 @@
+/* ==========================================================================
+   StatsBar — reusable animated stats band (home + every service page).
+   Self-contained: only depends on the app.css :root colour variables.
+   ========================================================================== */
+
+.statsbar {
+  background: #043528;                       /* dark-green band */
+  border-top: 1px solid rgba(248, 250, 234, 0.10);
+  border-bottom: 1px solid rgba(248, 250, 234, 0.10);
+  padding: 24px 0;
+  font-family: "UniNeue", "Poppins", sans-serif;
+}
+
+.statsbar .statsbar-row {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.statsbar .statsbar-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  /* entrance animation */
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.statsbar .statsbar-item.in { opacity: 1; transform: none; }
+
+.statsbar .statsbar-val {
+  font-family: "UniNeue-Heavy", sans-serif;
+  font-size: 30px;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--light-color);
+  font-variant-numeric: tabular-nums;        /* digits don't jitter while counting */
+}
+.statsbar .statsbar-val .statsbar-cur { color: var(--light-color); }
+.statsbar .statsbar-val sup {
+  font-size: 15px;
+  color: var(--primary-color);
+  vertical-align: super;
+  margin-left: 1px;
+}
+
+.statsbar .statsbar-label {
+  font-family: "UniNeue", sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(248, 250, 234, 0.55);
+}
+
+.statsbar .statsbar-sep {
+  width: 1px;
+  height: 38px;
+  background: rgba(248, 250, 234, 0.12);
+}
+
+@media (max-width: 760px) {
+  .statsbar .statsbar-sep { display: none; }
+  .statsbar .statsbar-row { gap: 24px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .statsbar .statsbar-item { opacity: 1; transform: none; transition: none; }
+}

@@ -1,0 +1,59 @@
+/* CTA — section styles (split out of the old shared IT.css).
+   Depends only on the app.css :root variables + .container/.btn helpers. */
+
+.it-section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: "UniNeue", monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary-color);
+  margin-bottom: 14px;
+}
+
+.it-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  padding: 13px 22px;
+  border-radius: 999px;
+  border: 1px solid rgba(248, 250, 234, 0.25);
+  color: var(--light-color);
+  font-family: "UniNeue-Bold", sans-serif;
+  font-size: 15px;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.it-btn-outline:hover { background: rgba(248, 250, 234, 0.08); }
+
+.it-cta { padding: 110px 0; text-align: center; }
+.it-cta-heading {
+  font-family: "UniNeue-Heavy", sans-serif;
+  font-size: clamp(44px, 8vw, 120px);
+  letter-spacing: -0.05em;
+  line-height: 0.92;
+  color: var(--light-color);
+  margin: 0;
+}
+.it-cta-sub {
+  margin: 24px auto 0;
+  max-width: 480px;
+  font-size: 16px;
+  line-height: 1.55;
+  color: rgba(248, 250, 234, 0.68);
+}
+.it-cta-btns {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 34px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.it-cta-btns .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 999px;
+}

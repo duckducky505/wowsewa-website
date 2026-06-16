@@ -1,0 +1,118 @@
+/* ==========================================================================
+   Testimonials — sits on the global .bg-light helper, which provides the
+   cream background AND the default text colour (--dark-color). So `color` is
+   overridden ONLY where the text must differ from that dark default. Font
+   sizes come from the app.css text utilities (.text-md) used in the markup.
+   ========================================================================== */
+
+.testimonials {
+  --lime:       var(--primary-color);     /* #D1FE17 */
+  --green:      var(--background-color);   /* #074C3A */
+  --cream:      var(--light-color);        /* #F8FAEA */
+  --green-deep: #053a2c;
+  --card:       rgba(1, 10, 8, 0.04);      /* subtle dark tint — visible on cream */
+  --line:       rgba(1, 10, 8, 0.12);
+  padding: 100px 0;
+}
+
+/* ---- Section header ----------------------------------------------------- */
+.testimonials .section-head {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 40px;
+  align-items: end;
+}
+.testimonials .section-num {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+  font-family: "UniNeue";
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.74rem;
+  color: var(--background-color);            /* green (vs dark default) */
+}
+.testimonials .ln { display: inline-block; width: 34px; height: 2px; background: currentColor; }
+.testimonials .section-head h2 {
+  margin: 0;
+  font-family: "UniNeue-Heavy";              /* display, upright */
+  font-weight: 400;                           /* the face supplies the weight */
+  font-size: clamp(2.3rem, 4.4vw, 3.9rem);
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+}
+/* accent word ("say") — real italic face, green */
+.testimonials .serif-it { font-family: "UniNeue-Italic"; color: var(--background-color); }
+.testimonials .lead { max-width: 42ch; }     /* size from .text-md; colour = dark default */
+.testimonials .lead a {
+  color: var(--background-color);            /* green (also overrides a{color:#333}) */
+  border-bottom: 1px dashed currentColor;
+  white-space: nowrap;
+}
+
+/* ---- Cards grid --------------------------------------------------------- */
+.testimonials .tgrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+  margin-top: 54px;
+}
+
+.testimonials .tcard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 26px;
+  min-height: 240px;
+}
+.testimonials .tcard.wide { grid-column: span 2; }
+.testimonials .tcard.lime { background: var(--lime); color: var(--green-deep); border-color: var(--lime); }
+
+.testimonials .qmark {
+  font-family: "UniNeue-Heavy";
+  font-size: 3rem;
+  line-height: 0.6;
+  color: var(--background-color);            /* green — visible on cream cards */
+}
+.testimonials .tcard.lime .qmark { color: var(--green-deep); opacity: 0.5; }
+
+.testimonials .ttext {                        /* colour = dark default */
+  flex: 1;
+  margin: 22px 0;
+  font-size: 1.02rem;
+  line-height: 1.5;
+}
+.testimonials .tcard.wide .ttext { font-size: 1.18rem; max-width: 60ch; }
+.testimonials .tcard.lime .ttext { color: var(--green-deep); }
+
+.testimonials .tperson { display: flex; align-items: center; gap: 12px; margin-top: auto; }
+.testimonials .tavatar {
+  flex: 0 0 auto;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--green-deep);
+  color: var(--lime);
+  font-family: "UniNeue-Bold";
+}
+.testimonials .tname { font-family: "UniNeue-Bold"; font-size: 0.94rem; }
+.testimonials .tcard.lime .tname { color: var(--green-deep); }
+.testimonials .tmeta { font-family: "UniNeue"; font-size: 0.78rem; opacity: 0.6; }
+.testimonials .tcard.lime .tmeta { opacity: 0.7; }
+
+/* ---- Responsive --------------------------------------------------------- */
+@media (max-width: 900px) {
+  .testimonials .section-head { grid-template-columns: 1fr; }
+  .testimonials .tgrid { grid-template-columns: 1fr 1fr; }
+  .testimonials .tcard.wide { grid-column: span 2; }
+}
+@media (max-width: 600px) {
+  .testimonials { padding: 70px 0; }
+  .testimonials .tgrid { grid-template-columns: 1fr; }
+  .testimonials .tcard.wide { grid-column: span 1; }
+}

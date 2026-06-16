@@ -1,0 +1,331 @@
+/* ==========================================================================
+   Training & Academy — scoped styles
+   Builds on app.css WITHOUT modifying it: reuses .container, .bg-main /
+   .bg-light / .bg-dark, .btn / .btn-primary and .accent-text-main, plus the
+   app.css color variables and the UniNeue font families. Because each
+   @font-face is font-weight:normal / font-style:normal, weight & italic are
+   selected via the family NAME (UniNeue / UniNeue-Bold / UniNeue-Heavy /
+   UniNeue-Italic). Every rule is scoped under .academy — no style leakage.
+   ========================================================================== */
+.academy {
+  --lime:       var(--primary-color);     /* #D1FE17 */
+  --green:      var(--background-color);   /* #074C3A */
+  --cream:      var(--light-color);        /* #F8FAEA */
+  --dark:       var(--dark-color);         /* #010a08 */
+  --green-deep: #053a2c;
+  --green-card: #0a5341;                   /* card sitting on the green page  */
+  font-family: "UniNeue", "Poppins", sans-serif;
+}
+
+/* shared eyebrow / labels ------------------------------------------------- */
+.academy .ac-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: "UniNeue", monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.72rem;
+  color: var(--lime);
+  margin-bottom: 22px;
+}
+.academy .ac-eyebrow .ln { width: 34px; height: 2px; background: currentColor; display: inline-block; }
+
+/* keep accent words lime even inside the heavy section titles */
+.academy .accent-text-main { font-family: "UniNeue-Italic", serif; color: var(--primary-color); }
+
+/* ==========================================================================
+   HERO
+   ========================================================================== */
+.academy .ac-hero { padding: 50px 0 84px; }
+.academy .ac-crumbs {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  font-family: "UniNeue", monospace;
+  font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+  color: rgba(248, 250, 234, 0.5);
+  margin-bottom: 38px;
+}
+.academy .ac-crumbs a { color: inherit; text-decoration: none; transition: color 0.2s; }
+.academy .ac-crumbs a:hover { color: var(--lime); }
+.academy .ac-crumbs .here { color: var(--lime); }
+
+.academy .ac-hero-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 48px;
+  align-items: center;
+}
+.academy .ac-hero-title {
+  margin: 0;
+  font-family: "UniNeue-Heavy", sans-serif;
+  font-size: clamp(3rem, 7vw, 5.6rem);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  color: var(--cream);
+}
+.academy .ac-hero-desc {
+  margin-top: 26px;
+  max-width: 46ch;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: rgba(248, 250, 234, 0.72);
+}
+.academy .ac-hero-ctas { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 32px; }
+.academy .ac-hero-ctas .btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 15px 26px; border-radius: 999px;
+  font-family: "UniNeue-Bold", sans-serif; font-size: 1rem;
+}
+.academy .ac-btn-outline {
+  display: inline-flex; align-items: center;
+  padding: 15px 26px; border-radius: 999px;
+  border: 1px solid rgba(248, 250, 234, 0.28);
+  color: var(--cream);
+  font-family: "UniNeue-Bold", sans-serif; font-size: 1rem;
+  text-decoration: none; transition: background 0.2s;
+}
+.academy .ac-btn-outline:hover { background: rgba(248, 250, 234, 0.08); }
+.academy .ac-arrow {
+  display: inline-grid; place-items: center; width: 22px; height: 22px;
+}
+
+/* hero media / drop zone */
+.academy .ac-hero-media { position: relative; }
+.academy .ac-hero-img {
+  position: relative; overflow: hidden;
+  min-height: 430px; height: 100%;
+  border-radius: 22px;
+  background: #06382a;
+  border: 1px solid rgba(248, 250, 234, 0.1);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 8px; cursor: pointer;
+  color: rgba(248, 250, 234, 0.45);
+}
+.academy .ac-hero-img-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.academy .ac-hero-img-label { font-size: 0.85rem; }
+.academy .ac-hero-img-browse { font-size: 0.8rem; }
+.academy .ac-hero-img-browse u { cursor: pointer; }
+.academy .ac-img-tag {
+  position: absolute; left: 18px; bottom: 18px; z-index: 2;
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 14px; border-radius: 999px;
+  background: var(--lime); color: var(--green-deep);
+  font-family: "UniNeue-Bold", monospace;
+  font-size: 0.68rem; letter-spacing: 0.04em;
+}
+
+/* ==========================================================================
+   CATALOGUE
+   ========================================================================== */
+.academy .ac-cat { padding: 92px 0; }
+.academy .ac-cat-head {
+  display: grid; grid-template-columns: 1.3fr 1fr; gap: 40px; align-items: end;
+  margin-bottom: 46px;
+}
+.academy .ac-cat-title {
+  margin: 0;
+  font-family: "UniNeue-Heavy", sans-serif;
+  font-size: clamp(2.3rem, 4.2vw, 3.4rem);
+  line-height: 1.02; letter-spacing: -0.02em;
+  color: var(--cream);
+}
+.academy .ac-cat-lead {
+  font-size: 0.95rem; line-height: 1.6; max-width: 42ch;
+  color: rgba(248, 250, 234, 0.66);
+}
+
+.academy .ac-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: start; }
+
+.academy .ac-card {
+  border-radius: 22px; padding: 26px;
+  border: 1px solid transparent;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.academy .ac-card.green { background: var(--green-card); color: var(--cream); border-color: rgba(209, 254, 23, 0.16); }
+.academy .ac-card.cream { background: var(--cream); color: var(--green-deep); }
+.academy .ac-card.is-open { border-color: var(--lime); }
+
+.academy .ac-card-top { display: flex; align-items: flex-start; gap: 14px; }
+.academy .ac-ic {
+  flex: 0 0 auto; width: 40px; height: 40px; border-radius: 12px;
+  display: grid; place-items: center;
+}
+.academy .ac-card.green .ac-ic { background: var(--lime); color: var(--green-deep); }
+.academy .ac-card.cream .ac-ic { background: var(--green-deep); color: var(--lime); }
+.academy .ac-card-id { flex: 1; min-width: 0; }
+.academy .ac-name { font-family: "UniNeue-Bold", sans-serif; font-size: 1.28rem; line-height: 1.1; }
+.academy .ac-sub { font-size: 0.86rem; margin-top: 3px; }
+.academy .ac-card.green .ac-sub { color: rgba(248, 250, 234, 0.62); }
+.academy .ac-card.cream .ac-sub { color: rgba(5, 58, 44, 0.6); }
+.academy .ac-price-wrap { text-align: right; flex: 0 0 auto; }
+.academy .ac-price { font-family: "UniNeue-Heavy", sans-serif; font-size: 1.38rem; letter-spacing: -0.02em; }
+.academy .ac-allin {
+  font-family: "UniNeue", monospace; font-size: 0.6rem; letter-spacing: 0.06em;
+  text-transform: uppercase; opacity: 0.55; margin-top: 2px;
+}
+
+.academy .ac-div { border: 0; border-top: 1px dashed; margin: 18px 0 14px; }
+.academy .ac-card.green .ac-div { border-color: rgba(209, 254, 23, 0.22); }
+.academy .ac-card.cream .ac-div { border-color: rgba(5, 58, 44, 0.18); }
+
+.academy .ac-meta-row { display: flex; flex-wrap: wrap; gap: 18px; }
+.academy .ac-meta {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-family: "UniNeue", monospace; font-size: 0.68rem; letter-spacing: 0.03em;
+}
+.academy .ac-card.green .ac-meta { color: rgba(248, 250, 234, 0.7); }
+.academy .ac-card.cream .ac-meta { color: rgba(5, 58, 44, 0.62); }
+
+.academy .ac-desc { margin-top: 14px; font-size: 0.92rem; line-height: 1.55; }
+.academy .ac-card.green .ac-desc { color: rgba(248, 250, 234, 0.72); }
+.academy .ac-card.cream .ac-desc { color: rgba(5, 58, 44, 0.78); }
+
+/* curriculum (expanded) */
+.academy .ac-cur-label {
+  font-family: "UniNeue", monospace; font-size: 0.62rem; letter-spacing: 0.12em;
+  text-transform: uppercase; margin-top: 22px;
+  color: rgba(248, 250, 234, 0.45);
+}
+.academy .ac-card.cream .ac-cur-label { color: rgba(5, 58, 44, 0.45); }
+.academy .ac-mods { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 18px; margin-top: 14px; }
+.academy .ac-mod { display: flex; align-items: center; gap: 10px; font-size: 0.84rem; }
+.academy .ac-mod-no {
+  flex: 0 0 auto;
+  font-family: "UniNeue", monospace; font-size: 0.6rem;
+  width: 22px; height: 18px; border-radius: 5px;
+  display: grid; place-items: center;
+}
+.academy .ac-card.green .ac-mod-no { background: rgba(209, 254, 23, 0.16); color: var(--lime); }
+.academy .ac-card.green .ac-mod { color: rgba(248, 250, 234, 0.86); }
+.academy .ac-card.cream .ac-mod-no { background: rgba(5, 58, 44, 0.1); color: var(--green); }
+.academy .ac-card.cream .ac-mod { color: rgba(5, 58, 44, 0.86); }
+
+.academy .ac-enrol-btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  margin-top: 24px; padding: 13px 22px; border: none; border-radius: 999px;
+  font-family: "UniNeue-Bold", sans-serif; font-size: 0.92rem; cursor: pointer;
+  transition: 0.2s;
+}
+.academy .ac-card.green .ac-enrol-btn { background: var(--lime); color: var(--green-deep); }
+.academy .ac-card.cream .ac-enrol-btn { background: var(--green-deep); color: var(--cream); }
+.academy .ac-enrol-btn:hover { filter: brightness(1.08); }
+.academy .ac-enrol-btn .ac-arrow {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: rgba(0, 0, 0, 0.16);
+}
+.academy .ac-card.cream .ac-enrol-btn .ac-arrow { background: rgba(209, 254, 23, 0.22); color: var(--lime); }
+
+.academy .ac-toggle {
+  display: inline-block; margin-top: 22px;
+  background: none; border: none; cursor: pointer; padding: 0;
+  font-family: "UniNeue-Bold", monospace; font-size: 0.72rem; letter-spacing: 0.04em;
+}
+.academy .ac-card.green .ac-toggle { color: var(--lime); }
+.academy .ac-card.cream .ac-toggle { color: var(--green); }
+
+/* ==========================================================================
+   HOW IT WORKS (4-step academy path)
+   ========================================================================== */
+.academy .ac-how { padding: 92px 0; }
+.academy .ac-how .ac-eyebrow { color: var(--green); }
+.academy .ac-how-head {
+  display: grid; grid-template-columns: 1.3fr 1fr; gap: 40px; align-items: end;
+  margin-bottom: 46px;
+}
+.academy .ac-how-title {
+  margin: 0;
+  font-family: "UniNeue-Heavy", sans-serif;
+  font-size: clamp(2.3rem, 4.2vw, 3.4rem);
+  line-height: 1.02; letter-spacing: -0.02em;
+  color: var(--dark);
+}
+.academy .ac-how-lead {
+  font-size: 0.95rem; line-height: 1.6; max-width: 40ch;
+  color: rgba(5, 58, 44, 0.66);
+}
+.academy .ac-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.academy .ac-step { border-radius: 20px; padding: 24px; min-height: 196px; display: flex; flex-direction: column; }
+.academy .ac-step.green { background: var(--green); color: var(--cream); }
+.academy .ac-step.dark  { background: var(--dark);  color: var(--cream); }
+.academy .ac-step.lime  { background: var(--lime);  color: var(--green-deep); }
+.academy .ac-step-no { font-family: "UniNeue-Heavy", sans-serif; font-size: 2rem; line-height: 1; letter-spacing: -0.02em; }
+.academy .ac-step-h { font-family: "UniNeue-Bold", sans-serif; font-size: 1.08rem; margin-top: 14px; }
+.academy .ac-step.green .ac-step-h, .academy .ac-step.dark .ac-step-h { color: var(--lime); }
+.academy .ac-step p { margin-top: 10px; font-size: 0.82rem; line-height: 1.5; }
+.academy .ac-step.green p, .academy .ac-step.dark p { color: rgba(248, 250, 234, 0.74); }
+.academy .ac-step.lime p { color: rgba(5, 58, 44, 0.8); }
+
+/* ==========================================================================
+   ENROL
+   ========================================================================== */
+.academy .ac-enrol { padding: 92px 0; }
+.academy .ac-enrol-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: start; }
+.academy .ac-enrol-title {
+  margin: 0;
+  font-family: "UniNeue-Heavy", sans-serif;
+  font-size: clamp(2.4rem, 4.5vw, 3.6rem);
+  line-height: 1.0; letter-spacing: -0.02em;
+  color: var(--cream);
+}
+.academy .ac-enrol-lead {
+  margin-top: 22px; max-width: 44ch; font-size: 0.95rem; line-height: 1.6;
+  color: rgba(248, 250, 234, 0.66);
+}
+.academy .ac-pills { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+.academy .ac-pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 16px; border-radius: 999px;
+  border: 1px solid rgba(248, 250, 234, 0.16);
+  font-family: "UniNeue", monospace; font-size: 0.7rem; letter-spacing: 0.04em;
+  color: rgba(248, 250, 234, 0.82);
+}
+.academy .ac-pill .d { width: 7px; height: 7px; border-radius: 50%; background: var(--lime); }
+
+.academy .ac-form { background: var(--cream); border-radius: 22px; padding: 28px; }
+.academy .ac-field { margin-bottom: 16px; }
+.academy .ac-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.academy .ac-flabel {
+  display: block;
+  font-family: "UniNeue", monospace; font-size: 0.62rem; letter-spacing: 0.1em;
+  text-transform: uppercase; color: rgba(5, 58, 44, 0.55); margin-bottom: 7px;
+}
+.academy .ac-input {
+  width: 100%; padding: 13px 14px; border-radius: 10px;
+  border: 1px solid rgba(5, 58, 44, 0.18); background: #fff;
+  font-family: "UniNeue", sans-serif; font-size: 0.95rem; color: var(--green-deep);
+}
+.academy .ac-input:focus { outline: 2px solid var(--lime); outline-offset: 1px; border-color: transparent; }
+.academy select.ac-input { appearance: none; cursor: pointer; }
+.academy .ac-submit {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  width: 100%; margin-top: 6px; padding: 16px 22px;
+  border: none; border-radius: 12px; cursor: pointer;
+  background: var(--green-deep); color: var(--cream);
+  font-family: "UniNeue-Bold", sans-serif; font-size: 0.98rem; transition: 0.2s;
+}
+.academy .ac-submit:hover { filter: brightness(1.15); }
+.academy .ac-submit .ac-arrow {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--lime); color: var(--green-deep);
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+@media (max-width: 960px) {
+  .academy .ac-hero-grid { grid-template-columns: 1fr; gap: 34px; }
+  .academy .ac-hero-img { min-height: 320px; }
+}
+@media (max-width: 900px) {
+  .academy .ac-cat-head, .academy .ac-how-head, .academy .ac-enrol-grid { grid-template-columns: 1fr; gap: 26px; }
+  .academy .ac-grid { grid-template-columns: 1fr; }
+  .academy .ac-steps { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 560px) {
+  .academy .ac-steps { grid-template-columns: 1fr; }
+  .academy .ac-mods, .academy .ac-field-row { grid-template-columns: 1fr; }
+  .academy .ac-hero-ctas .btn, .academy .ac-btn-outline { width: 100%; justify-content: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .academy * { scroll-behavior: auto; }
+}

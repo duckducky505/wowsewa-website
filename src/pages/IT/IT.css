@@ -1,0 +1,316 @@
+/* IT & Devices page — page-template styles (split out of the old shared IT.css).
+   Nav -> Navbar.css, CTA -> CTA.css, Other services -> Categories.css,
+   stats band -> the StatsBar component. Footer has its own Footer.css. */
+
+/* ── Pulse animation for live dots ── */
+@keyframes itPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.6); opacity: 0.4; }
+}
+
+/* ── BREADCRUMBS ── */
+.it-crumbs {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-family: "UniNeue", monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(248, 250, 234, 0.55);
+  margin-bottom: 34px;
+  flex-wrap: wrap;
+}
+.it-crumbs a { color: inherit; text-decoration: none; transition: color 0.2s; }
+.it-crumbs a:hover { color: var(--primary-color); }
+.it-crumbs-sep { opacity: 0.4; }
+
+/* ── HERO SECTION ── */
+.it-hero { padding: 56px 0 64px; }
+.it-hero-grid {
+  display: grid;
+  grid-template-columns: 1.04fr 0.96fr;
+  gap: 48px;
+  align-items: stretch;
+}
+@media (max-width: 960px) { .it-hero-grid { grid-template-columns: 1fr; gap: 30px; } }
+.it-hero-text { display: flex; flex-direction: column; justify-content: center; }
+.it-hero-id { display: flex; align-items: center; gap: 16px; margin-bottom: 26px; }
+.it-badge {
+  width: 64px; height: 64px;
+  border-radius: 18px;
+  background: var(--primary-color);
+  color: var(--dark-color);
+  display: grid; place-items: center;
+  flex-shrink: 0;
+}
+.it-cat-label {
+  font-family: "UniNeue", monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary-color);
+  margin-bottom: 6px;
+}
+.it-hero-title {
+  font-family: "UniNeue-Heavy", sans-serif;
+  font-size: clamp(48px, 7vw, 96px);
+  line-height: 0.92;
+  letter-spacing: -0.04em;
+  color: var(--light-color);
+  margin: 0;
+}
+.it-tagline {
+  font-family: "UniNeue-Bold", sans-serif;
+  font-size: clamp(20px, 2.4vw, 30px);
+  letter-spacing: -0.02em;
+  margin-top: 22px;
+  color: rgba(248, 250, 234, 0.92);
+  line-height: 1.2;
+}
+.it-hero-desc {
+  margin-top: 18px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: rgba(248, 250, 234, 0.72);
+  max-width: 50ch;
+}
+.it-meta-pills { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 24px; }
+.it-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(248, 250, 234, 0.2);
+  font-family: "UniNeue", monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--light-color);
+}
+.it-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  flex-shrink: 0;
+  animation: itPulse 1.6s ease-in-out infinite;
+}
+.it-hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 28px; align-items: center; }
+.it-hero-ctas .btn { display: inline-flex; align-items: center; gap: 10px; border-radius: 999px; }
+.it-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  padding: 13px 22px;
+  border-radius: 999px;
+  border: 1px solid rgba(248, 250, 234, 0.25);
+  color: var(--light-color);
+  font-family: "UniNeue-Bold", sans-serif;
+  font-size: 15px;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.it-btn-outline:hover { background: rgba(248, 250, 234, 0.08); }
+.it-hero-media { position: relative; min-height: 420px; }
+.it-hero-img {
+  position: relative;
+  overflow: hidden;
+  width: 100%; height: 100%;
+  min-height: 420px;
+  background: #d4e8c0;
+  border-radius: 26px;
+  border: 1px solid rgba(248, 250, 234, 0.12);
+  display: flex; align-items: center; justify-content: center; flex-direction: column;
+  gap: 10px;
+  color: #4a6b40;
+  cursor: pointer;
+}
+/* dropped photo fills the rounded box */
+.it-hero-img-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.it-hero-img-icon { opacity: 0.4; }
+.it-hero-img-label { font-size: 13px; opacity: 0.6; }
+.it-img-tag {
+  position: absolute;
+  left: 18px; bottom: 18px;
+  z-index: 2;
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 14px;
+  border-radius: 999px;
+  background: var(--primary-color);
+  color: var(--dark-color);
+  font-family: "UniNeue-Bold", monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ── SERVICES LIST ── */
+.it-svc-list { padding: 80px 0 90px; }
+.it-section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 30px;
+  margin-bottom: 42px;
+  flex-wrap: wrap;
+}
+.it-section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: "UniNeue", monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary-color);
+  margin-bottom: 14px;
+}
+.it-section-label-line { width: 32px; height: 1px; background: var(--primary-color); }
+.it-section-lead {
+  max-width: 360px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: rgba(248, 250, 234, 0.68);
+}
+.it-cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+@media (max-width: 920px) { .it-cards-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 620px) { .it-cards-grid { grid-template-columns: 1fr; } }
+
+/* Service card */
+.it-card {
+  border-radius: 18px;
+  overflow: hidden;
+  background: rgba(248, 250, 234, 0.05);
+  border: 1px solid rgba(248, 250, 234, 0.11);
+  display: flex; flex-direction: column;
+  transition: transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1), background 0.25s;
+}
+.it-card:hover { transform: translateY(-4px); background: rgba(248, 250, 234, 0.09); }
+.it-card-media {
+  position: relative;
+  width: 100%; height: 175px;
+  flex-shrink: 0;
+  background: #d4e8c0;
+  display: flex; align-items: center; justify-content: center; flex-direction: column;
+  gap: 8px;
+  color: #4a6b40;
+  border-bottom: 1px solid rgba(248, 250, 234, 0.1);
+  cursor: pointer;
+  font-size: 12px;
+  overflow: hidden;
+}
+/* dropped photo fills the card media area (sits under the .it-card-num badge) */
+.it-card-media-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.it-card-num {
+  position: absolute;
+  top: 12px; left: 12px;
+  z-index: 2;
+  font-family: "UniNeue", monospace;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: var(--dark-color);
+  color: var(--primary-color);
+}
+.it-card-body { display: flex; flex-direction: column; gap: 11px; padding: 20px 22px; flex: 1; }
+.it-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
+.it-card-name {
+  font-family: "UniNeue-Bold", sans-serif;
+  font-size: 19px;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--light-color);
+  max-width: 15ch;
+  margin: 0;
+}
+.it-card-price {
+  font-family: "UniNeue-Heavy", sans-serif;
+  font-size: 18px;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  color: var(--primary-color);
+}
+.it-card-price em {
+  font-family: "UniNeue-Italic", sans-serif;
+  font-style: italic;
+  font-size: 15px;
+  margin-right: 1px;
+}
+.it-card-desc { font-size: 13.5px; line-height: 1.5; color: rgba(248, 250, 234, 0.62); }
+.it-card-foot {
+  margin-top: auto;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px;
+  padding-top: 8px;
+}
+.it-card-time {
+  font-family: "UniNeue", monospace;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(248, 250, 234, 0.5);
+}
+.it-book-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px 8px 14px;
+  border-radius: 999px;
+  background: rgba(248, 250, 234, 0.07);
+  border: 1px solid rgba(248, 250, 234, 0.14);
+  font-family: "UniNeue-Bold", sans-serif;
+  font-size: 12px;
+  color: var(--light-color);
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.it-card:hover .it-book-btn {
+  background: var(--primary-color);
+  color: var(--dark-color);
+  border-color: var(--primary-color);
+}
+
+/* ── ASSURANCE ── */
+.it-assure { padding: 90px 0; }
+.it-assure-inner .it-section-label { color: #074C3A; }
+.it-assure-inner .it-section-label-line { background: #074C3A; }
+.it-assure-inner .it-section-lead { color: rgba(3, 33, 24, 0.68); }
+.it-assure-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 40px; }
+@media (max-width: 900px) { .it-assure-grid { grid-template-columns: repeat(2, 1fr); } }
+.it-acard {
+  border-radius: 28px;
+  padding: 26px;
+  min-height: 210px;
+  display: flex; flex-direction: column; justify-content: space-between;
+}
+.it-acard:nth-child(1) { background: #074C3A; color: var(--light-color); }
+.it-acard:nth-child(2) { background: #032118; color: var(--light-color); }
+.it-acard:nth-child(3) { background: var(--primary-color); color: var(--dark-color); }
+.it-acard:nth-child(4) { background: #074C3A; color: var(--light-color); }
+.it-acard-icon {
+  width: 42px; height: 42px;
+  border-radius: 12px;
+  display: grid; place-items: center;
+  background: rgba(128, 128, 128, 0.14);
+  margin-bottom: 16px;
+}
+.it-acard h3 {
+  font-family: "UniNeue-Bold", sans-serif;
+  font-size: 19px;
+  letter-spacing: -0.02em;
+  margin: 0 0 8px;
+  line-height: 1.1;
+}
+.it-acard p { font-size: 13.5px; line-height: 1.5; opacity: 0.8; margin: 0; }
