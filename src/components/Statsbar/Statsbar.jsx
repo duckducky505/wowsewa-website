@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import './StatsBar.css';
+import './Statsbar.css';
 
 /* format an in-progress value: integers get thousands separators,
    decimals are fixed to the requested precision */
