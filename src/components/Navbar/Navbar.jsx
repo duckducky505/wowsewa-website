@@ -76,8 +76,8 @@ function Navbar() {
         <div className={menuActive ? 'mobile-menu active' : 'mobile-menu'}>
           <ul>
             <li><Link to="/" onClick={close}>Home</Link></li>
-            <li><a href="/#services" onClick={handleServices}>Services</a></li>
-            <li><a href="/amc">AMC</a></li>
+            <li><Link to="/#services" onClick={handleServices}>Services</Link></li>
+            <li><Link to="/amc">AMC</Link></li>
             <li><Link to="/training-wowsewa" onClick={close}>Training</Link></li>
             <li><Link to="/about-us" onClick={close}>About Us</Link></li>
             <li>
