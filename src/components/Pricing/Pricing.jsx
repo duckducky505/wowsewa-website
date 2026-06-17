@@ -1,4 +1,5 @@
 import './Pricing.css';
+import { Link } from 'react-router-dom';
 
 const Pricing = () => {
   return (
@@ -80,9 +81,9 @@ const Pricing = () => {
         </div>
 
         <div className="pricing-footer">
-          <a href="/amc" className="btn btn-view-more">
+          <Link to="/amc" className="btn btn-view-more">
             View all AMC plans <span className="arr">→</span>
-          </a>
+          </Link>
         </div>
 
       </div>

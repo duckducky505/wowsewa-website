@@ -7,7 +7,7 @@ import {
 import { FcGoogle } from 'react-icons/fc';
 import { MdArrowForward } from 'react-icons/md';
 import './Linktree.css';
-import image from '../../assets/images/wowLogo2.png'
+import image from '../../assets/images/wowLogo2.png';
 
 const Linktree = () => {
   return (
@@ -127,7 +127,6 @@ const Linktree = () => {
             <span className="line"></span> MORE
           </div>
           <div className="more-grid">
-            {/* Uses bg-dark from App.css */}
             <div className="card bg-dark dark-card scan-card">
               <div className="qr-drop">
                 <span className="qr-icon">qr</span>
