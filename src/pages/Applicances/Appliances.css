@@ -289,6 +289,7 @@
 .it-assure-inner .it-section-lead { color: rgba(3, 33, 24, 0.68); }
 .it-assure-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 40px; }
 @media (max-width: 900px) { .it-assure-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 520px) { .it-assure-grid { grid-template-columns: 1fr; } }
 .it-acard {
   border-radius: 28px;
   padding: 26px;
@@ -314,3 +315,27 @@
   line-height: 1.1;
 }
 .it-acard p { font-size: 13.5px; line-height: 1.5; opacity: 0.8; margin: 0; }
+
+/* ── phone-specific additions ── */
+@media (max-width: 640px) {
+  .it-hero { padding: 36px 0 44px; }
+  .it-hero-title { font-size: clamp(40px, 10vw, 64px); }
+  .it-tagline { font-size: clamp(16px, 4vw, 22px); }
+  .it-hero-media { min-height: 280px; }
+  .it-hero-img { min-height: 280px; }
+  .it-meta-pills { gap: 7px; }
+  .it-pill { font-size: 10px; padding: 7px 11px; }
+  .it-hero-ctas { flex-direction: column; }
+  .it-hero-ctas .btn,
+  .it-btn-outline { width: 100%; justify-content: center; }
+  .it-svc-list { padding: 56px 0 64px; }
+  .it-assure { padding: 64px 0; }
+}
+@media (max-width: 420px) {
+  .it-hero-id { gap: 12px; }
+  .it-badge { width: 52px; height: 52px; border-radius: 14px; }
+  .it-hero-title { font-size: clamp(36px, 9vw, 52px); }
+  .it-cards-grid { gap: 12px; }
+  .it-acard { padding: 20px; min-height: 180px; }
+  .it-acard h3 { font-size: 17px; }
+}

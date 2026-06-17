@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Electrical.css';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Footer/Footer';
@@ -66,13 +67,32 @@ const ELEC_STATS = [
 
 // ── Sections ─────────────────────────────────────────────────────────────────
 function Hero() {
+
+  const navigate  = useNavigate();
+
+  const handleServices = (e) => {
+    e.preventDefault();
+    close();
+    if (location.pathname === '/') {
+      scrollToServices();
+    } else {
+      navigate('/');
+      setTimeout(scrollToServices, 150);
+    }
+  };
+
+    const scrollToServices = () => {
+    const el = document.getElementById('services');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   return (
     <header className="it-hero bg-main">
       <div className="container">
         <div className="it-crumbs">
           <a href="/">Home</a>
           <span className="it-crumbs-sep">/</span>
-          <a href="/services">Services</a>
+          <a href="/#services" onClick={handleServices}>Services</a>
           <span className="it-crumbs-sep">/</span>
           <span style={{ color: 'var(--primary-color)' }}>Electrical</span>
         </div>
@@ -100,13 +120,6 @@ function Hero() {
               <span className="it-pill"><span className="it-dot" />Visit from ₹249</span>
               <span className="it-pill"><span className="it-dot" />ISI-grade parts</span>
               <span className="it-pill"><span className="it-dot" />Same-day available</span>
-            </div>
-
-            <div className="it-hero-ctas">
-              <a href="/#book" className="btn btn-primary">
-                Book an electrical visit <ArrowIcon />
-              </a>
-              <a href="/services" className="it-btn-outline">All services</a>
             </div>
           </div>
 

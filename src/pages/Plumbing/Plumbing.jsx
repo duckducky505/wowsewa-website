@@ -1,9 +1,11 @@
 import React from 'react';
 import './Plumbing.css';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Footer/Footer';
 import Categories from '../../components/CategoriesServices/Categories';
 import CTA from '../../components/CTA/CTA';
+import StatsBar from '../../components/Statsbar/Statsbar';
 
 import plumbingMain from '../../assets/images/plumbing-main.webp'
 import  tap from '../../assets/images/sanitary-fitting.webp'
@@ -62,15 +64,41 @@ const ASSURANCE_ITEMS = [
   { icon: <SparkIcon />,    heading: 'One number, six trades', body: 'Plumbing to IT, no juggling contacts. Book it all from one app, one helpline.' },
 ];
 
+const PLUM_STATS = [
+  { value: 6,    sup: '+',    label: 'Services in Plumbing' },
+  { value: 249,  prefix: '₹', label: 'Starting price' },
+  { value: 90,   sup: 'd',    label: 'Warranty on repairs' },
+  { value: 4.92, decimals: 2, sup: '★', label: 'Average pro rating' },
+];
+
 // ── Sections ─────────────────────────────────────────────────────────────────
 function Hero() {
+
+  const navigate  = useNavigate();
+
+  const handleServices = (e) => {
+    e.preventDefault();
+    close();
+    if (location.pathname === '/') {
+      scrollToServices();
+    } else {
+      navigate('/');
+      setTimeout(scrollToServices, 150);
+    }
+  };
+
+    const scrollToServices = () => {
+    const el = document.getElementById('services');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   return (
     <header className="it-hero bg-main">
       <div className="container">
         <div className="it-crumbs">
           <a href="/">Home</a>
           <span className="it-crumbs-sep">/</span>
-          <a href="/services">Services</a>
+          <a href="/#services" onClick={handleServices}>Services</a>
           <span className="it-crumbs-sep">/</span>
           <span style={{ color: 'var(--primary-color)' }}>Plumbing</span>
         </div>
@@ -98,13 +126,6 @@ function Hero() {
               <span className="it-pill"><span className="it-dot" />Visit from ₹299</span>
               <span className="it-pill"><span className="it-dot" />90-day warranty</span>
               <span className="it-pill"><span className="it-dot" />Same-day available</span>
-            </div>
-
-            <div className="it-hero-ctas">
-              <a href="/#book" className="btn btn-primary">
-                Book a plumbing visit <ArrowIcon />
-              </a>
-              <a href="/services" className="it-btn-outline">All services</a>
             </div>
           </div>
 
@@ -229,6 +250,7 @@ export default function Plumbing() {
     <>
       <Navbar />
       <Hero />
+      <StatsBar stats={PLUM_STATS} />
       <ServicesList />
       <Assurance />
       <Categories exclude="plumbing" />

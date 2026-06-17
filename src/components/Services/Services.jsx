@@ -89,7 +89,7 @@ const Services = () => {
           </Link>
 
           {/* Deep cleaning */}
-          <Link to="/services/deep-cleaning" className="tile t-clean">
+          <Link to="/" className="tile t-clean">
             <div>
               <div className="t-meta">05 · Deep cleaning</div>
               <h3 style={{ marginTop: 10 }}>Sofas, kitchens,<br />bathrooms &amp; full-home.</h3>
@@ -102,7 +102,7 @@ const Services = () => {
           </Link>
 
           {/* Emergency */}
-          <Link to="/services/emergency" className="tile t-emerg">
+          <Link to="/" className="tile t-emerg">
             <div>
               <div className="t-meta">06 · Emergency</div>
               <h3 style={{ marginTop: 10 }}>11pm flood?<br />We pick up.</h3>

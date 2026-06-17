@@ -200,3 +200,64 @@
   background: var(--primary-color); color: var(--dark-color);
   font-family: "UniNeue-Bold", monospace; font-size: 11px; letter-spacing: 0.04em;
 }
+
+/* ── ADDITIONAL MOBILE RESPONSIVE ── */
+@media (max-width: 768px) {
+  .about-hero { padding: 20px 0 0; }
+  .about-hero-title { font-size: clamp(42px, 10vw, 72px); }
+  .about-hero-stats { gap: 28px; }
+  .about-stat-val { font-size: clamp(28px, 7vw, 36px); }
+
+  .about-drives { padding: 64px 0; }
+  .about-drives h2 { font-size: clamp(28px, 6vw, 42px); }
+
+  .about-vision { padding: 72px 0; }
+  .about-vision-head h2 { font-size: clamp(32px, 7vw, 50px); }
+  .about-founder-name { font-size: clamp(28px, 7vw, 42px); }
+  .about-quote { font-size: clamp(18px, 4vw, 24px); }
+
+  .about-journey { padding: 64px 0; }
+  .about-journey h2 { font-size: clamp(28px, 6vw, 42px); margin-bottom: 30px; }
+
+  .about-cta { padding: 80px 0; }
+  .about-cta-title { font-size: clamp(40px, 10vw, 80px); }
+  .about-cta-btns { flex-direction: column; align-items: center; }
+  .about-cta-btns .btn,
+  .about-cta-btns .about-btn-outline { width: 100%; justify-content: center; max-width: 360px; }
+
+  .about-media-wide { min-height: 320px; }
+}
+
+@media (max-width: 480px) {
+  .about-hero-title { font-size: clamp(36px, 9vw, 56px); }
+  .about-hero-stats { gap: 20px; }
+  .about-trades-row { gap: 10px; font-size: 11px; }
+
+  .about-vision-grid { gap: 26px; }
+  .about-founder-name { font-size: clamp(26px, 8vw, 36px); }
+  .about-bio p { font-size: 0.88rem; }
+
+  .about-jcard { min-height: 180px; padding: 20px; }
+  .about-jcard-year { font-size: 32px; }
+
+  .about-cta { padding: 60px 0; }
+  .about-cta-title { font-size: clamp(34px, 9vw, 56px); letter-spacing: -0.03em; }
+}
+
+/* ── About mobile ── */
+@media (max-width: 640px) {
+  .about-hero-title { font-size: clamp(38px, 10vw, 70px); }
+  .about-hero-stats { gap: 22px; }
+  .about-stat-val { font-size: clamp(28px, 8vw, 36px); }
+  .about-cta-title { font-size: clamp(40px, 10vw, 80px); }
+  .about-cta { padding: 72px 0; }
+  .about-drives { padding: 64px 0; }
+  .about-vision { padding: 64px 0; }
+  .about-journey { padding: 64px 0; }
+  .about-founder-name { font-size: clamp(28px, 7vw, 40px); }
+  .about-quote { font-size: clamp(18px, 4.5vw, 24px); }
+  .about-cta-btns { flex-direction: column; align-items: center; }
+  .about-cta-btns .btn-primary, .about-btn-outline { width: 100%; justify-content: center; text-align: center; }
+  .about-media-wide { min-height: 280px; }
+  /* about-mobile-hero marker for idempotency */
+}

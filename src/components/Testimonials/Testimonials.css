@@ -112,7 +112,14 @@
   .testimonials .tcard.wide { grid-column: span 2; }
 }
 @media (max-width: 600px) {
-  .testimonials { padding: 70px 0; }
-  .testimonials .tgrid { grid-template-columns: 1fr; }
+  .testimonials { padding: 64px 0; }
+  .testimonials .tgrid { grid-template-columns: 1fr; gap: 14px; }
   .testimonials .tcard.wide { grid-column: span 1; }
+  .testimonials .tcard { min-height: 180px; padding: 20px; }
+  .testimonials .section-head { gap: 18px; }
+}
+
+@media (max-width: 400px) {
+  .testimonials .tcard { padding: 20px; }
+  .testimonials .section-head h2 { font-size: clamp(2rem, 8vw, 3rem); }
 }

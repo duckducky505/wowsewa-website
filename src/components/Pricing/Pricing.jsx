@@ -23,67 +23,68 @@ const Pricing = () => {
           {/* Card 1 */}
           <div className="pcard">
             <div className="ptier">
-              <h3>Pay-as-you-go</h3>
+              <h3>Starter Plan</h3>
               <span className="ptag">Most flexible</span>
             </div>
-            <div className="price-amt"><span className="cur">Rs</span>249<small>/visit</small></div>
+            <div className="price-amt"><span className="cur">Rs</span>8000<small>/month</small></div>
             <p className="pdesc">
-              Book any single service. Diagnostic + visit fee adjusted into the
-              final bill if you proceed with the work.
+              Reliable Care. Every Month. Peace of mind. Every Day.
             </p>
             <ul className="pfeats">
-              <li><span className="ck">✓</span>Flat-priced before the pro arrives</li>
-              <li><span className="ck">✓</span>90-day warranty on the fix</li>
-              <li><span className="ck">✓</span>Cash, UPI or card</li>
+              <li><span className="ck">✓</span>1 Scheduled Visit</li>
+              <li><span className="ck">✓</span>Phone Support</li>
+              <li><span className="ck">✓</span>Priority Service</li>
+              <li><span className="ck">✓</span>AMC Discount 10%</li>
             </ul>
-            <a href="#" className="btn btn-ghost btn-block">
-              Book a single visit <span className="arr">→</span>
-            </a>
           </div>
 
           {/* Card 2 — featured */}
           <div className="pcard featured">
             <div className="ptier">
-              <h3>Home Plus</h3>
+              <h3>Business Plan</h3>
               <span className="ptag">Recommended</span>
             </div>
-            <div className="price-amt"><span className="cur">Rs</span>3,499<small>/year, 2-3 BHK</small></div>
+            <div className="price-amt"><span className="cur">Rs</span>15,000<small>/month</small></div>
             <p className="pdesc">
               Unlimited basic visits across all four services. Free AC service
               twice a year. Priority dispatch under an hour.
             </p>
             <ul className="pfeats">
-              <li><span className="ck">✓</span>Unlimited basic visits — all services</li>
-              <li><span className="ck">✓</span>2× AC service · 1× geyser service</li>
-              <li><span className="ck">✓</span>1-hour priority dispatch</li>
-              <li><span className="ck">✓</span>20% off parts &amp; installation</li>
+              <li><span className="ck">✓</span>2× visits/month</li>
+              <li><span className="ck">✓</span>Preventive maintainence</li>
+              <li><span className="ck">✓</span>Emergency Support</li>
+              <li><span className="ck">✓</span>AMC discount 12%</li>
             </ul>
-            <a href="#" className="btn btn-dark btn-block">
-              Start Home Plus <span className="arr">→</span>
-            </a>
           </div>
 
           {/* Card 3 */}
           <div className="pcard">
             <div className="ptier">
-              <h3>Society &amp; SMB</h3>
+              <h3>Corporate Plan</h3>
               <span className="ptag">By contract</span>
             </div>
-            <div className="price-amt">Custom<small>50+ units</small></div>
+            <div className="price-amt"><span className="cur">Rs</span>25,000<small>/month</small></div>
             <p className="pdesc">
               A dedicated supervisor, on-site SLA targets, a monthly maintenance
               check and a single invoice for the whole society or office.
             </p>
             <ul className="pfeats">
-              <li><span className="ck">✓</span>Dedicated supervisor &amp; account lead</li>
-              <li><span className="ck">✓</span>Same-day SLA, contractual</li>
-              <li><span className="ck">✓</span>Monthly preventive sweep</li>
+              <li><span className="ck">✓</span>Weekly Visits</li>
+              <li><span className="ck">✓</span>Emergency Response</li>
+              <li><span className="ck">✓</span>Monthly reports</li>
+              <li><span className="ck">✓</span>AMC discount 15%</li>
+              <li><span className="ck">✓</span>Dedicated Technical Support</li>
+              <li><span className="ck">✓</span>Monthly reports</li>
             </ul>
-            <a href="#" className="btn btn-ghost btn-block">
-              Talk to sales <span className="arr">→</span>
-            </a>
           </div>
         </div>
+
+        <div className="pricing-footer">
+          <a href="/amc" className="btn btn-view-more">
+            View all AMC plans <span className="arr">→</span>
+          </a>
+        </div>
+
       </div>
     </section>
   );

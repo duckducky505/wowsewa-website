@@ -61,6 +61,22 @@ const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
 
 const Hero = () => {
   const navigate = useNavigate();
+
+  const handleServices = (e) => {
+    e.preventDefault();
+    close();
+    if (location.pathname === '/') {
+      scrollToServices();
+    } else {
+      navigate('/');
+      setTimeout(scrollToServices, 150);
+    }
+  };
+
+    const scrollToServices = () => {
+    const el = document.getElementById('services');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
   const idRef = useRef(SEED.length);
   const [feed, setFeed] = useState(SEED);
   const [stats, setStats] = useState({ pros: 124, resp: 38 });
@@ -98,7 +114,7 @@ const Hero = () => {
           </p>
           <h1 className="hero-heading">
             Your home,<br />
-            <span className="hero-heading-accent">handled</span> by<br />
+            <span className="accent-text-main">handled</span> by<br />
             one number.
           </h1>
           <p className="hero-text">
@@ -107,10 +123,10 @@ const Hero = () => {
             live, pay only after the job is done right.
           </p>
           <div className="hero-buttons">
-            <a href="#" className="btn btn-primary">
-              Book a pro now <span className="hero-arrow"><Arrow /></span>
+            <a href="tel:+9779762424318" className="btn btn-primary">
+              Call Now<span className="hero-arrow"><Arrow /></span>
             </a>
-            <a href="#" className="btn hero-btn-outline">Browse services</a>
+            <a href="/#services" onClick={handleServices} className="btn hero-btn-outline">Browse services</a>
           </div>
           <div className="hero-rating">
             <span className="hero-stars">★★★★★</span>
@@ -128,7 +144,7 @@ const Hero = () => {
               <span className="live-dot-lg" aria-hidden="true"></span>
               <div>
                 <h4>Live on the network</h4>
-                <p className="live-sub">Updating in real time · 7 cities</p>
+                <p className="live-sub">Updating in real time</p>
               </div>
               <span className="live-now">NOW</span>
             </div>
@@ -165,10 +181,6 @@ const Hero = () => {
                 </div>
               ))}
             </div>
-
-            <button className="live-book" onClick={() => navigate('/services')}>
-              Book a pro near you <span className="book-arrow"><Arrow s={14} /></span>
-            </button>
           </div>
         </div>
       </div>

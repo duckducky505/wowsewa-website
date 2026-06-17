@@ -58,7 +58,7 @@ function Faq() {
           </div>
           <p className="faq-lead">
             Everything you need to know before you book. Still stuck? Call us on
-            1800-WOW-SEWA — real humans, seven days a week.
+            9762424318 or 9824232439, anytime, anyday, seven days a week.
           </p>
         </div>
 

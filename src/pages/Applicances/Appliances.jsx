@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Appliances.css';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Footer/Footer';
@@ -16,6 +17,7 @@ import chimney from '../../assets/images/hob.jpg'
 import dishwasher from '../../assets/images/ac-repair.webp'
 
 const APP_HERO_IMAGE = appliances;
+
 
 // ── Icons ───────────────────────────────────────────────────────────────────
 const SnowIcon = ({ size = 26 }) => (
@@ -64,15 +66,37 @@ const APP_STATS = [
   { value: 4.92, decimals: 2, sup: '★', label: 'Average pro rating' },
 ];
 
+
+
 // ── Sections ─────────────────────────────────────────────────────────────────
 function Hero() {
+
+  const navigate  = useNavigate();
+
+  const handleServices = (e) => {
+    e.preventDefault();
+    close();
+    if (location.pathname === '/') {
+      scrollToServices();
+    } else {
+      navigate('/');
+      setTimeout(scrollToServices, 150);
+    }
+  };
+
+    const scrollToServices = () => {
+    const el = document.getElementById('services');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+
   return (
     <header className="it-hero bg-main">
       <div className="container">
         <div className="it-crumbs">
           <a href="/">Home</a>
           <span className="it-crumbs-sep">/</span>
-          <a href="/services">Services</a>
+          <a href="/#services" onClick={handleServices}>Services</a>
           <span className="it-crumbs-sep">/</span>
           <span style={{ color: 'var(--primary-color)' }}>Appliances</span>
         </div>
@@ -100,13 +124,6 @@ function Hero() {
               <span className="it-pill"><span className="it-dot" />From ₹399</span>
               <span className="it-pill"><span className="it-dot" />Same-day install</span>
               <span className="it-pill"><span className="it-dot" />All brands</span>
-            </div>
-
-            <div className="it-hero-ctas">
-              <a href="/#book" className="btn btn-primary">
-                Book an appliance visit <ArrowIcon />
-              </a>
-              <a href="/services" className="it-btn-outline">All services</a>
             </div>
           </div>
 

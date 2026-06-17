@@ -54,7 +54,7 @@ function Navbar() {
 
         {/* desktop login */}
         <div className="nav-right">
-          <Link to="/login" className="btn btn-primary nav-login">
+          <Link to="/" className="btn btn-primary nav-login">
             <UserIcon /> Log In
           </Link>
         </div>
@@ -79,7 +79,7 @@ function Navbar() {
             <li><Link to="/training-wowsewa" onClick={close}>Training</Link></li>
             <li><Link to="/about-us" onClick={close}>About Us</Link></li>
             <li>
-              <Link to="/login" onClick={close} className="btn btn-primary nav-login" style={{ marginTop: 8, display: 'inline-flex', width: '100%', justifyContent: 'center' }}>
+              <Link to="/" onClick={close} className="btn btn-primary nav-login" style={{ marginTop: 8, display: 'inline-flex', width: '100%', justifyContent: 'center' }}>
                 <UserIcon /> Log In
               </Link>
             </li>

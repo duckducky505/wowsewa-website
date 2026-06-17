@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import './About.css';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Footer/Footer';
-import image from '../../assets/images/founderIMG.png'
+import image from '../../assets/images/founderIMG.jpg'
+import mainImage  from '../../assets/images/whychooseus.jpeg'
 
 // ── Icons ───────────────────────────────────────────────────────────────────
 const ImgIcon = ({ size = 32 }) => (
@@ -125,7 +126,7 @@ function DrivesUs() {
   return (
     <section className="about-drives bg-light">
       <div className="container about-drives-grid">
-        <DropImage size="about-media-wide" label="Drop a team / workshop photo" tag="Our crew, on the job" />
+        <img src={mainImage} alt="why-choose-us-image" />
 
         <div>
           <div className="about-eyebrow on-light"><span className="about-eyebrow-line" />What drives us</div>

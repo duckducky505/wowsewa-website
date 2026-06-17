@@ -1,0 +1,426 @@
+.amc-page {
+  background-color: #fff;
+  color: var(--dark-color);
+
+  /* Top Banner Block */
+  .amc-hero {
+    padding: 60px 0;
+    border-bottom: 4px solid var(--primary-color);
+    
+    p {
+      opacity: 0.9;
+      color: var(--light-color);
+    }
+  }
+
+  /* Pricing Subscriptions Module */
+  .amc-plans-section {
+    padding: 60px 15px;
+
+    .plans-header {
+      margin-bottom: 40px;
+      
+      span {
+        color: var(--background-color);
+        font-weight: bold;
+      }
+      p {
+        color: #666;
+      }
+    }
+
+    .plan-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin-top: 20px;
+      justify-items: center;
+    }
+
+    .plan-card {
+      width: 100%;
+      max-width: 380px;
+      display: flex;
+      flex-direction: column;
+      padding: 35px 25px;
+      position: relative;
+      border-radius: 12px;
+      border: 1px solid #e1e1e1;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      background: #fff;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+      &.plan-card--featured {
+        border: 3px solid var(--background-color);
+        transform: scale(1.03);
+        box-shadow: 0 10px 30px rgba(7, 76, 58, 0.15);
+      }
+
+      .featured-badge {
+        position: absolute;
+        top: -13px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: var(--background-color);
+        color: var(--primary-color);
+        padding: 4px 14px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: bold;
+        letter-spacing: 1px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .plan-header-block {
+        h3 {
+          color: var(--background-color);
+          margin: 0 0 5px 0;
+          font-weight: bold;
+        }
+        p {
+          font-size: 0.85rem;
+          color: #666;
+          margin: 0 0 20px 0;
+        }
+      }
+
+      .price-block {
+        margin: 20px 0;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #eee;
+
+        span:first-child {
+          font-weight: bold;
+          color: var(--dark-color);
+        }
+        span:last-child {
+          font-size: 0.9rem;
+          color: #666;
+        }
+      }
+
+      .tags-section {
+        margin-bottom: 20px;
+        
+        strong {
+          font-size: 0.85rem;
+          text-transform: uppercase;
+          color: #888;
+          letter-spacing: 0.5px;
+        }
+        
+        .tags-wrapper {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+          margin-top: 8px;
+        }
+        
+        .tag {
+          background-color: var(--light-color);
+          color: var(--background-color);
+          padding: 4px 10px;
+          border-radius: 6px;
+          font-size: 0.75rem;
+          font-weight: 600;
+        }
+      }
+
+      .features-section {
+        flex-grow: 1;
+        margin-bottom: 30px;
+        
+        strong {
+          font-size: 0.85rem;
+          text-transform: uppercase;
+          color: #888;
+          letter-spacing: 0.5px;
+        }
+        
+        ul {
+          padding: 0;
+          margin-top: 10px;
+        }
+        
+        .feature-item {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-bottom: 10px;
+          list-style-type: none;
+
+          svg {
+            color: var(--background-color);
+            flex-shrink: 0;
+          }
+          span {
+            font-size: 0.9rem;
+            color: #333;
+          }
+        }
+      }
+    }
+  }
+
+  /* Interactive Tab Filter Module */
+  .amc-verticals-section {
+    padding: 60px 0;
+
+    .verticals-header {
+      margin-bottom: 40px;
+      p { color: #555; }
+    }
+
+    .tab-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 35px;
+    }
+
+    .tab-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background-color: #fff;
+      color: var(--dark-color);
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.2s ease-in-out;
+
+      &:hover {
+        border-color: var(--background-color);
+      }
+
+      &.active {
+        background-color: var(--background-color);
+        color: var(--primary-color);
+        border-color: var(--background-color);
+      }
+    }
+
+    /* Selected Details Panel Container */
+    .board-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 25px;
+      align-items: stretch;
+
+      .scope-card {
+        flex: 1 1 550px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+        background: #fff;
+      }
+
+      .scope-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 25px;
+        border-bottom: 2px solid #f0f0f0;
+        padding-bottom: 15px;
+
+        h3 { 
+          color: var(--background-color); 
+          margin: 0; 
+          font-weight: bold; 
+        }
+        p { 
+          font-size: 0.95rem; 
+          margin: 4px 0 0 0; 
+        }
+        
+        .badge {
+          border: 1px solid var(--background-color);
+          color: var(--background-color);
+          padding: 4px 10px;
+          border-radius: 4px;
+          font-size: 0.65rem;
+          font-weight: bold;
+          letter-spacing: 0.5px;
+        }
+      }
+
+      .services-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .service-item-row {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+
+        .bullet-index {
+          background-color: var(--light-color);
+          color: var(--background-color);
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: bold;
+          font-size: 0.8rem;
+          flex-shrink: 0;
+          margin-top: 2px;
+        }
+
+        h4 {
+          margin: 0 0 2px 0;
+          font-size: 1rem;
+          font-weight: bold;
+          color: var(--dark-color);
+        }
+        p {
+          margin: 0;
+          font-size: 0.85rem;
+          color: #666;
+          line-height: 1.4;
+        }
+      }
+
+      .side-panel {
+        flex: 1 1 350px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+
+        .benefits-card {
+          padding: 30px;
+          border-radius: 10px;
+          flex-grow: 1;
+
+          h3 {
+            color: var(--primary-color);
+            margin-top: 0;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+          }
+          ul {
+            padding: 0;
+            margin: 20px 0 0 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+          }
+          li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            list-style: none;
+
+            svg {
+              color: var(--primary-color);
+              font-size: 1.2rem;
+              flex-shrink: 0;
+            }
+            span {
+              font-size: 0.95rem;
+              color: var(--light-color);
+            }
+          }
+        }
+
+        .technician-stamp {
+          background-color: var(--background-color);
+          padding: 20px 25px;
+          border-radius: 10px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+
+          .text-block {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            
+            span:first-child {
+              font-size: 0.75rem;
+              color: var(--primary-color);
+              letter-spacing: 1px;
+              font-weight: bold;
+            }
+            span:last-child {
+              font-size: 1.1rem;
+              font-weight: bold;
+              color: #fff;
+            }
+          }
+          svg {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            opacity: 0.8;
+          }
+        }
+      }
+    }
+  }
+
+  /* Bottom Actions & Address Layout */
+  .amc-footer-action {
+    padding: 60px 0;
+    color: #fff;
+
+    .footer-grid-layout {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 30px;
+
+      h3 { margin: 0 0 10px 0; font-weight: bold; }
+      p { color: #aaa; max-width: 450px; margin: 0; }
+    }
+
+    .contact-wrapper-block {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+
+    .contact-item-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #091210;
+      padding: 12px 20px;
+      border-radius: 8px;
+      border: 1px solid #15221e;
+
+      svg { color: var(--primary-color); font-size: 1.3rem; }
+      small { color: #888; display: block; font-size: 0.7rem; letter-spacing: 0.5px; }
+      strong { color: var(--light-color); }
+    }
+
+    .copyright-bar {
+      text-align: center;
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid #111;
+      font-size: 0.8rem;
+      color: #666;
+    }
+  }
+}
+
+/* Media Breakpoints configuration */
+@media (max-width: 960px) {
+  .amc-page {
+    .amc-plans-section .plan-grid {
+      grid-template-columns: 1fr;
+    }
+    .amc-verticals-section .board-wrapper {
+      flex-direction: column;
+    }
+  }
+}

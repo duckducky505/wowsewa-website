@@ -139,6 +139,11 @@ img{
     color: var(--primary-color);
 }
 
+.accent-text-bg{
+    font-family: "UniNeue-Bold";
+    color: var(--background-color);
+}
+
 .text-xxl{
     font-size: 3rem;
     line-height: 1.2;

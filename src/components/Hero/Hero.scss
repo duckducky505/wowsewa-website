@@ -1,0 +1,479 @@
+.hero {
+  --green-deep: #053a2c;
+  margin-bottom: 0;
+  padding: 70px 0 90px;
+  color: var(--light-color);
+  font-family: "UniNeue", "Poppins", sans-serif;
+
+  .container {
+    background-image: none;
+    height: auto;
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    align-items: center;
+    gap: 50px;
+    min-height: 72vh;
+  }
+
+  /* ---- Left column Content System ---- */
+  .hero-content {
+    width: 100%;
+  }
+
+  .hero-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 38px;
+    font-family: "UniNeue";
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.78rem;
+    color: var(--primary-color);
+
+    .hero-eyebrow-line {
+      width: 42px;
+      height: 2px;
+      background: var(--primary-color);
+    }
+  }
+
+  .hero-heading {
+    margin: 0 0 30px;
+    font-family: "UniNeue-Heavy";
+    font-weight: 400;
+    font-size: clamp(2.75rem, 6vw, 6.25rem);
+    line-height: 1;
+    letter-spacing: -0.015em;
+    color: var(--light-color);
+
+    &-accent {
+      font-family: "UniNeue-Italic";
+      color: var(--primary-color);
+    }
+  }
+
+  .hero-text {
+    width: 100%;
+    max-width: 33rem;
+    margin: 0 0 40px;
+    font-size: 1.05rem;
+    color: rgba(248, 250, 234, 0.82);
+    line-height: 1.5;
+  }
+
+  .hero-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 28px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    background: transparent;
+    font-family: "UniNeue-Bold";
+    font-size: 1rem;
+    line-height: 1;
+    transition: 0.25s;
+
+    &:hover {
+      opacity: 1;
+    }
+
+    &.btn-primary {
+      background: var(--primary-color);
+      color: var(--green-deep);
+      
+      &:hover {
+        transform: translateY(-1px);
+        filter: brightness(1.04);
+      }
+    }
+  }
+
+  .hero-btn-outline {
+    background: transparent;
+    color: var(--light-color);
+    border: 1px solid rgba(248, 250, 234, 0.35);
+
+    &:hover {
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+  }
+
+  .hero-arrow {
+    display: inline-grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: rgba(5, 58, 44, 0.16);
+    color: var(--green-deep);
+  }
+
+  .hero-rating {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 0.95rem;
+    color: rgba(248, 250, 234, 0.7);
+
+    .hero-stars {
+      color: var(--primary-color);
+      letter-spacing: 2px;
+    }
+
+    .hero-rating-score {
+      font-family: "UniNeue-Bold";
+      color: var(--light-color);
+    }
+  }
+
+  /* ---- Right column: Live Panel Feed ---- */
+  .hero-visual {
+    position: relative;
+  }
+
+  .hero-tag {
+    position: absolute;
+    top: -22px;
+    left: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: "UniNeue";
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.7rem;
+    color: rgba(248, 250, 234, 0.58);
+
+    .ln {
+      display: inline-block;
+      width: 28px;
+      height: 2px;
+      background: currentColor;
+    }
+  }
+
+  .hero-live {
+    background: var(--light-color);
+    color: var(--green-deep);
+    border-radius: 26px;
+    padding: 22px;
+    box-shadow: 0 34px 80px -24px rgba(0, 0, 0, 0.55);
+  }
+
+  .live-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    h4 {
+      font-family: "UniNeue-Bold";
+      font-size: 1.12rem;
+      line-height: 1.1;
+      margin: 0;
+    }
+  }
+
+  .live-dot-lg {
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(209, 254, 23, 0.22);
+    display: grid;
+    place-items: center;
+
+    &:after {
+      content: '';
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--primary-color);
+      animation: heroDotPulse 1.6s ease-out infinite;
+    }
+  }
+
+  .live-sub {
+    font-family: "UniNeue", monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.04em;
+    color: rgba(5, 58, 44, 0.6);
+    margin: 2px 0 0 0;
+  }
+
+  .live-now {
+    margin-left: auto;
+    align-self: flex-start;
+    font-family: "UniNeue-Bold", monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: var(--green-deep);
+    color: var(--primary-color);
+    animation: heroNowBlink 1.6s ease-in-out infinite;
+  }
+
+  .live-divider {
+    border: 0;
+    border-top: 1px dashed rgba(5, 58, 44, 0.18);
+    margin: 18px 0;
+  }
+
+  .live-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .live-stat {
+    background: rgba(7, 76, 58, 0.06);
+    border-radius: 14px;
+    padding: 12px 12px 10px;
+  }
+
+  .live-stat-val {
+    font-family: "UniNeue-Heavy";
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--green-deep);
+
+    sup {
+      font-size: 0.7rem;
+    }
+    .u {
+      font-family: "UniNeue";
+      font-size: 0.7rem;
+      margin-left: 2px;
+    }
+  }
+
+  .live-stat-lbl {
+    font-family: "UniNeue", monospace;
+    font-size: 0.56rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(5, 58, 44, 0.55);
+    margin-top: 7px;
+  }
+
+  .live-flash {
+    display: inline-block;
+    animation: heroFlash 0.7s ease-out;
+  }
+
+  .live-feed {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .live-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(7, 76, 58, 0.05);
+    border-radius: 14px;
+    padding: 11px 12px;
+
+    &.is-new {
+      animation: heroRowIn 0.7s ease-out;
+    }
+  }
+
+  .live-row-icon {
+    flex: 0 0 auto;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    background: var(--green-deep);
+    color: var(--primary-color);
+
+    svg {
+      display: block;
+    }
+  }
+
+  .live-row-main {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .live-row-name {
+    font-family: "UniNeue-Bold";
+    font-size: 0.9rem;
+    color: var(--green-deep);
+    line-height: 1.15;
+  }
+
+  .live-row-meta {
+    font-family: "UniNeue", monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.02em;
+    color: rgba(5, 58, 44, 0.55);
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .live-status {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: "UniNeue", monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.03em;
+    padding: 5px 9px;
+    border-radius: 999px;
+    white-space: nowrap;
+
+    .s-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    &.done {
+      background: rgba(7, 76, 58, 0.10);
+      color: #0c6b46;
+      .s-dot { background: #16a34a; }
+    }
+
+    &.progress {
+      background: rgba(214, 158, 46, 0.16);
+      color: #9a6b00;
+      .s-dot { background: #e0a106; }
+    }
+  }
+
+  /* ---- Dynamic Animation Sets ---- */
+  @keyframes heroDotPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(209, 254, 23, 0.55); }
+    70%      { box-shadow: 0 0 0 9px rgba(209, 254, 23, 0); }
+  }
+  @keyframes heroNowBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+  @keyframes heroRowIn {
+    0%   { opacity: 0; transform: translateY(-10px); background: rgba(209, 254, 23, 0.30); }
+    60%  { background: rgba(209, 254, 23, 0.16); }
+    100% { opacity: 1; transform: none; background: rgba(7, 76, 58, 0.05); }
+  }
+  @keyframes heroFlash { 0% { color: #5f8a12; } 100% { color: var(--green-deep); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .live-dot-lg::after, .live-now, .live-row.is-new { animation: none; }
+  }
+
+  /* ---- Responsive Rules Breakdown ---- */
+  @media (max-width: 960px) {
+    .container { 
+      grid-template-columns: 1fr;
+      gap: 45px;
+      min-height: auto; 
+    }
+
+    /* Target structural blocks to center-align down single column layout */
+    .hero-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .hero-eyebrow {
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+
+    .hero-heading {
+      text-align: center;
+    }
+
+    .hero-text {
+      text-align: center;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero-buttons {
+      justify-content: center;
+      width: 100%;
+      max-width: 450px;
+    }
+
+    .hero-rating {
+      justify-content: center;
+    }
+
+    .hero-visual {
+      width: 100%; 
+      max-width: 520px;
+      margin: 0 auto; 
+    }
+  }
+
+  @media (max-width: 670px) {
+    padding: 40px 0 60px;
+
+    .hero-text {
+      max-width: 100%;
+      font-size: 1rem;
+    }
+
+    .hero-buttons {
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    .hero-tag {
+      position: static;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+
+    .hero-live {
+      text-align: left;
+    }
+    
+    .live-stats { gap: 7px; }
+    .live-stat { padding: 10px 8px 8px; }
+    .live-stat-val { font-size: 1.2rem; }
+    .live-row { padding: 9px 10px; gap: 9px; }
+    .live-row-icon { width: 30px; height: 30px; }
+    .live-row-name { font-size: 0.82rem; }
+    .live-row-meta { font-size: 0.6rem; }
+    .live-status { font-size: 0.56rem; padding: 4px 7px; }
+  }
+
+  @media (max-width: 420px) {
+    .hero-heading {
+      font-size: clamp(2.3rem, 11vw, 3.2rem);
+    }
+    .live-stats {
+      grid-template-columns: 1fr 1fr;
+      .live-stat:last-child {
+        grid-column: 1 / -1;
+      }
+    }
+  }
+}

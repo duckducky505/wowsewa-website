@@ -36,8 +36,8 @@ const ALL_CATEGORIES = [
   { slug: 'electrical',    name: 'Electrical',     path: '/services/electrical-wowsewa',    icon: <Bolt /> },
   { slug: 'appliances',    name: 'Appliances',     path: '/services/appliances-wowsewa',    icon: <Snow /> },
   { slug: 'it-devices',    name: 'IT & Devices',   path: '/services/IT-wowsewa',            icon: <Chip /> },
-  { slug: 'deep-cleaning', name: 'Deep Cleaning',  path: '/services/deep-cleaning-wowsewa', icon: <Spark /> },
-  { slug: 'emergency',     name: '24×7 Emergency', path: '/services/emergency-wowsewa',     icon: <Shield /> },
+  { slug: 'deep-cleaning', name: 'Deep Cleaning',  icon: <Spark /> },
+  { slug: 'emergency',     name: '24×7 Emergency', icon: <Shield /> },
 ];
 
 export default function Categories({ exclude }) {

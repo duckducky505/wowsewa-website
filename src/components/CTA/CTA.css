@@ -30,9 +30,9 @@
 .it-cta { padding: 110px 0; text-align: center; }
 .it-cta-heading {
   font-family: "UniNeue-Heavy", sans-serif;
-  font-size: clamp(44px, 8vw, 120px);
-  letter-spacing: -0.05em;
-  line-height: 0.92;
+  font-size: clamp(36px, 6.5vw, 100px);
+  letter-spacing: -0.04em;
+  line-height: 0.94;
   color: var(--light-color);
   margin: 0;
 }
@@ -56,4 +56,25 @@
   align-items: center;
   gap: 10px;
   border-radius: 999px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .it-cta { padding: 80px 0; }
+  .it-cta-heading { font-size: clamp(36px, 10vw, 72px); }
+  .it-cta-sub { font-size: 15px; }
+}
+@media (max-width: 480px) {
+  .it-cta { padding: 60px 0; }
+  .it-cta-heading { font-size: clamp(30px, 9vw, 52px); letter-spacing: -0.03em; }
+  .it-cta-btns { flex-direction: column; align-items: center; }
+  .it-cta-btns .btn,
+  .it-cta-btns .it-btn-outline { width: 100%; justify-content: center; max-width: 360px; }
+}
+
+@media (max-width: 560px) {
+  .it-cta { padding: 72px 0; }
+  .it-cta-heading { font-size: clamp(32px, 9vw, 56px); }
+  .it-cta-btns { flex-direction: column; align-items: stretch; }
+  .it-cta-btns .btn, .it-cta-btns .it-btn-outline { width: 100%; justify-content: center; text-align: center; }
 }

@@ -1,13 +1,3 @@
-/* ==========================================================================
-   Pricing — scoped styles
-   Builds on app.css WITHOUT modifying it: reuses the global .container, .btn,
-   .btn-block, .btn-dark classes and derives its palette from app.css tokens.
-   Uses ONLY the company UniNeue fonts. Because each @font-face is declared
-   font-style:normal / font-weight:normal, weight/italic is selected via the
-   family NAME (UniNeue / UniNeue-Bold / UniNeue-Heavy / UniNeue-Italic).
-   Every rule is scoped under .pricing, so there is no style leakage.
-   ========================================================================== */
-
 .pricing {
   --lime:       var(--primary-color);     /* #D1FE17 */
   --green:      var(--background-color);   /* #074C3A */
@@ -22,7 +12,6 @@
   font-family: "UniNeue", "Poppins", sans-serif;
 }
 
-/* ---- Section header ----------------------------------------------------- */
 .pricing .pricing-head {
   display: grid;
   grid-template-columns: 1.35fr 1fr;
@@ -212,6 +201,26 @@
 }
 .pricing .btn .arr { font-size: 1.15rem; line-height: 1; }
 
+
+.pricing .pricing-footer {
+  margin-top: 48px;
+  display: flex;
+  justify-content: center;
+}
+
+.pricing .btn-view-more {
+  width: auto;
+  min-width: 240px;
+  justify-content: center;
+  border-color: var(--lime);
+  color: var(--lime);
+}
+
+.pricing .btn-view-more:hover {
+  background: var(--lime);
+  color: var(--green-deep);
+}
+
 /* ---- Responsive --------------------------------------------------------- */
 @media (max-width: 900px) {
   .pricing .pricing-head { grid-template-columns: 1fr; gap: 20px; }
@@ -224,4 +233,5 @@
   .pricing .ptag { align-self: flex-start; }
   .pricing .price-amt { font-size: 2.4rem; margin-top: 16px; }
   .pricing .btn { justify-content: center; }
+  .pricing .btn-view-more { width: 100%; }
 }

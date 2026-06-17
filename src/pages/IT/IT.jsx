@@ -1,5 +1,6 @@
 import React from 'react';
 import './IT.css';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Footer/Footer';
 import Categories from '../../components/CategoriesServices/Categories';
@@ -83,13 +84,32 @@ const IT_STATS = [
 
 // ── Sub-components that stay local to this page ─────────────────────────────
 function Hero() {
+
+  const navigate  = useNavigate();
+
+  const handleServices = (e) => {
+    e.preventDefault();
+    close();
+    if (location.pathname === '/') {
+      scrollToServices();
+    } else {
+      navigate('/');
+      setTimeout(scrollToServices, 150);
+    }
+  };
+
+    const scrollToServices = () => {
+    const el = document.getElementById('services');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   return (
     <header className="it-hero bg-main">
       <div className="container">
         <div className="it-crumbs">
           <a href="index.html">Home</a>
           <span className="it-crumbs-sep">/</span>
-          <a href="services.html">Services</a>
+          <a href="/#services" onClick={handleServices}>Services</a>
           <span className="it-crumbs-sep">/</span>
           <span style={{ color: 'var(--primary-color)' }}>IT &amp; Devices</span>
         </div>
@@ -117,13 +137,6 @@ function Hero() {
               <span className="it-pill"><span className="it-dot" />Visit from ₹449</span>
               <span className="it-pill"><span className="it-dot" />Brand-certified</span>
               <span className="it-pill"><span className="it-dot" />On-site &amp; remote</span>
-            </div>
-
-            <div className="it-hero-ctas">
-              <a href="index.html#book" className="btn btn-primary">
-                Book an IT &amp; Devices visit <ArrowIcon />
-              </a>
-              <a href="services.html" className="it-btn-outline">All services</a>
             </div>
           </div>
 

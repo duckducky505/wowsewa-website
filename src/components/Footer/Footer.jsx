@@ -42,10 +42,11 @@ const Footer = () => {
               fixed, up-front prices, booked in under a minute.
             </p>
             <div className="footer-social">
-              <a href="#" aria-label="LinkedIn"><LinkedIn /></a>
-              <a href="#" aria-label="Twitter / X"><XIcon /></a>
-              <a href="#" aria-label="Instagram"><Instagram /></a>
-              <a href="#" aria-label="Facebook"><Facebook /></a>
+              <a href="https://www.facebook.com/wowsewaa" aria-label="Facebook"><Facebook /></a>
+              <a href="https://www.instagram.com/wowsewaa/" aria-label="Instagram"><Instagram /></a>
+              <a href="https://www.linkedin.com/company/wowsewaa/" aria-label="LinkedIn"><LinkedIn /></a>
+              <a href="https://x.com/WowSewa" aria-label="Twitter / X"><XIcon /></a>
+              
             </div>
           </div>
 
@@ -53,12 +54,12 @@ const Footer = () => {
           <div>
             <h4>Services</h4>
             <ul>
-              <li><a href="plumbing.html">Plumbing</a></li>
-              <li><a href="electrical.html">Electrical</a></li>
-              <li><a href="appliances.html">Appliances</a></li>
-              <li><a href="it-devices.html">IT &amp; Devices</a></li>
-              <li><a href="deep-cleaning.html">Deep Cleaning</a></li>
-              <li><a href="emergency.html">24×7 Emergency</a></li>
+              <li><a href="/services/Plumbing-wowsewa">Plumbing</a></li>
+              <li><a href="/services/electrical-wowsewa">Electrical</a></li>
+              <li><a href="/services/appliances-wowsewa">Appliances</a></li>
+              <li><a href="/services/IT-wowsewa">IT &amp; Devices</a></li>
+              <li><a href="/">Deep Cleaning</a></li>
+              <li><a href="/">24×7 Emergency</a></li>
             </ul>
           </div>
 
@@ -67,8 +68,10 @@ const Footer = () => {
             <h4>Company</h4>
             <ul>
               <li><Link to="/about-us">About Us</Link></li>
-              <li><Link to="/privacy-wowsewa">Privacy Policy</Link></li>
-              <li><Link to="/terms-and-conditions-wowsewa">Terms &amp; Conditions</Link></li>
+              <li><Link to="/training-wowsewa">Training</Link></li>
+              <li><Link to="/linktree">LinkTree</Link></li>
+              <li><Link to="/privacy-policy">Privacy Policy</Link></li>
+              <li><Link to="/terms-and-conditions">Terms &amp; Conditions</Link></li>
             </ul>
           </div>
 
@@ -78,11 +81,12 @@ const Footer = () => {
             <ul className="footer-contact">
               <li>
                 <span className="ci"><FiMail size={17} /></span>
-                <a href="mailto:wowsewaa@gmail.com">hello@wowsewa.com</a>
+                <a href="mailto:wowsewaa@gmail.com">wowsewaa@gmail.com</a>
               </li>
               <li>
                 <span className="ci"><FiPhone size={17} /></span>
-                <a href="tel:+97718009697392">+977 1800-WOW-SEWA</a>
+                <a href="tel:+9779762424318">9762424318,</a>
+                <a href="tel:+9779824232439">9824232439</a>
               </li>
               <li>
                 <span className="ci"><FiMapPin size={17} /></span>
