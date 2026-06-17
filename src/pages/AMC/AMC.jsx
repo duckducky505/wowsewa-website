@@ -111,7 +111,7 @@ const AMC_SERVICES = [
   }
 ];
 
-export default function Amc() {
+export default function AMC() {
   const [activeTab, setActiveTab] = useState('networking');
   const activeService = AMC_SERVICES.find(s => s.id === activeTab);
 

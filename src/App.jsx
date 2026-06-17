@@ -12,7 +12,7 @@ import ScrollToTop from './components/ScrollToTop/ScrollToTop';
 import WhattsappIcon from './components/Whattsapp/Whattsapp';
 import PrivacyPolicy from './pages/TermsAndConditions/WowPrivacy';
 import TermsAndConditions from './pages/TermsAndConditions/TermsAndConditions';
-import Amc from './pages/AMC/AMC';
+import AMC from './pages/AMC/AMC';
 
 function App() {
   return (
@@ -23,7 +23,7 @@ function App() {
           <Route path="/" element={<Home/>}/>
           <Route path="/home" element={<Home/>}/>
           <Route path="/about-us" element={<About/>}/>
-          <Route path="/amc" element={<Amc/>}/>
+          <Route path="/amc" element={<AMC/>}/>
           <Route path="/training-wowsewa" element={<Training/>}/>
           <Route path="/services/Plumbing-wowsewa" element={<Plumbing/>}/>
           <Route path="/services/IT-wowsewa" element={<IT/>}/>
