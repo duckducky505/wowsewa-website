@@ -47,6 +47,7 @@ function Navbar() {
           <ul>
             <li><Link to="/">Home</Link></li>
             <li><a href="/#services" onClick={handleServices}>Services</a></li>
+            <li><Link to="/amc">AMC</Link></li>
             <li><Link to="/training-wowsewa">Training</Link></li>
             <li><Link to="/about-us">About Us</Link></li>
           </ul>
@@ -76,6 +77,7 @@ function Navbar() {
           <ul>
             <li><Link to="/" onClick={close}>Home</Link></li>
             <li><a href="/#services" onClick={handleServices}>Services</a></li>
+            <li><a href="/amc">AMC</a></li>
             <li><Link to="/training-wowsewa" onClick={close}>Training</Link></li>
             <li><Link to="/about-us" onClick={close}>About Us</Link></li>
             <li>
