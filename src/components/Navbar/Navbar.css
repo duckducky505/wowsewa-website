@@ -2,38 +2,40 @@
   position: sticky;
   top: 0;
   z-index: 50;
-  padding: 16px 0;
+  padding: 14px 0;
   border-bottom: 1px solid rgba(248, 250, 234, 0.10);
 }
 .navbar .container {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
+  gap: 20px;
 }
 
-/* left — logo */
-.navbar .logo { display: flex; align-items: center; }
-.navbar .logo img { height: 40px; width: auto; display: block; }
+/* logo */
+.navbar .logo { display: flex; align-items: center; flex-shrink: 0; }
+.navbar .logo img { height: 36px; width: auto; display: block; }
 
-/* center — links */
-.navbar .main-menu { flex: 1; display: flex; justify-content: center; }
-.navbar .main-menu ul { display: flex; gap: 6px; align-items: center; }
+/* center links */
+.navbar .main-menu { flex: 1; display: flex; justify-content: center; min-width: 0; }
+.navbar .main-menu ul { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; justify-content: center; }
 .navbar .main-menu a {
-  padding: 9px 16px;
+  display: block;
+  padding: 8px 14px;
   border-radius: 999px;
   font-family: "UniNeue-Bold", sans-serif;
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: rgba(248, 250, 234, 0.85);
   transition: background 0.2s, color 0.2s;
+  white-space: nowrap;
 }
 .navbar .main-menu a:hover {
   background: rgba(248, 250, 234, 0.08);
   color: var(--primary-color);
 }
 
-/* right — login */
-.navbar .nav-right { display: flex; align-items: center; }
+/* login */
+.navbar .nav-right { display: flex; align-items: center; flex-shrink: 0; }
 .navbar .nav-login {
   display: inline-flex;
   align-items: center;
@@ -41,29 +43,48 @@
   padding: 10px 18px;
   border-radius: 999px;
   font-family: "UniNeue-Bold", sans-serif;
-  font-weight: normal;          /* the UniNeue-Bold face supplies the weight */
+  font-size: 0.9rem;
+  white-space: nowrap;
 }
 
-/* hamburger — hidden on desktop, revealed at <=670px by app.css */
+/* hamburger — hidden desktop */
 .navbar .hamburger-button {
   display: none;
+  flex-direction: column;
+  justify-content: center;
   background: none;
   border: none;
   cursor: pointer;
   padding: 8px;
+  gap: 5px;
+  flex-shrink: 0;
 }
 .navbar .hamburger-line {
-  width: 26px;
-  height: 2.5px;
+  width: 24px;
+  height: 2px;
   border-radius: 2px;
   background: var(--light-color);
-  margin: 5px 0;
+  transition: transform 0.25s, opacity 0.25s;
 }
 
-/* below 768px the centred links + right login collapse into the hamburger drawer.
-   These live here (not only in app.css) so they win over this file's base rules. */
+/* mobile drawer — app.css positions it; we override colors */
+.navbar .mobile-menu { background: #053a2c; }
+.navbar .mobile-menu ul { margin-top: 80px; padding: 0 20px; }
+.navbar .mobile-menu li { margin: 6px 0; }
+.navbar .mobile-menu a {
+  display: block;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-family: "UniNeue-Bold", sans-serif;
+  font-size: 1.1rem;
+  color: var(--light-color);
+  transition: background 0.2s, color 0.2s;
+}
+.navbar .mobile-menu a:hover { background: rgba(248, 250, 234, 0.08); color: var(--primary-color); }
+
+/* collapse at 768px */
 @media (max-width: 768px) {
   .navbar .main-menu { display: none; }
-  .navbar .nav-right { display: none; }
-  .navbar .hamburger-button { display: block; }
+  .navbar .nav-right  { display: none; }
+  .navbar .hamburger-button { display: flex; }
 }

@@ -1,0 +1,314 @@
+/* Wrapper configuration */
+.connect-page-wrapper {
+  min-height: 100vh;
+  padding: 40px 0 60px 0;
+}
+
+.connect-container {
+  max-width: 650px;
+}
+
+.text-white {
+  color: #fff !important;
+}
+
+/* Header */
+.connect-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+.connect-header .brand-logo-img {
+  height: 30px;
+  -o-object-fit: contain;
+     object-fit: contain;
+}
+.connect-header .status-badge {
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.connect-header .status-badge .dot {
+  width: 6px;
+  height: 6px;
+  background-color: var(--primary-color);
+  border-radius: 50%;
+}
+
+/* Section Labels (Overlines) */
+.section-label-line {
+  color: var(--primary-color);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+}
+.section-label-line .line {
+  height: 1px;
+  width: 30px;
+  background-color: var(--primary-color);
+}
+
+/* Hero Titles */
+.hero-title {
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.hero-desc {
+  opacity: 0.9;
+  max-width: 90%;
+  margin-bottom: 40px;
+}
+
+/* Arrow Buttons */
+.arrow-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 0.9rem;
+}
+.arrow-btn.dark-arrow {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+/* Google Card Specifics */
+.google-review-card {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  border-radius: 16px;
+  position: relative;
+  margin-bottom: 40px;
+  transition: transform 0.2s ease;
+}
+.google-review-card:hover {
+  transform: translateY(-2px);
+}
+.google-review-card .google-icon-wrapper {
+  background: #fff;
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 15px;
+}
+.google-review-card .card-content .stars {
+  letter-spacing: 2px;
+  margin-bottom: 2px;
+  font-size: 0.95rem;
+}
+.google-review-card .card-content h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+.google-review-card .card-content p {
+  margin: 0;
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+/* Social Grid Specifics */
+.links-section {
+  margin-bottom: 40px;
+}
+.links-section .social-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+.links-section .social-grid .social-card {
+  position: relative;
+  border-radius: 16px;
+  padding: 20px;
+  transition: transform 0.2s ease;
+}
+.links-section .social-grid .social-card:hover {
+  transform: translateY(-2px);
+}
+.links-section .social-grid .social-card .social-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 1.4rem;
+  margin-bottom: 15px;
+  /* Brand Colors */
+}
+.links-section .social-grid .social-card .social-icon.fb {
+  background: #1877F2;
+}
+.links-section .social-grid .social-card .social-icon.ig {
+  background: #E4405F;
+}
+.links-section .social-grid .social-card .social-icon.yt {
+  background: #FF0000;
+}
+.links-section .social-grid .social-card .social-icon.tt {
+  background: #000000;
+}
+.links-section .social-grid .social-card .social-icon.in {
+  background: #0A66C2;
+}
+.links-section .social-grid .social-card .social-icon.wa {
+  background: #25D366;
+}
+.links-section .social-grid .social-card .social-icon.web {
+  background: var(--primary-color);
+  color: var(--dark-color);
+}
+.links-section .social-grid .social-card .social-info h4 {
+  margin: 0 0 5px 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+.links-section .social-grid .social-card .social-info p {
+  margin: 0 0 5px 0;
+  font-size: 0.8rem;
+  color: #555;
+}
+.links-section .social-grid .social-card .social-info span {
+  font-size: 0.75rem;
+  color: #888;
+}
+
+/* More Section */
+.more-section {
+  margin-bottom: 40px;
+}
+.more-section .more-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+.more-section .more-grid .dark-card {
+  border-radius: 16px;
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+}
+.more-section .more-grid .dark-card .qr-drop {
+  background: #fff;
+  color: var(--dark-color);
+  border: 1.5px dashed #ccc;
+  padding: 8px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 65px;
+  height: 65px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.more-section .more-grid .dark-card .qr-drop .qr-icon {
+  font-size: 0.6rem;
+  color: #999;
+  margin-bottom: 2px;
+}
+.more-section .more-grid .dark-card .qr-drop span {
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+.more-section .more-grid .dark-card .qr-drop small {
+  font-size: 0.5rem;
+  color: #666;
+  text-decoration: underline;
+}
+.more-section .more-grid .dark-card .card-content h4 {
+  margin: 0 0 5px 0;
+  font-size: 1.05rem;
+  color: var(--primary-color);
+}
+.more-section .more-grid .dark-card .card-content p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #aaa;
+}
+
+/* Contact Section */
+.contact-section {
+  margin-bottom: 40px;
+}
+.contact-section .contact-card {
+  border-radius: 16px;
+  padding: 25px;
+}
+.contact-section .contact-card .contact-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+.contact-section .contact-card .contact-grid .contact-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.contact-section .contact-card .contact-grid .contact-item .c-icon {
+  background: rgba(209, 254, 23, 0.1); /* Primary color with opacity */
+  color: var(--primary-color);
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.1rem;
+}
+.contact-section .contact-card .contact-grid .contact-item label {
+  display: block;
+  font-size: 0.65rem;
+  color: #888;
+  letter-spacing: 1px;
+  margin-bottom: 2px;
+}
+.contact-section .contact-card .contact-grid .contact-item p {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--light-color);
+}
+
+/* Footer */
+.connect-footer {
+  text-align: center;
+  color: #8fa69c;
+  letter-spacing: 0.5px;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 670px) {
+  .links-section .social-grid,
+  .more-section .more-grid,
+  .contact-section .contact-grid {
+    grid-template-columns: 1fr;
+  }
+}/*# sourceMappingURL=Linktree.css.map */

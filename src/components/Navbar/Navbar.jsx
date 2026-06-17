@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import './Navbar.css';
 import logo from '../../assets/images/wowLogo.png';
 
@@ -13,51 +13,73 @@ const UserIcon = ({ size = 16 }) => (
 function Navbar() {
   const [menuActive, setMenuActive] = useState(false);
   const close = () => setMenuActive(false);
+  const navigate  = useNavigate();
+  const location  = useLocation();
+
+  const scrollToServices = () => {
+    const el = document.getElementById('services');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const handleServices = (e) => {
+    e.preventDefault();
+    close();
+    if (location.pathname === '/') {
+      scrollToServices();
+    } else {
+      navigate('/');
+      setTimeout(scrollToServices, 150);
+    }
+  };
 
   return (
     <nav className="navbar bg-main">
       <div className="container">
-        {/* left — logo */}
+        {/* logo */}
         <div className="logo">
           <Link to="/" onClick={close}>
             <img src={logo} alt="WowSewa" />
           </Link>
         </div>
 
+        {/* desktop center links */}
         <div className="main-menu">
           <ul>
             <li><Link to="/">Home</Link></li>
-            <li><Link to="/">Services</Link></li>
+            <li><a href="/#services" onClick={handleServices}>Services</a></li>
             <li><Link to="/training-wowsewa">Training</Link></li>
             <li><Link to="/about-us">About Us</Link></li>
           </ul>
         </div>
 
-        {/* right — login */}
+        {/* desktop login */}
         <div className="nav-right">
           <Link to="/login" className="btn btn-primary nav-login">
             <UserIcon /> Log In
           </Link>
         </div>
 
-        {/* Hamburger button (shown under 670px via app.css) */}
+        {/* hamburger */}
         <button
-          id="hamburger-button"
           className="hamburger-button"
           aria-label="Toggle menu"
-          onClick={() => setMenuActive((active) => !active)}
+          aria-expanded={menuActive}
+          onClick={() => setMenuActive((a) => !a)}
         >
-          <div className="hamburger-line"></div>
-          <div className="hamburger-line"></div>
-          <div className="hamburger-line"></div>
+          <div className={`hamburger-line${menuActive ? ' open' : ''}`} />
+          <div className={`hamburger-line${menuActive ? ' open' : ''}`} />
+          <div className={`hamburger-line${menuActive ? ' open' : ''}`} />
         </button>
 
+        {/* mobile drawer */}
         <div className={menuActive ? 'mobile-menu active' : 'mobile-menu'}>
           <ul>
             <li><Link to="/" onClick={close}>Home</Link></li>
-            <li><Link to="/about" onClick={close}>About Us</Link></li>
+            <li><a href="/#services" onClick={handleServices}>Services</a></li>
+            <li><Link to="/training-wowsewa" onClick={close}>Training</Link></li>
+            <li><Link to="/about-us" onClick={close}>About Us</Link></li>
             <li>
-              <Link to="/login" onClick={close} className="btn btn-primary nav-login">
+              <Link to="/login" onClick={close} className="btn btn-primary nav-login" style={{ marginTop: 8, display: 'inline-flex', width: '100%', justifyContent: 'center' }}>
                 <UserIcon /> Log In
               </Link>
             </li>

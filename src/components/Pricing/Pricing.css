@@ -49,7 +49,7 @@
 }
 .pricing .pricing-title {
   margin: 0;
-  font-family: "UniNeue";        /* display, upright */
+  font-family: "UniNeue-Heavy";        /* display, upright */
   font-weight: 400;                     /* the face supplies the weight */
   font-size: clamp(2.3rem, 4.4vw, 3.9rem);
   line-height: 1.02;
@@ -125,7 +125,7 @@
 
 /* price */
 .pricing .price-amt {
-  font-family: "UniNeue-Bold";
+  font-family: "UniNeue-Heavy";
   font-size: 3rem;
   line-height: 1;
   letter-spacing: -0.02em;
@@ -214,6 +214,14 @@
 
 /* ---- Responsive --------------------------------------------------------- */
 @media (max-width: 900px) {
-  .pricing .pricing-head { grid-template-columns: 1fr; }
+  .pricing .pricing-head { grid-template-columns: 1fr; gap: 20px; }
   .pricing .pricing-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .pricing { padding: 64px 0; }
+  .pricing .pcard { padding: 22px 18px; }
+  .pricing .ptier { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .pricing .ptag { align-self: flex-start; }
+  .pricing .price-amt { font-size: 2.4rem; margin-top: 16px; }
+  .pricing .btn { justify-content: center; }
 }

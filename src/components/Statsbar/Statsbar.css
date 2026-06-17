@@ -61,7 +61,12 @@
 
 @media (max-width: 760px) {
   .statsbar .statsbar-sep { display: none; }
-  .statsbar .statsbar-row { gap: 24px; }
+  .statsbar .statsbar-row { gap: 18px; }
+}
+@media (max-width: 480px) {
+  .statsbar { padding: 18px 0; }
+  .statsbar .statsbar-row { gap: 12px 18px; }
+  .statsbar .statsbar-val { font-size: 24px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

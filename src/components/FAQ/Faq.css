@@ -113,12 +113,19 @@
 
 /* ---- responsive --------------------------------------------------------- */
 @media (max-width: 900px) {
-  .faq .faq-head { grid-template-columns: 1fr; gap: 22px; align-items: start; }
+  .faq .faq-head { grid-template-columns: 1fr; gap: 18px; align-items: start; }
+  .faq .faq-lead { max-width: 100%; }
 }
-@media (max-width: 560px) {
-  .faq { padding: 64px 0; }
-  .faq .faq-q { padding: 20px 16px; gap: 12px; grid-template-columns: 20px 1fr auto; }
-  .faq .faq-a p { padding: 0 16px 22px 48px; }
+@media (max-width: 640px) {
+  .faq { padding: 60px 0; }
+  .faq .faq-title { font-size: clamp(2.4rem, 10vw, 3.2rem); }
+  .faq .faq-q { padding: 18px 14px; gap: 10px; grid-template-columns: 22px 1fr auto; }
+  .faq .faq-qt { font-size: 1rem; }
+  .faq .faq-a p { padding: 0 14px 20px 46px; font-size: 0.9rem; }
+}
+@media (max-width: 400px) {
+  .faq .faq-q { grid-template-columns: 18px 1fr auto; gap: 8px; }
+  .faq .faq-a p { padding: 0 10px 18px 36px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .faq .faq-item, .faq .faq-a { transition: none; }
