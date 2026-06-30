@@ -42,7 +42,7 @@ const About = () => {
               <div className="founder-image-container__ring" aria-hidden="true" />
             </div>
             <div className="founder-content reveal-up">
-              <span className="eyebrow">Meet the Visionary</span>
+              <span className="eyebrow text-md">Meet the Visionary</span>
               <h2 className="founder-name">Mr. Jiwan Joshi</h2>
               <p className="founder-title">Founder &amp; Head Technician</p>
               <p>

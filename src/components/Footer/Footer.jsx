@@ -55,7 +55,7 @@ const Footer = () => {
                         <h4>Contact</h4>
                         <ul className="contact-list">
                             <li><FaEnvelope className="footer-icon" /> wowsewaa@gmail.com</li>
-                            <li><FaPhoneAlt className="footer-icon" /> 9762424318</li>
+                            <li><FaPhoneAlt className="footer-icon" /> 9762424318, </li>
                             <li><FaMapMarkerAlt className="footer-icon" /> Kathmandu, Nepal</li>
                         </ul>
                     </div>

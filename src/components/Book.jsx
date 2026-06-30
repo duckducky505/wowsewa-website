@@ -17,7 +17,7 @@ const Book = () => {
           </div>
           <div className="cta-buttons">
             <a
-              href="https://docs.google.com/forms/..."
+              href="https://docs.google.com/forms/d/e/1FAIpQLSeS8Hh4Jrfmro0vhR1a_diqDQjrTF8fa7MiV0KgCw0jyYYcbw/viewform?safe=active"
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-darkgreen btn-large"

@@ -22,7 +22,6 @@ const plans = [
   {
     tag: 'Basic',
     name: 'Essential',
-    price: '4,999',
     featured: false,
     features: [
       { ok: true, t: '2 Scheduled Inspections' },
@@ -34,7 +33,6 @@ const plans = [
   {
     tag: 'Best Value',
     name: 'Standard',
-    price: '9,999',
     featured: true,
     features: [
       { ok: true, t: '4 Scheduled Inspections' },
@@ -46,7 +44,6 @@ const plans = [
   {
     tag: 'Advanced',
     name: 'Enterprise',
-    price: '19,999',
     featured: false,
     features: [
       { ok: true, t: 'Monthly Tech Audits' },
@@ -89,10 +86,6 @@ const AMC = () => {
               >
                 <span className="amc-card__tag">{p.tag}</span>
                 <h3 className="amc-card__name">{p.name}</h3>
-                <div className="amc-card__price">
-                  <span className="amc-card__cur">NPR</span> {p.price}
-                  <span className="amc-card__per">/year</span>
-                </div>
                 <ul className="amc-card__features">
                   {p.features.map((f) => (
                     <li key={f.t} className={f.ok ? '' : 'is-off'}>
@@ -101,7 +94,7 @@ const AMC = () => {
                   ))}
                 </ul>
                 <a
-                  href="https://docs.google.com/forms/..."
+                  href="https://docs.google.com/forms/d/e/1FAIpQLSeS8Hh4Jrfmro0vhR1a_diqDQjrTF8fa7MiV0KgCw0jyYYcbw/viewform?safe=active"
                   target="_blank"
                   rel="noopener noreferrer"
                   className={`btn btn-block ${p.featured ? 'btn-primary' : 'btn-outline-green'}`}
@@ -118,7 +111,7 @@ const AMC = () => {
         <div className="container">
           <div className="ds-head">
             <span className="eyebrow eyebrow--center">Why AMC</span>
-            <h2>Why choose an <span className="accent-text-primary">AMC?</span></h2>
+            <h2>Why choose an <span className="accent-text-lime-dark">AMC?</span></h2>
           </div>
           <div className="amc-benefits__grid">
             {benefits.map((b) => (

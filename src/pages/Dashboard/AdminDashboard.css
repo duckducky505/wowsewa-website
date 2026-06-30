@@ -376,13 +376,22 @@
   color: #16202b;
   background: #f1f3f7;
 }
+.adash-wrap .adash-row-actions {
+  display: inline-flex;
+  gap: 8px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+.adash-wrap .adash-header-right {
+  flex-wrap: wrap;
+}
 .adash-wrap .adash-view-all-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   background: transparent;
   border: 1px solid #e6e9ee;
-  color: #2e8fe0;
+  color: var(--bg-color);
   font-weight: 700;
   font-size: 0.9rem;
   cursor: pointer;

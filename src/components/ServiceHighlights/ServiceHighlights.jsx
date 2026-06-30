@@ -38,7 +38,7 @@ const ServiceHighlights = () => {
         <div className="ds-head">
           <span className="eyebrow eyebrow--center">Our Expertise</span>
           <h2>
-            One team for <span className="accent-text-primary">every</span> repair
+            One team for <span className="accent-text-lime-dark">every</span> repair
           </h2>
           <p>Professional, all-in-one solutions for your home and workspace.</p>
         </div>
@@ -51,7 +51,7 @@ const ServiceHighlights = () => {
               style={{ animationDelay: `${index * 0.08}s` }}
             >
               <div className="highlight-icon">{item.icon}</div>
-              <h3>{item.title}</h3>
+              <h3 className='accent-text-lime-dark'>{item.title}</h3>
               <p>{item.desc}</p>
               <Link to="/services" className="learn-more">
                 View Details <FaArrowRight className="icon-right" />

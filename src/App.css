@@ -63,8 +63,7 @@ html { scroll-behavior: smooth; }
 
 ::selection { background: var(--primary-color); color: var(--dark-color); }
 
-/* Public site shell — keeps marketing pages on a seamless dark canvas
-   without affecting the admin AfterLoginLayout. */
+
 .site-shell {
     min-height: 100vh;
     background: var(--dark-color);
@@ -302,7 +301,7 @@ h1, h2, h3, h4, .text-xxl, .text-xl,.text-lg,.text-md,.text-sm .btn {
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    font-size: 0.74rem;
+    font-size: 1.1rem;
     font-weight: 600;
     letter-spacing: 0.22em;
     text-transform: uppercase;
@@ -431,14 +430,14 @@ h1, h2, h3, h4, .text-xxl, .text-xl,.text-lg,.text-md,.text-sm .btn {
 
 .table-universal {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse:separate;
 }
 
 .table-universal th {
     background: #f8fafc;
     color: #64748b;
     font-weight: 600;
-    font-size: 0.85rem;
+    font-size: 0.6rem;
     padding: 15px;
     text-transform: uppercase;
     text-align: left;
@@ -485,7 +484,7 @@ h1, h2, h3, h4, .text-xxl, .text-xl,.text-lg,.text-md,.text-sm .btn {
 }
 
 .in-app-container .accent-text-primary {
-    color: #2e8fe0;
+    color: var(--lime-dark);   /* brand lime-dark — readable on the light admin */
 }
 
 .in-app-container .text-md.accent-text-white {

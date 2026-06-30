@@ -25,7 +25,7 @@ const Home = () => {
     ];
 
     const homeStats = [
-        { number: '500+', label: 'Jobs Completed' },
+        { number: '1000+', label: 'Jobs Completed' },
         { number: '15+', label: 'Expert Technicians' },
         { number: '4.9', label: 'Customer Rating' },
         { number: '30m', label: 'Avg. Response' },

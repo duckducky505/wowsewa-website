@@ -19,10 +19,14 @@ import Bookings from './pages/Booking/Booking';
 import HoldingSheet from './pages/HoldingSheet/HoldingSheet';
 import CashFlowPage from './pages/CashFlow/Cashflow';
 import JobsCategory from './pages/JobsCategory/JobsCategory';
+import ScrollToTop from './components/ScrollToTop/ScrollToTop';
+import WhatsAppFloat from './components/Whattsapp/Whattsapp';
 
 const App = () => {
   return (
     <BrowserRouter>
+    <ScrollToTop />
+    <WhatsAppFloat />
       <Routes>
         {/* Public routes */}
         <Route path="/login"  element={<Login />} />
@@ -36,7 +40,7 @@ const App = () => {
 
 
         {/* Admin protected routes */}
-        <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
+        {/* <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
           <Route element={<AfterLoginLayout />}>
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin/booking"   element={<Bookings />} />
@@ -44,7 +48,7 @@ const App = () => {
             <Route path="/admin/users"     element={<Users />} />
             <Route path="/admin/settings"  element={<div>Settings</div>} />
           </Route>
-        </Route>
+        </Route> */}
 
         {/* Customer protected routes */}
         {/* <Route element={<ProtectedRoute allowedRoles={["customer"]} />}>
@@ -54,7 +58,7 @@ const App = () => {
             <Route path="/customer/settings"    element={<div>Settings</div>} />
           </Route>
         </Route> */}
-
+        
         <Route element={<MainLayout />}>
           <Route path="/"                    element={<Home />} />
           <Route path="/home"                element={<Home />} />

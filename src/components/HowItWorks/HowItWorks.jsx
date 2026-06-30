@@ -31,7 +31,7 @@ const HowItWorks = () => {
         <div className="ds-head">
           <span className="eyebrow eyebrow--center">How It Works</span>
           <h2>
-            Help in <span className="accent-text-primary">four simple</span> steps
+            Help in <span className="accent-text-lime-dark">four simple</span> steps
           </h2>
           <p>From first call to a job well done — transparent every step of the way.</p>
         </div>

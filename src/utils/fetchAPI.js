@@ -10,7 +10,7 @@ export const fetchAPI = async (url, method, body = null) => {
 
     if (!response.ok) {
         console.error("API Error Status:", response.status);
-        return null;
+        return false;
     }
 
     const rawData = await response.text();

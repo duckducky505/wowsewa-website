@@ -1,6 +1,3 @@
-/* AdminDashboard — light admin (Sass source of truth)
-   Shared by CashFlow & HoldingSheet. Class names preserved. */
-
 $ad-bg: #f4f6f8;
 $ad-surface: #ffffff;
 $ad-surface-2: #f1f3f7;
@@ -419,13 +416,24 @@ $ad-blue: #2e8fe0;
     }
   }
 
+  .adash-row-actions {
+    display: inline-flex;
+    gap: 8px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+
+  .adash-header-right {
+    flex-wrap: wrap;
+  }
+
   .adash-view-all-btn {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     background: transparent;
     border: 1px solid $ad-line;
-    color: $ad-blue;
+    color: var(--bg-color);
     font-weight: 700;
     font-size: 0.9rem;
     cursor: pointer;

@@ -76,7 +76,7 @@ const MainBanner = ({
               <FaStar /><FaStar /><FaStar /><FaStar /><FaStar />
             </div>
             <p>
-              <strong>4.9/5</strong> from 500+ jobs across homes &amp; businesses
+              <strong>4.9/5</strong> from 1000+ jobs across homes &amp; businesses
             </p>
           </div>
         </div>

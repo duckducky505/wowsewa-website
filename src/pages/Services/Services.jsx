@@ -12,6 +12,10 @@ import {
   FaArrowRight,
 } from 'react-icons/fa';
 
+const phoneNumber = "9779762424318"; 
+const message = "Hello WowSewa! I would like to book a package.";
+const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+
 const serviceStats = [
   { number: '500+', label: 'Repairs Completed' },
   { number: '15+', label: 'Expert Technicians' },
@@ -56,6 +60,7 @@ const servicesData = [
 ];
 
 const ServiceCard = ({ item, index }) => (
+  
   <article
     className="sp-card reveal-up"
     style={{ animationDelay: `${index * 0.08}s` }}
@@ -77,7 +82,7 @@ const ServiceCard = ({ item, index }) => (
     </div>
     <div className="sp-card__footer">
       <a
-        href="https://docs.google.com/forms/..."
+        href={whatsappUrl}
         target="_blank"
         rel="noopener noreferrer"
         className="sp-card__cta"
@@ -93,7 +98,7 @@ const Services = () => {
     <main className="services-page">
       <MainBanner
         badge="What We Do"
-        title={<>Our <span className="accent-text-primary">specialized</span> services</>}
+        title={<>Our <span className="accent-text-primary">Specialized</span> services</>}
         subtitle="Precision installation, expert repair and proactive maintenance — for every corner of your home and business."
         compact
       />
@@ -134,7 +139,7 @@ const Services = () => {
               </p>
             </div>
             <a
-              href="https://docs.google.com/forms/..."
+              href="https://docs.google.com/forms/d/e/1FAIpQLSeS8Hh4Jrfmro0vhR1a_diqDQjrTF8fa7MiV0KgCw0jyYYcbw/viewform?safe=active"
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-darkgreen btn-large"
@@ -151,9 +156,9 @@ const Services = () => {
                 We handle custom requirements for businesses and homes alike.
               </p>
             </div>
-            <Link to="/about" className="btn btn-primary btn-large">
+            <a href="tel:9762424318" className="btn btn-primary btn-large">
               Talk to Us <FaArrowRight />
-            </Link>
+            </a>
           </div>
         </div>
       </section>

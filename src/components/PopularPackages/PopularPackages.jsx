@@ -21,9 +21,14 @@ const packages = [
   { img: fridgeImg, name: 'Fridge Gas Refill', tag: 'Popular', price: 'NPR 1,499' },
 ];
 
+
+const phoneNumber = "9779762424318"; 
+const message = "Hello WowSewa! I would like to book a package.";
+const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+
 const PackageCard = ({ p }) => (
   <a
-    href="https://docs.google.com/forms/..."
+    href={whatsappUrl}
     target="_blank"
     rel="noopener noreferrer"
     className="pp-card"
@@ -38,9 +43,6 @@ const PackageCard = ({ p }) => (
       </div>
       <h3 className="pp-card__name">{p.name}</h3>
       <div className="pp-card__foot">
-        <span className="pp-card__price">
-          <span>from</span> {p.price}
-        </span>
         <span className="pp-card__go">
           Book <FaArrowRight />
         </span>
@@ -54,9 +56,9 @@ const PopularPackages = () => {
     <section className="pp-section section-ec sec-light">
       <div className="container">
         <div className="ds-head">
-          <span className="eyebrow eyebrow--center">Popular Packages</span>
+          <span className="eyebrow eyebrow--center accent-text-lime-dark">Popular Packages</span>
           <h2>
-            Our most <span className="accent-text-primary">requested</span> services
+            Our most <span className="accent-text-lime-dark">requested</span> services
           </h2>
           <p>Fixed-price packages Kathmandu books again and again.</p>
         </div>

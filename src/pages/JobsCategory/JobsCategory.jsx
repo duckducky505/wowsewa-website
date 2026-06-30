@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { FaPlus, FaEdit, FaTrash, FaSearch } from 'react-icons/fa';
 import {
   FaFaucet, FaBolt, FaNetworkWired, FaSnowflake,
@@ -6,52 +6,56 @@ import {
 } from 'react-icons/fa6';
 import { PopupModal } from '../../components/Popup/PopupModal';
 import './JobsCategory.css';
+import { fetchHook } from '../../hooks/fetchHook';
+import { fetchAPI } from '../../utils/fetchAPI';
 
-/* ── Design-only sample data (no backend wired) ──────────────────────── */
+/* ── Icon Mapping ────────────────────────────────────────── */
 const ICONS = {
-  Plumbing: <FaFaucet />,
-  Electrical: <FaBolt />,
+  'Plumbing': <FaFaucet />,
+  'Electrician': <FaBolt />,
+  'Laptop Servicing': <FaLaptop />,
+  'AC Installation and Repair': <FaSnowflake />,
   'IT & Networking': <FaNetworkWired />,
-  Appliances: <FaSnowflake />,
-  Computers: <FaLaptop />,
-  Security: <FaVideo />,
+  'Security': <FaVideo />,
 };
 
-const SAMPLE_JOBS = [
-  { id: 1, title: 'Emergency Leak Repair', category: 'Plumbing', basePrice: 999, status: 'Active', description: 'Rapid response for burst pipes and hidden leaks.' },
-  { id: 2, title: 'House Rewiring', category: 'Electrical', basePrice: 4999, status: 'Active', description: 'Full house rewiring and circuit-breaker upgrades.' },
-  { id: 3, title: 'Office WiFi Setup', category: 'IT & Networking', basePrice: 3999, status: 'Active', description: 'Mesh WiFi, router configuration and LAN/WAN setup.' },
-  { id: 4, title: 'AC Deep Cleaning', category: 'Appliances', basePrice: 1499, status: 'Active', description: 'Filter cleaning, gas check and performance tune-up.' },
-  { id: 5, title: 'Laptop Servicing', category: 'Computers', basePrice: 1299, status: 'Draft', description: 'Thermal paste, deep cleaning and hardware upgrades.' },
-  { id: 6, title: 'CCTV Installation', category: 'Security', basePrice: 5999, status: 'Inactive', description: 'Camera mounting, DVR/NVR config and remote viewing.' },
-];
+const blankForm = { jobName: '' };
 
-const CATEGORIES = ['Plumbing', 'Electrical', 'IT & Networking', 'Appliances', 'Computers', 'Security'];
-const STATUSES = ['Active', 'Draft', 'Inactive'];
+/* ── CRITICAL FIX: JobForm is now OUTSIDE the main component ── */
+const JobForm = ({ form, onField, closeAll, onSubmit, submitLabel }) => (
+  <form className="modal-form" onSubmit={onSubmit}>
+    <label>Job Name</label>
+    <input
+      type="text" name="jobsName" placeholder="e.g. Carpentry"
+      value={form.jobsName || ''} onChange={onField} required
+    />
 
-const blankForm = { title: '', category: '', basePrice: '', status: 'Active', description: '' };
+    <div className="modal-btns">
+      <button type="button" className="btn btn-dark" onClick={closeAll}>Cancel</button>
+      <button type="submit" className="btn btn-primary">{submitLabel}</button>
+    </div>
+  </form>
+);
 
 const JobsCategory = () => {
-  const [jobs, setJobs] = useState(SAMPLE_JOBS);
   const [search, setSearch] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('');
-
+  
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selected, setSelected] = useState(null);
   const [form, setForm] = useState(blankForm);
 
-  const filtered = useMemo(() => {
-    const q = search.toLowerCase();
-    return jobs.filter(
-      (j) =>
-        (j.title.toLowerCase().includes(q) ||
-          j.category.toLowerCase().includes(q) ||
-          j.description.toLowerCase().includes(q)) &&
-        (categoryFilter ? j.category === categoryFilter : true)
-    );
-  }, [jobs, search, categoryFilter]);
+  const { data: jobsCategory } = fetchHook("https://localhost:7011/api/Jobs/getAllJobs");
+  
+  const jobsList = Array.isArray(jobsCategory) ? jobsCategory : [];
+  
+  const filteredJobs = jobsList.filter(j => 
+    j && (
+      (j.jobName?.toLowerCase() || '').includes(search.toLowerCase()) || 
+      (j.jobCompanyCode?.toLowerCase() || '').includes(search.toLowerCase())
+    )
+  );
 
   const onField = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
 
@@ -63,68 +67,49 @@ const JobsCategory = () => {
     setSelected(null); setForm(blankForm);
   };
 
-  /* Local-only handlers (UI demo — no API) */
-  const handleAdd = (e) => {
+  const handleAdd = (e) => { 
     e.preventDefault();
-    setJobs((prev) => [
-      ...prev,
-      { ...form, id: Date.now(), basePrice: Number(form.basePrice) || 0 },
-    ]);
-    closeAll();
+    const payload = {
+      jobsName : form.jobsName
+    }
+    const addResponse = fetchAPI("https://localhost:7011/api/Jobs/addNewJob", "POST", payload);
+    if(addResponse) {
+      window.alert("New Job added successfully.");
+      window.location.reload();
+    }
+    else{
+      window.alert("Error from the api. Please try again later.");
+    }
   };
 
-  const handleEdit = (e) => {
-    e.preventDefault();
-    setJobs((prev) =>
-      prev.map((j) =>
-        j.id === selected.id ? { ...j, ...form, basePrice: Number(form.basePrice) || 0 } : j
-      )
-    );
-    closeAll();
+
+  const handleEdit = (e) => { 
+    e.preventDefault(); 
+
+    const editResponse = fetchAPI("https:")
   };
 
-  const handleDelete = () => {
-    setJobs((prev) => prev.filter((j) => j.id !== selected.id));
-    closeAll();
+
+  const handleDelete = () => { 
+    if(!selected) return;
+    try {
+      const response = fetchAPI(
+        `https://localhost:7011/api/Jobs/deleteJob/${selected.jobId}`, 
+        "DELETE"
+      );
+
+      // Check if response is successful (adjust based on what your fetchAPI returns)
+      if (response) {
+        window.alert("The job is deleted successfully.");
+        window.location.reload();
+      } else {
+        window.alert("Error deleting the job. Please try again later.");
+      }
+    } catch (error) {
+      console.error("Delete Error:", error);
+      window.alert("An error occurred while deleting the job.");
+    }
   };
-
-  const JobForm = ({ onSubmit, submitLabel }) => (
-    <form className="modal-form" onSubmit={onSubmit}>
-      <label>Job Title</label>
-      <input
-        type="text" name="title" placeholder="e.g. Emergency Leak Repair"
-        value={form.title} onChange={onField} required
-      />
-
-      <label>Category</label>
-      <select name="category" value={form.category} onChange={onField} required>
-        <option value="">Select a category</option>
-        {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-      </select>
-
-      <label>Base Price (NPR)</label>
-      <input
-        type="number" name="basePrice" placeholder="e.g. 1499"
-        value={form.basePrice} onChange={onField} min="0"
-      />
-
-      <label>Status</label>
-      <select name="status" value={form.status} onChange={onField}>
-        {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
-      </select>
-
-      <label>Description</label>
-      <textarea
-        name="description" rows="3" placeholder="Short description of the job"
-        value={form.description} onChange={onField}
-      />
-
-      <div className="modal-btns">
-        <button type="button" className="btn btn-dark" onClick={closeAll}>Cancel</button>
-        <button type="submit" className="btn btn-primary">{submitLabel}</button>
-      </div>
-    </form>
-  );
 
   return (
     <div className="in-app-container jc-page">
@@ -144,16 +129,8 @@ const JobsCategory = () => {
 
       <div className="jc-stat-row">
         <div className="jc-stat">
-          <span className="jc-stat__num">{jobs.length}</span>
-          <span className="jc-stat__lbl">Total Jobs</span>
-        </div>
-        <div className="jc-stat">
-          <span className="jc-stat__num">{jobs.filter((j) => j.status === 'Active').length}</span>
-          <span className="jc-stat__lbl">Active</span>
-        </div>
-        <div className="jc-stat">
-          <span className="jc-stat__num">{CATEGORIES.length}</span>
-          <span className="jc-stat__lbl">Categories</span>
+          <span className="jc-stat__num">{jobsList.length}</span>
+          <span className="jc-stat__lbl">Total Registered Categories</span>
         </div>
       </div>
 
@@ -162,20 +139,10 @@ const JobsCategory = () => {
           <FaSearch className="search-icon" />
           <input
             type="text"
-            placeholder="Search by job, category or description..."
+            placeholder="Search by job code or name..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-        </div>
-        <div className="filter-group">
-          <select
-            className="filter-select"
-            value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
-          >
-            <option value="">All Categories</option>
-            {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-          </select>
         </div>
       </div>
 
@@ -183,38 +150,27 @@ const JobsCategory = () => {
         <table className="table-universal">
           <thead>
             <tr>
-              <th>Job</th>
-              <th>Category</th>
-              <th>Base Price</th>
-              <th>Status</th>
+              <th>Company Code</th>
+              <th>Job Category</th>
               <th className="text-center">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filtered.length > 0 ? (
-              filtered.map((job) => (
-                <tr key={job.id}>
-                  <td data-label="Job">
+            {filteredJobs.length > 0 ? (
+              filteredJobs.map((job) => (
+                <tr key={job.jobId || job.id}>
+                  <td data-label="Company Code">
+                    <span className="jc-cat-tag">{job.jobCompanyCode}</span>
+                  </td>
+                  <td data-label="Job Category">
                     <div className="jc-job">
                       <span className="jc-job__icon">
-                        {ICONS[job.category] || <FaBolt />}
+                        {ICONS[job.jobName] || <FaBolt />} 
                       </span>
                       <div className="jc-job__text">
-                        <span className="jc-job__title">{job.title}</span>
-                        <span className="jc-job__desc">{job.description}</span>
+                        <span className="jc-job__title">{job.jobName}</span>
                       </div>
                     </div>
-                  </td>
-                  <td data-label="Category">
-                    <span className="jc-cat-tag">{job.category}</span>
-                  </td>
-                  <td data-label="Base Price">
-                    <strong>Rs. {Number(job.basePrice).toLocaleString()}</strong>
-                  </td>
-                  <td data-label="Status">
-                    <span className={`status-pill ${job.status.toLowerCase()}`}>
-                      {job.status}
-                    </span>
                   </td>
                   <td data-label="Actions">
                     <div className="table-btns-flex">
@@ -230,7 +186,7 @@ const JobsCategory = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="5" className="text-center" style={{ padding: '2rem' }}>
+                <td colSpan="3" className="text-center" style={{ padding: '2rem' }}>
                   No jobs found.
                 </td>
               </tr>
@@ -240,16 +196,28 @@ const JobsCategory = () => {
       </div>
 
       <PopupModal open={isAddOpen} onClose={closeAll} title="Add New Job">
-        <JobForm onSubmit={handleAdd} submitLabel="Add Job" />
+        <JobForm 
+          form={form} 
+          onField={onField} 
+          closeAll={closeAll} 
+          onSubmit={handleAdd} 
+          submitLabel="Add Job" 
+        />
       </PopupModal>
 
       <PopupModal open={isEditOpen} onClose={closeAll} title="Edit Job">
-        <JobForm onSubmit={handleEdit} submitLabel="Save Changes" />
+        <JobForm 
+          form={form} 
+          onField={onField} 
+          closeAll={closeAll} 
+          onSubmit={handleEdit} 
+          submitLabel="Save Changes" 
+        />
       </PopupModal>
 
       <PopupModal open={isDeleteOpen} onClose={closeAll} title="Delete Job">
         <p>
-          Are you sure you want to delete <b>{selected?.title}</b>? This action
+          Are you sure you want to delete <b>{selected?.jobName}</b>? This action
           cannot be undone.
         </p>
         <div className="modal-btns">
