@@ -19,15 +19,43 @@ const ICONS = {
   'Security': <FaVideo />,
 };
 
-const blankForm = { jobName: '' };
+const blankForm = { jobsName: '' };
 
-/* ── CRITICAL FIX: JobForm is now OUTSIDE the main component ── */
+/* ── Fallback data for the cash-flow-by-category summary, shown until the
+   API below returns real numbers. Matches the shape { category, income,
+   expense, net, transactions }. ── */
+const MOCK_CATEGORY_SUMMARY = [
+  { category: 'AC Service',        income: 3000, expense: 0,    transactions: 1 },
+  { category: 'Electrical',        income: 0,    expense: 0,    transactions: 0 },
+  { category: 'Plumbing',          income: 2000, expense: 0,    transactions: 1 },
+  { category: 'CCTV / Networking', income: 6000, expense: 0,    transactions: 1 },
+  { category: 'Repair Lab',        income: 0,    expense: 0,    transactions: 0 },
+  { category: 'Training / Class',  income: 0,    expense: 0,    transactions: 0 },
+  { category: 'Spare Parts',       income: 0,    expense: 2500, transactions: 1 },
+  { category: 'Gas',               income: 0,    expense: 1500, transactions: 1 },
+  { category: 'Transport',         income: 0,    expense: 300,  transactions: 1 },
+  { category: 'Salary',            income: 0,    expense: 0,    transactions: 0 },
+  { category: 'Rent',              income: 0,    expense: 0,    transactions: 0 },
+  { category: 'Electricity',       income: 0,    expense: 0,    transactions: 0 },
+  { category: 'Marketing',         income: 0,    expense: 0,    transactions: 0 },
+  { category: 'Office Expense',    income: 0,    expense: 0,    transactions: 0 },
+  { category: 'Other Income',      income: 0,    expense: 0,    transactions: 0 },
+  { category: 'Other Expense',     income: 0,    expense: 0,    transactions: 0 },
+];
+
+const rs = (n) => (n ? `Rs ${n.toLocaleString()}` : '-');
+
+/* ── CRITICAL FIX: Value tracking now uses form.jobsName to match name="jobsName" ── */
 const JobForm = ({ form, onField, closeAll, onSubmit, submitLabel }) => (
   <form className="modal-form" onSubmit={onSubmit}>
     <label>Job Name</label>
     <input
-      type="text" name="jobsName" placeholder="e.g. Carpentry"
-      value={form.jobsName || ''} onChange={onField} required
+      type="text" 
+      name="jobsName" 
+      placeholder="e.g. Carpentry"
+      value={form.jobsName || ''} 
+      onChange={onField} 
+      required
     />
 
     <div className="modal-btns">
@@ -47,9 +75,10 @@ const JobsCategory = () => {
   const [form, setForm] = useState(blankForm);
 
   const { data: jobsCategory } = fetchHook("https://localhost:7011/api/Jobs/getAllJobs");
-  
+
   const jobsList = Array.isArray(jobsCategory) ? jobsCategory : [];
-  
+  const categorySummary =  MOCK_CATEGORY_SUMMARY;
+
   const filteredJobs = jobsList.filter(j => 
     j && (
       (j.jobName?.toLowerCase() || '').includes(search.toLowerCase()) || 
@@ -57,10 +86,29 @@ const JobsCategory = () => {
     )
   );
 
+  // running totals for the summary table's footer row
+  const summaryTotals = categorySummary.reduce(
+    (acc, row) => ({
+      income: acc.income + (row.income || 0),
+      expense: acc.expense + (row.expense || 0),
+      transactions: acc.transactions + (row.transactions || 0),
+    }),
+    { income: 0, expense: 0, transactions: 0 }
+  );
+
   const onField = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
 
   const openAdd = () => { setForm(blankForm); setIsAddOpen(true); };
-  const openEdit = (job) => { setSelected(job); setForm({ ...job }); setIsEditOpen(true); };
+  
+  /* ── CRITICAL FIX: Safely map backend data property (jobName) over to our form state key (jobsName) ── */
+  const openEdit = (job) => { 
+    setSelected(job); 
+    setForm({ 
+      jobsName: job.jobName || '' 
+    }); 
+    setIsEditOpen(true); 
+  };
+  
   const openDelete = (job) => { setSelected(job); setIsDeleteOpen(true); };
   const closeAll = () => {
     setIsAddOpen(false); setIsEditOpen(false); setIsDeleteOpen(false);
@@ -85,8 +133,36 @@ const JobsCategory = () => {
 
   const handleEdit = (e) => { 
     e.preventDefault(); 
+    if(!selected) return;
 
-    const editResponse = fetchAPI("https:")
+    const patchPayload = [];
+
+    const currentValue = form.jobsName  || '';
+    const originalValue = selected.jobName || '';
+
+    if(currentValue.trim() !== originalValue.trim()){
+      patchPayload.push({
+        op: "replace",
+        path: "/JobName", 
+        value: currentValue,
+      });
+    }
+
+    if (patchPayload.length === 0) {
+      window.alert("No changes detected.");
+      closeAll();
+      return;
+    }
+
+    const editResponse = fetchAPI(`https://localhost:7011/api/Jobs/update-job/${selected.jobId}`, "PATCH", patchPayload);
+
+    if (editResponse) {
+      window.alert("Job edited successfully.");
+      window.location.reload();
+    } else {
+      window.alert("Error updating the job. Please try again later.");
+    }
+    closeAll();
   };
 
 
@@ -98,7 +174,6 @@ const JobsCategory = () => {
         "DELETE"
       );
 
-      // Check if response is successful (adjust based on what your fetchAPI returns)
       if (response) {
         window.alert("The job is deleted successfully.");
         window.location.reload();
@@ -158,7 +233,7 @@ const JobsCategory = () => {
           <tbody>
             {filteredJobs.length > 0 ? (
               filteredJobs.map((job) => (
-                <tr key={job.jobId || job.id}>
+                <tr key={job.jobId }>
                   <td data-label="Company Code">
                     <span className="jc-cat-tag">{job.jobCompanyCode}</span>
                   </td>
@@ -192,6 +267,55 @@ const JobsCategory = () => {
               </tr>
             )}
           </tbody>
+        </table>
+      </div>
+
+      {/* ── Cash flow by category ─────────────────────────────────────── */}
+      <div className="jc-summary-head">
+        <h2 className="text-lg accent-text-white">Cash Flow by Category</h2>
+        <p className="text-md accent-text-white">
+          Income, expense and net position for every category this period.
+        </p>
+      </div>
+
+      <div className="table-card bg-text-main jc-summary-card">
+        <table className="jc-summary-table">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th className="text-right">Income</th>
+              <th className="text-right">Expense</th>
+              <th className="text-right">Net</th>
+              <th className="text-right">Transactions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {categorySummary.map((row) => {
+              const net = (row.income || 0) - (row.expense || 0);
+              return (
+                <tr key={row.category}>
+                  <td data-label="Category" className="jc-cat-name">{row.category}</td>
+                  <td data-label="Income" className="text-right">{rs(row.income)}</td>
+                  <td data-label="Expense" className="text-right">{rs(row.expense)}</td>
+                  <td data-label="Net" className={'text-right' + (net < 0 ? ' jc-net-neg' : '')}>
+                    {net === 0 ? '-' : net < 0 ? `(Rs ${Math.abs(net).toLocaleString()})` : rs(net)}
+                  </td>
+                  <td data-label="Transactions" className="text-right">
+                    {row.transactions ? row.transactions : '-'}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+          <tfoot>
+            <tr className="jc-total-row">
+              <td>Total</td>
+              <td className="text-right">{rs(summaryTotals.income)}</td>
+              <td className="text-right">{rs(summaryTotals.expense)}</td>
+              <td className="text-right">{rs(summaryTotals.income - summaryTotals.expense)}</td>
+              <td className="text-right">{summaryTotals.transactions}</td>
+            </tr>
+          </tfoot>
         </table>
       </div>
 

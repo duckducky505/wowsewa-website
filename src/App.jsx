@@ -12,8 +12,7 @@ import Signup from './pages/Signup';
 import Staffs from './pages/Staffs/Staffs';
 import Users from './pages/Users/Users';
 import ProtectedRoute from './routes/ProtectedRoute';
-import AdminDashboard from './pages/Dashboard/AdminDashboard';
-import CustomerDashboard from './pages/Dashboard/CustomerDashboard';
+import AdminDashboard from './pages/AdminDashboard/AdminDashboard';
 import AfterLoginLayout from './layouts/AfterLoginLayout';
 import Bookings from './pages/Booking/Booking';
 import HoldingSheet from './pages/HoldingSheet/HoldingSheet';
@@ -21,6 +20,8 @@ import CashFlowPage from './pages/CashFlow/Cashflow';
 import JobsCategory from './pages/JobsCategory/JobsCategory';
 import ScrollToTop from './components/ScrollToTop/ScrollToTop';
 import WhatsAppFloat from './components/Whattsapp/Whattsapp';
+import CashFlow from './pages/CashFlow/Cashflow';
+import CustomerDashboard from './pages/Customer/CustomerDashboard/CustomerDashboard';
 
 const App = () => {
   return (
@@ -31,33 +32,30 @@ const App = () => {
         {/* Public routes */}
         <Route path="/login"  element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route element={<AfterLoginLayout />}>
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            <Route path="/admin/jobs" element={<JobsCategory />} />
-            <Route path="/admin/CashFlow" element={<CashFlowPage />} />
-            <Route path="/admin/HoldingSheet" element={<HoldingSheet />} />
-        </Route>
 
 
         {/* Admin protected routes */}
-        {/* <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
+        <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
           <Route element={<AfterLoginLayout />}>
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin/booking"   element={<Bookings />} />
+            <Route path="/admin/CashFlow"   element={<CashFlow />} />
+            <Route path="/admin/HoldingSheet"   element={<HoldingSheet />} />
+            <Route path="/admin/jobs"   element={<JobsCategory />} />
             <Route path="/admin/staffs"    element={<Staffs />} />
             <Route path="/admin/users"     element={<Users />} />
             <Route path="/admin/settings"  element={<div>Settings</div>} />
           </Route>
-        </Route> */}
+        </Route>
 
-        {/* Customer protected routes */}
-        {/* <Route element={<ProtectedRoute allowedRoles={["customer"]} />}>
+        {/* Customer protected routes */} 
+        <Route element={<ProtectedRoute allowedRoles={["customer"]} />}>
           <Route element={<AfterLoginLayout />}>
             <Route path="/customer/dashboard"   element={<CustomerDashboard />} />
             <Route path="/customer/my-bookings" element={<Bookings />} />
             <Route path="/customer/settings"    element={<div>Settings</div>} />
           </Route>
-        </Route> */}
+        </Route>
         
         <Route element={<MainLayout />}>
           <Route path="/"                    element={<Home />} />

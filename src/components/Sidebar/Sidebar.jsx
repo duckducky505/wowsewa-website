@@ -11,10 +11,8 @@ const menuConfig = {
   admin: [
     { name: 'Dashboard',      icon: MdDashboard, path: '/admin/dashboard' },
     { name: 'Job Categories', icon: MdWork,      path: '/admin/jobs'      },
-    { name: 'Bookings',       icon: MdStore,     path: '/admin/booking'   },
-    { name: 'Users',     icon: MdAnalytics, path: '/admin/users'     },
-    { name: 'Staffs',    icon: MdPeople,    path: '/admin/staffs'    },
-    { name: 'Settings',  icon: MdSettings,  path: '/admin/settings'  },
+    { name: 'Staffs',           icon: MdPeople,     path: '/admin/staffs'    },
+    { name: 'Settings',       icon: MdSettings,  path: '/admin/settings'  },
   ],
   customer: [
     { name: 'Dashboard',   icon: MdDashboard, path: '/customer/dashboard'   },

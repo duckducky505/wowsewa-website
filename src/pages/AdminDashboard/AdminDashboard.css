@@ -1,6 +1,3 @@
-@charset "UTF-8";
-/* AdminDashboard — light admin (Sass source of truth)
-   Shared by CashFlow & HoldingSheet. Class names preserved. */
 .adash-wrap {
   width: 100%; /* fill content area like .in-app-container pages */
   max-width: none;

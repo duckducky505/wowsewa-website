@@ -22,8 +22,6 @@ const blankForm = {
 const HoldingSheet = () => {
   const navigate = useNavigate();
 
-
-  /* Modal state (design-only) */
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -34,6 +32,8 @@ const HoldingSheet = () => {
   const {data : statusValues} = fetchHook("https://localhost:7011/api/Categories/get/Status");
   const {data : paymentType} = fetchHook("https://localhost:7011/api/Categories/get/Payment-Method-Values");
   const {data : entryType} = fetchHook("https://localhost:7011/api/Categories/get/Entry-Types");
+
+  const {data : employeesData} = fetchHook("https://localhost:7011/api/Employee/getEmployeesDetail");
 
   
 
@@ -67,7 +67,14 @@ const HoldingSheet = () => {
     e.preventDefault();
 
     const payload = new{
-
+      createdDate: form.createdDate,
+      fromHolderName: form.fromHolderName,
+      toHolderName: form.toHolderName,
+      entryType: form.entryType || entryType?.[0] || 'Collection',
+      paymentMethod: form.paymentMethod || paymentType?.[0] || 'Cash',
+      amount: Number(form.amount) || 0,
+      status: form.status || statusValues?.[0] || 'Pending',
+      note: form.note,
     }
 
     const addRes = fetchAPI("https://localhost:7011/api/HoldingSheet/add/holding-Sheet-Data", "POST", payload);
@@ -81,17 +88,52 @@ const HoldingSheet = () => {
 
   const handleEdit = (e) => {
     e.preventDefault();
-    setSheets((prev) =>
-      prev.map((s) =>
-        s.id === selected.id ? { ...s, ...form, amount: Number(form.amount) || 0 } : s
-      )
-    );
+    if(!selected) return;
+    
+    const patchPayload = [];
+
+    const fields = [
+      { key: 'createdDate', path: '/CreatedDate', isNumber: false },
+      { key: 'fromHolderName', path: '/FromHolderName', isNumber: false },
+      { key: 'toHolderName', path: '/ToHolderName', isNumber: false },
+      { key: 'entryType', path: '/EntryType', isNumber: false },
+      { key: 'paymentMethod', path: '/PaymentMethod', isNumber: false },
+      { key: 'amount', path: '/Amount', isNumber: true },
+      { key: 'status', path: '/Status', isNumber: false },
+      { key: 'note', path: '/Note', isNumber: false },
+    ];
+
+    fields.forEach(({key, path, isNumber}) => {
+      const currentValue = isNumber ? (Number(form[key]) || 0) : form[key];
+      const originalValue = isNumber ? (Number(selected[key]) || 0) : (selected[key] || '');
+
+      if(currentValue !== originalValue) {
+        patchPayload.push({
+          op:"replace",
+          path : path,
+          value: currentFormvalue
+        });
+      }
+    });
+
+    if (patchPayload.length === 0) {
+      window.alert("No changes detected.");
+      closeAll();
+      return;
+    }
+
+    const editRes = fetchAPI(`https://localhost:7011/api/HoldingSheet/update-holding-sheet-data/${selected.id}`, "PATCH", payload);
+
+    if(editRes){
+      window.alert("Data edited successfully.");
+      window.location.reload();
+    }
     closeAll();
   };
 
   const handleDelete = () => {
     if(!selected) return;
-    const delRes = fetchAPI(`https://localhost:7011/api/HoldingSheet/delete/${selected.id}`);
+    const delRes = fetchAPI(`https://localhost:7011/api/HoldingSheet/delete/${selected.id}`, "DELETE");
 
     if(delRes){
       window.alert("Data deleted successfully.");

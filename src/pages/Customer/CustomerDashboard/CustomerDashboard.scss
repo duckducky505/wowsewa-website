@@ -1,0 +1,105 @@
+// pages/CustomerDashboard/CustomerDashboard.scss
+// Standalone — no shared partial. Built on top of app.css tokens/classes:
+// --primary-color, --bg-color, --lime-dark, --r-sm/md/pill, .btn, .btn-primary,
+// .status-pill, .table-card, .table-universal, .in-app-container, .accent-text-white.
+
+.cdash-page {
+  .accent-text-white { color: #16202b; }
+}
+
+.cdash-page-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+}
+
+.cdash-section {
+  margin-bottom: 30px;
+
+  &-title {
+    font-size: 1.02rem;
+    font-weight: 700;
+    color: #16202b;
+    margin: 0 0 14px;
+  }
+}
+
+// empty state (no current booking)
+.cdash-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 48px 20px;
+  background: #ffffff;
+  border: 1px dashed #d7dce3;
+  border-radius: var(--r-md);
+  color: #8a94a3;
+  text-align: center;
+}
+
+// current booking card(s)
+.cdash-current-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cdash-current-card {
+  background: #ffffff;
+  border: 1px solid #e6e9ee;
+  border-left: 4px solid var(--primary-color);
+  border-radius: var(--r-md);
+  padding: 22px;
+  box-shadow: 0 6px 18px rgba(22, 32, 43, 0.05);
+}
+
+.cdash-current-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  h4 {
+    margin: 0;
+    font-size: 1.08rem;
+    font-weight: 700;
+    color: #16202b;
+  }
+}
+
+.cdash-current-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 12px;
+  font-size: 0.86rem;
+  color: #6b7280;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+}
+
+.cdash-current-foot {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #eef1f5;
+  font-size: 0.86rem;
+  color: #6b7280;
+
+  strong { color: #16202b; }
+}
+
+// past-bookings table sits inside .table-card / .table-universal from app.css —
+// nothing to redeclare, just responsive tweaks for this page specifically.
+@media (max-width: 560px) {
+  .cdash-current-meta { gap: 10px; flex-direction: column; }
+  .cdash-page-head { align-items: flex-start; }
+}
