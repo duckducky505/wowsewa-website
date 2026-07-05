@@ -37,7 +37,7 @@ const statusPillClass = (status) => {
 const CustomerDashboard = () => {
   const navigate = useNavigate();
 
-
+  
 
   const current =  MOCK_CURRENT;
   const history =  MOCK_HISTORY;
@@ -49,12 +49,11 @@ const CustomerDashboard = () => {
           <h1 className="text-xl accent-text-white">Dashboard</h1>
           <p className="text-md accent-text-white">Your current and past bookings.</p>
         </div>
-        <button className="btn btn-primary" onClick={() => navigate('/account/bookings')}>
+        <button className="btn btn-primary" onClick={() => navigate('/customer/bookings')}>
           <MdAdd size={18} /> Book a service
         </button>
       </div>
 
-      {/* CURRENT / PRESENT BOOKING(S) */}
       <section className="cdash-section">
         <h3 className="cdash-section-title">Current booking</h3>
 

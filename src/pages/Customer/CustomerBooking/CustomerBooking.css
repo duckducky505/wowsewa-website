@@ -1,0 +1,144 @@
+.cdash-page .accent-text-white {
+  color: #16202b;
+}
+
+.cdash-page-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+}
+
+.cdash-form {
+  width: 100%;
+  max-width: 900px;
+  background: #ffffff;
+  border: 1px solid #e6e9ee;
+  border-radius: var(--r-md);
+  padding: 28px;
+  box-shadow: 0 6px 18px rgba(22, 32, 43, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.cdash-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+@media (max-width: 640px) {
+  .cdash-form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.cdash-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.cdash-field label {
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #6b7280;
+}
+.cdash-field input, .cdash-field select, .cdash-field textarea {
+  padding: 11px 13px;
+  border-radius: var(--r-sm);
+  border: 1px solid #d7dce3;
+  background: #f4f6f8;
+  color: #16202b;
+  font-family: inherit;
+  font-size: 0.92rem;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+.cdash-field input:focus, .cdash-field select:focus, .cdash-field textarea:focus {
+  border-color: var(--primary-color);
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(209, 254, 23, 0.28);
+}
+.cdash-field select {
+  cursor: pointer;
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 34px;
+}
+.cdash-field textarea {
+  resize: vertical;
+}
+
+.cdash-form-btns {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 4px;
+}
+.cdash-form-btns .btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cdash-confirm {
+  background: #ffffff;
+  border: 1px solid #e6e9ee;
+  border-radius: var(--r-md);
+  box-shadow: 0 6px 18px rgba(22, 32, 43, 0.05);
+  max-width: 460px;
+  margin: 40px auto 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  padding: 40px 30px;
+}
+
+.cdash-confirm-icon {
+  color: #16a34a;
+}
+
+.cdash-confirm h2 {
+  margin: 6px 0 0;
+  font-size: 1.3rem;
+  color: #16202b;
+}
+
+.cdash-confirm p {
+  margin: 0;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+.cdash-confirm p strong {
+  color: #16202b;
+}
+
+.cdash-confirm-id {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--lime-dark);
+  background: rgba(209, 254, 23, 0.14);
+  padding: 6px 14px;
+  border-radius: var(--r-pill);
+  margin: 6px 0 14px;
+}
+
+@media (max-width: 480px) {
+  .cdash-form {
+    padding: 20px;
+  }
+  .cdash-form-btns .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}/*# sourceMappingURL=CustomerBooking.css.map */
