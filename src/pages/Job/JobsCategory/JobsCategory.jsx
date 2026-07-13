@@ -4,10 +4,10 @@ import {
   FaFaucet, FaBolt, FaNetworkWired, FaSnowflake,
   FaLaptop, FaVideo,
 } from 'react-icons/fa6';
-import { PopupModal } from '../../components/Popup/PopupModal';
+import { PopupModal } from '../../../components/Popup/PopupModal';
 import './JobsCategory.css';
-import { fetchHook } from '../../hooks/fetchHook';
-import { fetchAPI } from '../../utils/fetchAPI';
+import { fetchHook } from '../../../hooks/fetchHook';
+import { fetchAPI } from '../../../utils/fetchAPI';
 
 /* ── Icon Mapping ────────────────────────────────────────── */
 const ICONS = {

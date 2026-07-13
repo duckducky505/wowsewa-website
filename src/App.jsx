@@ -12,12 +12,10 @@ import Signup from './pages/Signup';
 import Staffs from './pages/Staffs/Staffs';
 import Users from './pages/Users/Users';
 import ProtectedRoute from './routes/ProtectedRoute';
-import AdminDashboard from './pages/AdminDashboard/AdminDashboard';
 import AfterLoginLayout from './layouts/AfterLoginLayout';
 import Bookings from './pages/Booking/Booking';
 import HoldingSheet from './pages/HoldingSheet/HoldingSheet';
 import CashFlowPage from './pages/CashFlow/Cashflow';
-import JobsCategory from './pages/JobsCategory/JobsCategory';
 import ScrollToTop from './components/ScrollToTop/ScrollToTop';
 import WhatsAppFloat from './components/Whattsapp/Whattsapp';
 import CashFlow from './pages/CashFlow/Cashflow';
@@ -25,6 +23,9 @@ import CustomerDashboard from './pages/Customer/CustomerDashboard/CustomerDashbo
 import CustomerBooking from './pages/Customer/CustomerBooking/CustomerBooking';
 import CustomerSettings from './pages/Customer/Settings/CustomerSettings';
 import ReceptionDashboard from './pages/Reception/Dashboard/ReceptionDashboard';
+import JobsPage from './pages/Job/JobsMainPage/JobsPage';
+import JobsCategory from './pages/Job/JobsCategory/JobsCategory';
+import AdminDashboard from './pages/AdminDashboard/Dashboard/AdminDashboard';
 
 const App = () => {
   return (
@@ -44,7 +45,7 @@ const App = () => {
             <Route path="/admin/booking"   element={<Bookings />} />
             <Route path="/admin/CashFlow"   element={<CashFlow />} />
             <Route path="/admin/HoldingSheet"   element={<HoldingSheet />} />
-            <Route path="/admin/jobs"   element={<JobsCategory />} />
+            <Route path="/admin/jobs"   element={<JobsPage />} />
             <Route path="/admin/staffs"    element={<Staffs />} />
             <Route path="/admin/users"     element={<Users />} />
             <Route path="/admin/settings"  element={<div>Settings</div>} />
