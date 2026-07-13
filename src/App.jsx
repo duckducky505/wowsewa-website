@@ -22,8 +22,9 @@ import ScrollToTop from './components/ScrollToTop/ScrollToTop';
 import WhatsAppFloat from './components/Whattsapp/Whattsapp';
 import CashFlow from './pages/CashFlow/Cashflow';
 import CustomerDashboard from './pages/Customer/CustomerDashboard/CustomerDashboard';
-import CustomerBookings from './pages/Customer/CustomerBooking/CustomerBooking';
+import CustomerBooking from './pages/Customer/CustomerBooking/CustomerBooking';
 import CustomerSettings from './pages/Customer/Settings/CustomerSettings';
+import ReceptionDashboard from './pages/Reception/Dashboard/ReceptionDashboard';
 
 const App = () => {
   return (
@@ -54,7 +55,8 @@ const App = () => {
         <Route element={<ProtectedRoute allowedRoles={["customer"]} />}>
           <Route element={<AfterLoginLayout />}>
             <Route path="/customer/dashboard"   element={<CustomerDashboard />} />
-            <Route path="/customer/my-bookings" element={<CustomerBookings />} />
+            <Route path="/customer/my-bookings" element={<CustomerBooking />} />
+            <Route path="/customer/reception" element={<ReceptionDashboard />} />
             <Route path="/customer/settings"    element={<CustomerSettings/>} />
           </Route>
         </Route>

@@ -27,7 +27,7 @@
       <select name="jobCategory" value={form.jobCategory} onChange={onField}>
         <option value="">-- Select Category --</option>
         {jobsData?.map((job) => (
-          <option key={job.jobId} value={job.jobId}>{job.jobName}</option>
+          <option key={job. jobId} value={job.jobId}>{job.jobName}</option>
         ))}
       </select>
 
@@ -95,21 +95,21 @@
       setIsAddOpen(true); 
     };
     
-    const openEdit = (entry) => {
-      setSelected(entry);
-      setForm({
-        createdDate: entry.createdDate || '',
-        jobCategory: entry.jobCategory?.jobId || entry.jobCategory || '',
-        clientName: entry.clientName || '',
-        employeeName: entry.employee?.name || '',
-        cashType: entry.cashType ,
-        paymentMethod: entry.paymentMethod ,
-        cashIn: entry.cashIn ?? '',
-        cashOut: entry.cashOut ?? '',
-        description: entry.description || '',
-      });
-      setIsEditOpen(true);
-    };
+  const openEdit = (entry) => {
+    setSelected(entry);
+    setForm({
+      createdDate: entry.createdDate || '',
+      jobCategory: entry.jobId ? entry.jobId.toString() : '',
+      clientName: entry.clientName || '',
+      employeeName: entry.employee?.guidId || '', 
+      cashType: entry.cashType || 'Income',
+      paymentMethod: entry.paymentMethod || 'Cash',
+      cashIn: entry.cashIn ?? '',
+      cashOut: entry.cashOut ?? '',
+      description: entry.description || '',
+    });
+    setIsEditOpen(true);
+  };
     
     const openDelete = (entry) => { 
       setSelected(entry); 
@@ -279,7 +279,9 @@
                 {cashFlowData?.map(flow => (
                   <tr key={flow.id}>
                     <td data-label="Date">{flow.createdDate}</td>
-                    <td data-label="Category">{flow.jobCategory?.jobName || flow.jobCategory || '-'}</td>
+                    <td data-label="Category">
+                      {jobsData?.find(job => job.jobId === flow.jobId)?.jobName}
+                    </td>
                     <td data-label="Client">{flow.clientName}</td>
                     <td data-label="Employee"><strong>{flow.employee?.name}</strong></td>
                     <td data-label="Type">
