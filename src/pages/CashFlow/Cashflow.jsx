@@ -1,176 +1,213 @@
-  import React, { useState } from 'react';
-  import { useNavigate } from 'react-router-dom';
-  import { MdArrowBack, MdFileDownload, MdAdd } from 'react-icons/md';
-  import { FaEdit, FaTrash } from 'react-icons/fa';
-  import { PopupModal } from '../../components/Popup/PopupModal';
-  import { fetchHook } from '../../hooks/fetchHook';
-  import { fetchAPI } from '../../utils/fetchAPI';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { MdArrowBack, MdFileDownload, MdAdd, MdClose } from 'react-icons/md';
+import { FaEdit, FaTrash } from 'react-icons/fa';
+import { fetchHook } from '../../hooks/fetchHook';
+import { fetchAPI } from '../../utils/fetchAPI';
+import './Cashflow.css';
 
-  const blankForm = {
-    createdDate: '',
-    jobCategory: '',
-    clientName: '',
-    employeeName: '',
-    cashType: 'Income',
-    paymentMethod: 'Cash',
-    cashIn: '',
-    cashOut: '',
-    description: '',
+const blankForm = {
+  createdDate: '',
+  jobCategory: '',
+  clientName: '',
+  employeeName: '',
+  cashType: 'Income',
+  paymentMethod: 'Cash',
+  cashIn: '',
+  cashOut: '',
+  description: '',
+};
+
+const CashFlowForm = ({ onSubmit, submitLabel, form, onField, closeAll, industryData, cashTypes, paymentMethods, employeesData, submitting }) => (
+  <form className="wsw-cashflow__form" onSubmit={(e) => e.preventDefault()}>
+    <div className="wsw-cashflow__field">
+      <label className="wsw-cashflow__label" htmlFor="cf-date">Date</label>
+      <input id="cf-date" type="date" name="createdDate" className="wsw-cashflow__input" value={form.createdDate} onChange={onField} required />
+    </div>
+
+    <div className="wsw-cashflow__field">
+      <label className="wsw-cashflow__label" htmlFor="cf-category">Job category</label>
+      <select id="cf-category" name="jobCategory" className="wsw-cashflow__select" value={form.jobCategory} onChange={onField}>
+        <option value="">-- Select category --</option>
+        {industryData?.map((job) => (
+          <option key={job.industryId} value={job.industryId}>{job.industryName}</option>
+        ))}
+      </select>
+    </div>
+
+    <div className="wsw-cashflow__field-row">
+      <div className="wsw-cashflow__field">
+        <label className="wsw-cashflow__label" htmlFor="cf-client">Client name</label>
+        <input
+          id="cf-client"
+          type="text"
+          name="clientName"
+          className="wsw-cashflow__input"
+          placeholder="e.g. Ramesh Sharma"
+          value={form.clientName}
+          onChange={onField}
+        />
+      </div>
+      <div className="wsw-cashflow__field">
+        <label className="wsw-cashflow__label" htmlFor="cf-employee">Employee assignee</label>
+        <select id="cf-employee" name="employeeName" className="wsw-cashflow__select" value={form.employeeName} onChange={onField}>
+          <option value="">-- Select employee --</option>
+          {employeesData?.map((emp) => (
+            <option key={emp.guidId} value={emp.guidId}>{emp.name}</option>
+          ))}
+        </select>
+      </div>
+    </div>
+
+    <div className="wsw-cashflow__field-row">
+      <div className="wsw-cashflow__field">
+        <label className="wsw-cashflow__label" htmlFor="cf-cashtype">Cash type</label>
+        <select id="cf-cashtype" name="cashType" className="wsw-cashflow__select" value={form.cashType} onChange={onField}>
+          {cashTypes?.map((t) => <option key={t} value={t}>{t}</option>)}
+        </select>
+      </div>
+      <div className="wsw-cashflow__field">
+        <label className="wsw-cashflow__label" htmlFor="cf-payment">Payment method</label>
+        <select id="cf-payment" name="paymentMethod" className="wsw-cashflow__select" value={form.paymentMethod} onChange={onField}>
+          {paymentMethods?.map((m) => <option key={m} value={m}>{m}</option>)}
+        </select>
+      </div>
+    </div>
+
+    <div className="wsw-cashflow__field-row">
+      <div className="wsw-cashflow__field">
+        <label className="wsw-cashflow__label" htmlFor="cf-cashin">Cash in (Rs)</label>
+        <input id="cf-cashin" type="number" name="cashIn" className="wsw-cashflow__input" placeholder="0" value={form.cashIn} onChange={onField} min="0" />
+      </div>
+      <div className="wsw-cashflow__field">
+        <label className="wsw-cashflow__label" htmlFor="cf-cashout">Cash out (Rs)</label>
+        <input id="cf-cashout" type="number" name="cashOut" className="wsw-cashflow__input" placeholder="0" value={form.cashOut} onChange={onField} min="0" />
+      </div>
+    </div>
+
+    <div className="wsw-cashflow__field">
+      <label className="wsw-cashflow__label" htmlFor="cf-description">Description</label>
+      <textarea
+        id="cf-description"
+        name="description"
+        className="wsw-cashflow__textarea"
+        rows="3"
+        placeholder="Short note about the transaction"
+        value={form.description}
+        onChange={onField}
+      />
+    </div>
+
+    <div className="wsw-cashflow__modal-actions">
+      <button type="button" className="wsw-cashflow__primary-btn" onClick={onSubmit} disabled={submitting}>
+        {submitting ? 'Saving…' : submitLabel}
+      </button>
+      <button type="button" className="wsw-cashflow__ghost-btn" onClick={closeAll}>
+        Cancel
+      </button>
+    </div>
+  </form>
+);
+
+const CashFlow = () => {
+  const navigate = useNavigate();
+
+  const { data: cashFlowData } = fetchHook("https://localhost:7011/api/CashFlow/get/allCashFlowData");
+  const { data: industryData } = fetchHook("https://localhost:7011/api/industry/getIndustryData");
+  const { data: employeesData } = fetchHook("https://localhost:7011/api/Employee/getEmployeesDetail");
+  const { data: cashType } = fetchHook("https://localhost:7011/api/Categories/get/Cash-Type-Values");
+  const { data: paymentMethod } = fetchHook("https://localhost:7011/api/Categories/get/Payment-Method-Values");
+
+  const [mode, setMode] = useState(null); // null | 'add' | 'edit' | 'delete'
+  const [selected, setSelected] = useState(null);
+  const [form, setForm] = useState(blankForm);
+  const [submitting, setSubmitting] = useState(false);
+
+  const onField = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+
+  const openAdd = () => {
+    setForm(blankForm);
+    setMode('add');
   };
 
-  const CashFlowForm = ({ onSubmit, submitLabel, form, onField, closeAll, jobsData, cashTypes, paymentMethods, employeesData }) => (
-    <form className="modal-form" onSubmit={(e) => e.preventDefault()}>
-      <label>Date</label>
-      <input type="date" name="createdDate" value={form.createdDate} onChange={onField} required />
-
-      <label>Job Category</label>
-      <select name="jobCategory" value={form.jobCategory} onChange={onField}>
-        <option value="">-- Select Category --</option>
-        {jobsData?.map((job) => (
-          <option key={job. jobId} value={job.jobId}>{job.jobName}</option>
-        ))}
-      </select>
-
-      <label>Client Name</label>
-      <input type="text" name="clientName" placeholder="e.g. Ramesh Sharma" value={form.clientName} onChange={onField} />
-
-      <label>Employee Assignee</label>
-      <select name="employeeName" value={form.employeeName} onChange={onField}>
-        <option value="">-- Select Employee --</option>
-        {employeesData?.map((emp, index) => (
-          <option key={emp.guidId} value={emp.guidId}>
-            {emp.name}
-          </option>
-        ))}
-      </select>
-
-      <label>Cash Type</label>
-      <select name="cashType" value={form.cashType} onChange={onField}>
-        {cashTypes?.map((t) => <option key={t} value={t}>{t}</option>)}
-      </select>
-
-      <label>Payment Method</label>
-      <select name="paymentMethod" value={form.paymentMethod} onChange={onField}>
-        {paymentMethods?.map((m) => <option key={m} value={m}>{m}</option>)}
-      </select>
-
-      <label>Cash In (Rs.)</label>
-      <input type="number" name="cashIn" placeholder="0" value={form.cashIn} onChange={onField} min="0" />
-
-      <label>Cash Out (Rs.)</label>
-      <input type="number" name="cashOut" placeholder="0" value={form.cashOut} onChange={onField} min="0" />
-
-      <label>Description</label>
-      <textarea name="description" rows="3" placeholder="Short note about the transaction" value={form.description} onChange={onField} />
-
-      <div className="modal-btns">
-        <button type="button" className="btn btn-dark" onClick={closeAll}>Cancel</button>
-        <button type="button" className="btn btn-primary" onClick={onSubmit}>{submitLabel}</button>
-      </div>
-    </form>
-  );
-
-  const CashFlow = () => {
-    const navigate = useNavigate();
-
-    const {data : cashFlowData} = fetchHook("https://localhost:7011/api/CashFlow/get/allCashFlowData");
-    const {data : jobsData} = fetchHook("https://localhost:7011/api/Jobs/getAllJobs");
-    const {data : employeesData} = fetchHook("https://localhost:7011/api/Employee/getEmployeesDetail");
-    const {data : cashType} = fetchHook("https://localhost:7011/api/Categories/get/Cash-Type-Values");
-    const {data : paymentMethod} = fetchHook("https://localhost:7011/api/Categories/get/Payment-Method-Values");
-
-
-
-    /* Modal Design Trigger States */
-    const [isAddOpen, setIsAddOpen] = useState(false);
-    const [isEditOpen, setIsEditOpen] = useState(false);
-    const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-    const [selected, setSelected] = useState(null);
-    const [form, setForm] = useState(blankForm);
-
-    const onField = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
-
-    const openAdd = () => { 
-      setForm(blankForm); 
-      setIsAddOpen(true); 
-    };
-    
   const openEdit = (entry) => {
     setSelected(entry);
     setForm({
       createdDate: entry.createdDate || '',
-      jobCategory: entry.jobId ? entry.jobId.toString() : '',
+      jobCategory: entry.industryId ? entry.industryId.toString() : '',
       clientName: entry.clientName || '',
-      employeeName: entry.employee?.guidId || '', 
+      employeeName: entry.employee?.guidId || '',
       cashType: entry.cashType || 'Income',
       paymentMethod: entry.paymentMethod || 'Cash',
       cashIn: entry.cashIn ?? '',
       cashOut: entry.cashOut ?? '',
       description: entry.description || '',
     });
-    setIsEditOpen(true);
+    setMode('edit');
   };
-    
-    const openDelete = (entry) => { 
-      setSelected(entry); 
-      setIsDeleteOpen(true); 
+
+  const openDelete = (entry) => {
+    setSelected(entry);
+    setMode('delete');
+  };
+
+  const closeAll = () => {
+    setMode(null);
+    setSelected(null);
+    setForm(blankForm);
+    setSubmitting(false);
+  };
+
+  const addFunc = async () => {
+    setSubmitting(true);
+
+    const payload = {
+      createdDate: form.createdDate,
+      industryId: parseInt(form.jobCategory),
+      clientName: form.clientName,
+      cashType: form.cashType,
+      description: form.description || "",
+      cashIn: parseFloat(form.cashIn) || 0,
+      cashOut: parseFloat(form.cashOut) || 0,
+      paymentMethod: form.paymentMethod,
+      employeeId: form.employeeName,
     };
-    
-    const closeAll = () => {
-      setIsAddOpen(false); 
-      setIsEditOpen(false); 
-      setIsDeleteOpen(false);
-      setSelected(null); 
-      setForm(blankForm);
-    };
 
-    //Functions
-    const addFunc = async () => {
+    const res = await fetchAPI("https://localhost:7011/api/CashFlow/add/CashFlowData", "POST", payload);
+    setSubmitting(false);
 
-      const payload = {
-          createdDate: form.createdDate, 
-          jobId: parseInt(form.jobCategory), 
-          clientName: form.clientName,
-          cashType: form.cashType,
-          description: form.description || "",
-          cashIn: parseFloat(form.cashIn) || 0,
-          cashOut: parseFloat(form.cashOut) || 0,
-          paymentMethod: form.paymentMethod,
-          employeeId: form.employeeName 
-      };
-
-      const res = await fetchAPI("https://localhost:7011/api/CashFlow/add/CashFlowData", "POST", payload);
-      if(res){
-        window.alert("New CashFlow Data has been added successfully.")
-        window.location.reload();
-      }
-      else 
-        window.alert("Some error occured. Please try again later.");
+    if (res) {
+      window.alert("New cash flow entry has been added successfully.");
+      window.location.reload();
+    } else {
+      window.alert("Some error occurred. Please try again later.");
     }
+  };
 
+  const deleteFunc = async () => {
+    if (!selected) return;
+    setSubmitting(true);
 
-    const deleteFunc = async () => {
+    const res = await fetchAPI(`https://localhost:7011/api/CashFlow/delete/${selected.id}`, "DELETE");
+    setSubmitting(false);
 
-      if (!selected) return;
-
-      const res = await fetchAPI(`https://localhost:7011/api/CashFlow/delete/${selected.id}`, "DELETE");
-      if(res) {
-        window.alert("Data deleted successfully.");
-        window.location.reload();
-      }
-      else window.alert("Data deleted successfully.");
+    if (res) {
+      window.alert("Entry deleted successfully.");
+      window.location.reload();
+    } else {
+      window.alert("Some error occurred. Please try again.");
     }
+  };
 
+  const editFunc = async () => {
+    if (!selected) return;
+    setSubmitting(true);
 
-    const editFunc = async () => {
+    const patchPayload = [];
 
-      if (!selected) return;
-
-      const patchPayload = [];
-      
-      const fields = [
+    const fields = [
       { key: 'createdDate', path: '/createdDate', type: 'string' },
-      { key: 'jobCategory', path: '/jobId', type: 'int' },
+      { key: 'jobCategory', path: '/industryId', type: 'int' },
       { key: 'clientName', path: '/clientName', type: 'string' },
       { key: 'cashType', path: '/cashType', type: 'string' },
       { key: 'description', path: '/description', type: 'string' },
@@ -180,14 +217,13 @@
       { key: 'employeeName', path: '/employeeId', type: 'nullableString' },
     ];
 
-    fields.forEach(({key, path, type}) => {
+    fields.forEach(({ key, path, type }) => {
       let currentValue = form[key];
       let originalValue = selected[key];
 
-      if(key === 'jobCategory'){
-        originalValue = selected.jobCategory?.jobId;
-      } 
-      else if(key === 'employeeName'){
+      if (key === 'jobCategory') {
+        originalValue = selected.industryId;
+      } else if (key === 'employeeName') {
         originalValue = selected.employee?.guidId;
       }
 
@@ -204,158 +240,187 @@
         currentValue = currentValue || '';
         originalValue = originalValue || '';
       }
+
       if (currentValue !== originalValue) {
         patchPayload.push({
           op: "replace",
-          path: path,
-          value: currentValue
+          path,
+          value: currentValue,
         });
       }
     });
 
     if (patchPayload.length === 0) {
       window.alert("No changes detected.");
+      setSubmitting(false);
       closeAll();
       return;
     }
 
-      const res = await fetchAPI(`https://localhost:7011/api/CashFlow/update/${selected.id}`,"PATCH", patchPayload);
-      if(res){
-        window.alert("Data updated successfully.");
-        window.location.reload();
-      }
-      else{
-        window.alert("Some error occured. Please try again.");
-      }
-    }
+    const res = await fetchAPI(`https://localhost:7011/api/CashFlow/update/${selected.id}`, "PATCH", patchPayload);
+    setSubmitting(false);
 
-  //table
-    return (
-      <div className="in-app-container">
-        <header className="in-app-header">
-          <div className="header-text">
-            <button
-              className="btn btn-sm btn-dark"
-              style={{ marginBottom: '14px' }}
-              onClick={() => navigate(-1)}
-            >
-              <MdArrowBack /> Back to Dashboard
+    if (res) {
+      window.alert("Entry updated successfully.");
+      window.location.reload();
+    } else {
+      window.alert("Some error occurred. Please try again.");
+    }
+  };
+
+  return (
+    <div className="wsw-cashflow">
+      <header className="wsw-cashflow__header">
+        <div className="wsw-cashflow__header-inner">
+          <div>
+            <button type="button" className="wsw-cashflow__back-btn" onClick={() => navigate(-1)}>
+              <MdArrowBack /> Back to dashboard
             </button>
-            <h1 className="text-xl accent-text-white">
-              Cash Flow <span className="accent-text-lime-dark">Ledger</span>
-            </h1>
-            <p className="text-md accent-text-white">
-              Historic balance sheets for platform workflow parameters
-            </p>
+            <span className="wsw-cashflow__eyebrow">Ledger audits</span>
+            <h1 className="wsw-cashflow__title">Cash flow</h1>
+            <p className="wsw-cashflow__sub">Historic balance sheets for platform workflow parameters.</p>
           </div>
-          <div className="table-btns-flex">
-            <button className="btn btn-primary" onClick={openAdd}>
-              <MdAdd size={18} /> Add Entry
+          <div className="wsw-cashflow__header-actions">
+            <button type="button" className="wsw-cashflow__add-btn" onClick={openAdd}>
+              <MdAdd size={18} /> Add entry
             </button>
-            <button className="btn btn-dark">
+            <button type="button" className="wsw-cashflow__icon-btn">
               <MdFileDownload size={18} /> Export
             </button>
           </div>
-        </header>
+        </div>
+      </header>
 
-        <div className="table-card bg-text-main">
-          <div className="table-responsive">
-            <table className="table-universal">
+      <div className="wsw-cashflow__body">
+        <section className="wsw-cashflow__panel" aria-label="Cash flow entries">
+          <div className="wsw-cashflow__table-wrap">
+            <table className="wsw-cashflow__table">
               <thead>
                 <tr>
                   <th>Date</th>
                   <th>Category</th>
-                  <th>Client Target</th>
-                  <th>Employee Assignee</th>
+                  <th>Client</th>
+                  <th>Employee assignee</th>
                   <th>Type</th>
                   <th>Method</th>
-                  <th>Cash In</th>
-                  <th>Cash Out</th>
+                  <th>Cash in</th>
+                  <th>Cash out</th>
                   <th>Description</th>
-                  <th className="text-center">Actions</th>
+                  <th aria-label="Actions" />
                 </tr>
               </thead>
               <tbody>
-                {cashFlowData?.map(flow => (
-                  <tr key={flow.id}>
-                    <td data-label="Date">{flow.createdDate}</td>
-                    <td data-label="Category">
-                      {jobsData?.find(job => job.jobId === flow.jobId)?.jobName}
+                {cashFlowData?.length > 0 ? cashFlowData.map((flow) => (
+                  <tr className="wsw-cashflow__row" key={flow.id}>
+                    <td>{flow.createdDate}</td>
+                    <td className="wsw-cashflow__cell-muted">
+                      {industryData?.find((job) => job.industryId === flow.industryId)?.industryName}
                     </td>
-                    <td data-label="Client">{flow.clientName}</td>
-                    <td data-label="Employee"><strong>{flow.employee?.name}</strong></td>
-                    <td data-label="Type">
-                      <span className={`status-pill ${flow.cashType?.toLowerCase() === 'income' ? 'completed' : 'cancelled'}`}>
+                    <td className="wsw-cashflow__cell-strong">{flow.clientName}</td>
+                    <td className="wsw-cashflow__cell-strong">{flow.employee?.name}</td>
+                    <td>
+                      <span
+                        className={
+                          "wsw-cashflow__status-pill " +
+                          (flow.cashType?.toLowerCase() === 'income'
+                            ? "wsw-cashflow__status-pill--income"
+                            : "wsw-cashflow__status-pill--expense")
+                        }
+                      >
                         {flow.cashType}
                       </span>
                     </td>
-                    <td data-label="Method">{flow.paymentMethod}</td>
-                    <td data-label="Cash In">
-                      {flow.cashIn > 0
-                        ? <strong className="accent-text-lime-dark">Rs. {flow.cashIn.toLocaleString()}</strong>
-                        : '-'}
+                    <td className="wsw-cashflow__cell-muted">{flow.paymentMethod}</td>
+                    <td className="wsw-cashflow__cell-amount wsw-cashflow__cell-amount--in">
+                      {flow.cashIn > 0 ? `Rs. ${flow.cashIn.toLocaleString()}` : '—'}
                     </td>
-                    <td data-label="Cash Out">
-                      {flow.cashOut > 0
-                        ? <strong style={{ color: '#ef4444' }}>Rs. {flow.cashOut.toLocaleString()}</strong>
-                        : '-'}
+                    <td className="wsw-cashflow__cell-amount wsw-cashflow__cell-amount--out">
+                      {flow.cashOut > 0 ? `Rs. ${flow.cashOut.toLocaleString()}` : '—'}
                     </td>
-                    <td data-label="Description">{flow.description}</td>
-                    <td data-label="Actions">
-                      <div className="table-btns-flex">
-                        <button className="btn btn-sm btn-primary" onClick={() => openEdit(flow)}>
+                    <td className="wsw-cashflow__cell-muted">{flow.description}</td>
+                    <td>
+                      <div className="wsw-cashflow__row-actions">
+                        <button type="button" className="wsw-cashflow__icon-action" onClick={() => openEdit(flow)}>
                           <FaEdit /> Edit
                         </button>
-                        <button className="btn btn-sm btn-danger" onClick={() => openDelete(flow)}>
+                        <button
+                          type="button"
+                          className="wsw-cashflow__icon-action wsw-cashflow__icon-action--danger"
+                          onClick={() => openDelete(flow)}
+                        >
                           <FaTrash /> Delete
                         </button>
                       </div>
                     </td>
                   </tr>
-                ))}
+                )) : (
+                  <tr>
+                    <td colSpan={10}>
+                      <div className="wsw-cashflow__empty">
+                        <p className="wsw-cashflow__empty-title">No entries yet</p>
+                        <p className="wsw-cashflow__empty-body">Add the first cash flow entry to get started.</p>
+                      </div>
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
-        </div>
-
-        {/* STATIC FORM MODALS FOR VISUAL DESIGN CHECKING */}
-        <PopupModal open={isAddOpen} onClose={closeAll} title="Add Cash Flow Entry">
-          <CashFlowForm 
-            submitLabel="Add Entry" 
-            form={form} 
-            onField={onField} 
-            closeAll={closeAll} 
-            jobsData={jobsData}
-            cashTypes={cashType}
-            paymentMethods={paymentMethod}
-            employeesData={employeesData}
-            onSubmit={addFunc}
-          />
-        </PopupModal>
-
-        <PopupModal open={isEditOpen} onClose={closeAll} title="Edit Cash Flow Entry">
-          <CashFlowForm 
-            submitLabel="Save Changes" 
-            form={form} 
-            onField={onField} 
-            closeAll={closeAll} 
-            jobsData={jobsData}
-            cashTypes={cashType}
-            paymentMethods={paymentMethod}
-            employeesData={employeesData}
-            onSubmit={editFunc}
-          />
-        </PopupModal>
-
-        <PopupModal open={isDeleteOpen} onClose={closeAll} title="Delete Entry">
-          <p>Are you sure you want to delete the entry for <b>{selected?.clientName || 'this row'}</b>?</p>
-          <div className="modal-btns">
-            <button className="btn btn-dark" onClick={closeAll}>Cancel</button>
-            <button className="btn btn-danger" onClick={deleteFunc}>Confirm Delete</button>
-          </div>
-        </PopupModal>
+        </section>
       </div>
-    );
-  };
 
-  export default CashFlow;
+      {(mode === 'add' || mode === 'edit') && (
+        <div className="wsw-cashflow__modal-backdrop" role="dialog" aria-modal="true" aria-label={mode === 'add' ? 'Add cash flow entry' : 'Edit cash flow entry'}>
+          <div className="wsw-cashflow__modal">
+            <div className="wsw-cashflow__modal-head">
+              <h2 className="wsw-cashflow__modal-title">
+                {mode === 'add' ? 'Add cash flow entry' : 'Edit cash flow entry'}
+              </h2>
+              <button type="button" className="wsw-cashflow__modal-close" onClick={closeAll} aria-label="Close">
+                <MdClose size={20} />
+              </button>
+            </div>
+            <CashFlowForm
+              submitLabel={mode === 'add' ? 'Add entry' : 'Save changes'}
+              form={form}
+              onField={onField}
+              closeAll={closeAll}
+              industryData={industryData}
+              cashTypes={cashType}
+              paymentMethods={paymentMethod}
+              employeesData={employeesData}
+              onSubmit={mode === 'add' ? addFunc : editFunc}
+              submitting={submitting}
+            />
+          </div>
+        </div>
+      )}
+
+      {mode === 'delete' && (
+        <div className="wsw-cashflow__modal-backdrop" role="dialog" aria-modal="true" aria-label="Delete entry">
+          <div className="wsw-cashflow__modal wsw-cashflow__modal--narrow">
+            <div className="wsw-cashflow__modal-head">
+              <h2 className="wsw-cashflow__modal-title">Delete entry</h2>
+              <button type="button" className="wsw-cashflow__modal-close" onClick={closeAll} aria-label="Close">
+                <MdClose size={20} />
+              </button>
+            </div>
+            <p className="wsw-cashflow__confirm-copy">
+              Are you sure you want to delete the entry for <strong>{selected?.clientName || 'this row'}</strong>? This can't be undone.
+            </p>
+            <div className="wsw-cashflow__modal-actions">
+              <button type="button" className="wsw-cashflow__danger-btn" onClick={deleteFunc} disabled={submitting}>
+                {submitting ? 'Deleting…' : 'Confirm delete'}
+              </button>
+              <button type="button" className="wsw-cashflow__ghost-btn" onClick={closeAll}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default CashFlow;

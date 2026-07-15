@@ -1,6 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@500&family=Inter:wght@400;500;600&display=swap");
 
-.wsw-holding {
+.wsw-cashflow {
   --wsw-lime: #D1FE17;
   --wsw-green: #074C3A;
   --wsw-green-dark: #053528;
@@ -220,8 +220,16 @@
   &__cell-amount {
     font-family: var(--wsw-font-mono);
     font-weight: 700;
-    color: var(--wsw-green);
+    color: var(--wsw-muted);
     white-space: nowrap;
+
+    &--in {
+      color: var(--wsw-green);
+    }
+
+    &--out {
+      color: var(--wsw-red);
+    }
   }
 
   &__tag {
@@ -246,6 +254,7 @@
     color: var(--wsw-muted);
     text-transform: capitalize;
 
+    &--income,
     &--completed,
     &--paid,
     &--cleared {
@@ -258,6 +267,7 @@
       color: #8a5a12;
     }
 
+    &--expense,
     &--cancelled,
     &--rejected {
       background: rgba(192, 57, 43, 0.1);

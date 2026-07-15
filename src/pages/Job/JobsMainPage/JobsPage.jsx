@@ -1,8 +1,8 @@
 // pages/JobsManagement/JobsPage.jsx
 import React, { useMemo, useState } from "react";
+import { fetchHook } from '../../../hooks/fetchHook';
 import "./JobsPage.css";
 
-// ---- Mock data (shaped to match the real API contract) --------------------------------------------------------------
 
 const CATEGORIES = ["Plumbing", "Electrical", "Home Appliances", "IT Devices"];
 
@@ -42,7 +42,10 @@ function emptyDraft(category) {
 // ---- Component --------------------------------------------------------------
 
 export default function JobsPage() {
-  const [jobs, setJobs] = useState(INITIAL_JOBS);
+
+  const { data: industryData } = fetchHook("https://localhost:7011/api/industry/getIndustryData");
+  const { data: dutyData } = fetchHook("https://localhost:7011/getAllDutyData")
+
   const [activeCategory, setActiveCategory] = useState("All");
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
@@ -50,6 +53,11 @@ export default function JobsPage() {
   const [draft, setDraft] = useState(emptyDraft());
   const [errors, setErrors] = useState({});
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+
+
+
+
+  
 
   const filteredJobs = useMemo(() => {
     return jobs.filter((job) => {
@@ -62,7 +70,7 @@ export default function JobsPage() {
 
   const categoryCounts = useMemo(() => {
     const counts = { All: jobs.length };
-    CATEGORIES.forEach((c) => {
+    industryData.forEach((c) => {
       counts[c] = jobs.filter((j) => j.category === c).length;
     });
     return counts;

@@ -66,7 +66,7 @@ const AdminDashboard = () => {
   const [timeFrame, setTimeFrame] = useState('monthly');
   const [activeIndex, setActiveIndex] = useState(null);
 
-  const { data: categories_data } = fetchHook("https://localhost:7011/api/AdminDashboard/donut/jobs-category");
+  const { data: categories_data } = fetchHook("https://localhost:7011/api/AdminDashboard/donut/industry-category");
 
   const monthNames = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -102,7 +102,7 @@ const AdminDashboard = () => {
   // Brand-aligned donut palette: lime, deep green, amber, muted green, ink
   const categoryColors = ['#D1FE17', '#074C3A', '#E8A33D', '#4E9C7F', '#010A08'];
   const categoryData = categories_data?.map((item, idx) => ({
-    name: item.jobName,
+    name: item.industryName,
     value: item.totalEarnings,
     color: categoryColors[idx % categoryColors.length]
   }));
