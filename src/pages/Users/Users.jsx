@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { FaUserPlus, FaEdit, FaTrash, FaSearch } from 'react-icons/fa';
-import styles from '../Staffs/Staffs.module.css'; 
+// import styles from '../Staffs/Staffs.module.css'; 
 import Loader from '../../components/Loader/Loading';
 import { fetchHook } from '../../hooks/fetchHook';
 import { PopupModal } from '../../components/Popup/PopupModal'; 

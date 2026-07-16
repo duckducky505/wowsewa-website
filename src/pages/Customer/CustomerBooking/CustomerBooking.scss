@@ -400,6 +400,20 @@
     color: #C0392B;
   }
 
+  &__loading-note {
+    font-size: 0.9rem;
+    color: var(--wsw-muted);
+    padding: 1rem 0;
+  }
+
+  &__error--form {
+    background: rgba(192, 57, 43, 0.08);
+    border: 1px solid rgba(192, 57, 43, 0.25);
+    border-radius: 10px;
+    padding: 0.65rem 0.9rem;
+    margin: -0.3rem 0 0;
+  }
+
   &__submit {
     align-self: flex-start;
     background: var(--wsw-green);
@@ -412,9 +426,14 @@
     margin-top: 0.5rem;
     transition: background 0.15s ease, transform 0.15s ease;
 
-    &:hover {
+    &:hover:not(:disabled) {
       background: var(--wsw-green-dark);
       transform: translateY(-1px);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
 
     &:focus-visible {

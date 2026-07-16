@@ -1,271 +1,495 @@
-import React, { useState } from 'react';
-import { FaUserPlus, FaEdit, FaTrash, FaSearch } from 'react-icons/fa';
-import styles from './Staffs.module.css'; 
-import { fetchHook } from '../../hooks/fetchHook'; 
-import { PopupModal } from '../../components/Popup/PopupModal'; 
-import { fetchAPI } from '../../utils/fetchAPI';
+// pages/StaffManagement/StaffPage.jsx
+import React, { useMemo, useState } from "react";
+import { MdClose, MdAdd, MdFileDownload } from "react-icons/md";
+import { fetchHook } from "../../hooks/fetchHook";
+import { fetchAPI } from "../../utils/fetchAPI";
+import "./Staffs.css";
 
-const Staffs = () => {
-    const { data: employees, loading } = fetchHook("https://localhost:7011/api/Employee/getEmployeesDetail");
-    const {data : employeeRolesFetch} = fetchHook("https://localhost:7011/api/Employee/getEmployeeRoles");;
+const STATUS_OPTIONS = ["Active", "On duty", "Off duty", "Suspended"];
 
-    // --- MODAL STATES ---
-    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    
-    // --- DATA STATE ---
-    const [selectedStaff, setSelectedStaff] = useState(null);
+// ---- Helpers --------------------------------------------------------------
 
+function initials(name) {
+  return (name || "")
+    .split(" ")
+    .filter(Boolean)
+    .map((n) => n[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+}
 
-    //add state
-    const [addName, setAddName] = useState(null);
-    const [addPhoneNumber, setAddPhoneNumber] = useState(null);
-    const [addEmployeeRole, setAddEmployeeRole] = useState(null);
+function normalizeEmployee(raw) {
+  return {
+    id: raw.guidId ?? raw.GuidId ?? raw.id ?? raw.Id,
+    name: raw.name ?? raw.Name ?? raw.fullName ?? raw.FullName ?? "",
+    phone: raw.phone ?? raw.Phone ?? raw.phoneNumber ?? raw.PhoneNumber ?? "",
+    email: raw.email ?? raw.Email ?? "",
+    industryId: raw.industryId ?? raw.IndustryId ?? raw.industry?.industryId ?? null,
+    industryName: raw.industryName ?? raw.IndustryName ?? raw.industry?.industryName ?? "Unassigned",
+    status: raw.status ?? raw.Status ?? "Active",
+    joinedDate: raw.joinedDate ?? raw.JoinedDate ?? raw.createdDate ?? raw.CreatedDate ?? "",
+  };
+}
 
+function normalizeIndustry(raw) {
+  return {
+    id: raw.industryId ?? raw.IndustryId ?? raw.id ?? raw.Id,
+    name: raw.industryName ?? raw.IndustryName ?? raw.name ?? raw.Name ?? "",
+  };
+}
 
-    //update State
-    const [updatedName, setUpdatedName] = useState(null);
-    const [updatedPhoneNumber, setUpdatedPhoneNumber] = useState(null)
-    const [updatedRole, setUpdatedRole] = useState(null);
+function emptyDraft() {
+  return { name: "", phone: "", email: "", industryId: "", status: "Active", joinedDate: "" };
+}
 
-    const employeeRoles = employeeRolesFetch || [];
+// ---- Component --------------------------------------------------------------
 
+export default function StaffPage() {
+  const { data: rawEmployeeData, loading: staffLoading } = fetchHook(
+    "https://localhost:7011/api/Employee/getEmployeesDetail"
+  );
+  const { data: rawIndustryData, loading: industriesLoading } = fetchHook(
+    "https://localhost:7011/api/industry/getIndustryData"
+  );
 
-    //Add Function
+  const [activeIndustryId, setActiveIndustryId] = useState("All");
+  const [search, setSearch] = useState("");
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [draft, setDraft] = useState(emptyDraft());
+  const [errors, setErrors] = useState({});
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
-    const addNewEmployee = async() => {
+  const industries = useMemo(
+    () => (rawIndustryData || []).map(normalizeIndustry),
+    [rawIndustryData]
+  );
 
-        const payload = {
-            name : addName,
-            phoneNumber : addPhoneNumber,
-            employeeRole : addEmployeeRole
-        }
+  const staff = useMemo(
+    () => (rawEmployeeData || []).map(normalizeEmployee),
+    [rawEmployeeData]
+  );
 
-        const sendToAPI = await fetchAPI("https://localhost:7011/api/Employee/AddEmployee","POST",payload);
-        if(sendToAPI){
-            alert("New Employee added successfully");
-            window.location.reload();
-        }
-        else{
-            alert("Something went wrong.");
-        }
+  const isLoading = staffLoading || industriesLoading;
+
+  const filteredStaff = useMemo(() => {
+    return staff.filter((s) => {
+      const matchesCategory = activeIndustryId === "All" || s.industryId === activeIndustryId;
+      const q = search.trim().toLowerCase();
+      const matchesSearch =
+        !q ||
+        s.name.toLowerCase().includes(q) ||
+        s.phone.toLowerCase().includes(q) ||
+        s.email.toLowerCase().includes(q);
+      return matchesCategory && matchesSearch;
+    });
+  }, [staff, activeIndustryId, search]);
+
+  const categoryCounts = useMemo(() => {
+    const counts = { All: staff.length };
+    industries.forEach((ind) => {
+      counts[ind.id] = staff.filter((s) => s.industryId === ind.id).length;
+    });
+    return counts;
+  }, [staff, industries]);
+
+  const stats = useMemo(() => {
+    const active = staff.filter((s) => s.status === "Active" || s.status === "On duty").length;
+    return [
+      { label: "Total staff", value: staff.length },
+      { label: "Active now", value: active },
+      { label: "Categories covered", value: new Set(staff.map((s) => s.industryId).filter(Boolean)).size },
+    ];
+  }, [staff]);
+
+  function openAddForm() {
+    setEditingId(null);
+    setDraft(emptyDraft());
+    setErrors({});
+    setShowForm(true);
+  }
+
+  function openEditForm(person) {
+    setEditingId(person.id);
+    setDraft({
+      name: person.name,
+      phone: person.phone,
+      email: person.email,
+      industryId: person.industryId ?? "",
+      status: person.status,
+      joinedDate: person.joinedDate,
+    });
+    setErrors({});
+    setShowForm(true);
+  }
+
+  function closeForm() {
+    setShowForm(false);
+    setEditingId(null);
+    setErrors({});
+  }
+
+  function updateDraft(field, value) {
+    setDraft((prev) => ({ ...prev, [field]: value }));
+    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }));
+  }
+
+  function validateDraft() {
+    const next = {};
+    if (!draft.name.trim()) next.name = "Enter the staff member's name";
+    if (!/^[0-9+\s-]{7,15}$/.test(draft.phone.trim())) next.phone = "Enter a valid phone number";
+    if (draft.email.trim() && !/^\S+@\S+\.\S+$/.test(draft.email.trim())) {
+      next.email = "Enter a valid email, or leave it blank";
     }
+    if (!draft.industryId) next.industryId = "Choose a category";
+    setErrors(next);
+    return Object.keys(next).length === 0;
+  }
 
+  async function handleSubmit(e) {
+    e.preventDefault();
+    if (!validateDraft()) return;
 
-    //Update Function 
+    setSubmitting(true);
 
-    const onSaveChanges = async(e) => {
+    const payload = {
+      name: draft.name.trim(),
+      phone: draft.phone.trim(),
+      email: draft.email.trim(),
+      industryId: draft.industryId,
+      status: draft.status,
+      joinedDate: draft.joinedDate,
+    };
 
-        e.preventDefault();
+    const editPayload = [
+      { op: "replace", path: "/name", value: payload.name },
+      { op: "replace", path: "/phone", value: payload.phone },
+      { op: "replace", path: "/email", value: payload.email },
+      { op: "replace", path: "/industryId", value: payload.industryId },
+      { op: "replace", path: "/status", value: payload.status },
+      { op: "replace", path: "/joinedDate", value: payload.joinedDate },
+    ];
 
-        const payload = {
-            name: updatedName,
-            phoneNumber : updatedPhoneNumber,
-            employeeRole : updatedRole || selectedStaff.employeeRole,
-        }
+    const res = editingId
+      ? await fetchAPI(`https://localhost:7011/api/Employee/update-employee-data/${editingId}`, "PATCH", editPayload)
+      : await fetchAPI("https://localhost:7011/api/Employee/addNewEmployee", "POST", payload);
 
-        const id = selectedStaff.guidId;
+    setSubmitting(false);
 
-        const isItGood = await fetchAPI(`https://localhost:7011/api/Employee/UpdateEmployee/${id}`,"PATCH",payload);
-
-        if(isItGood){
-            alert("Employee details updated successfully");
-            window.location.reload()
-        }
+    if (res) {
+      window.alert(editingId ? "Staff member updated successfully." : "Staff member added successfully.");
+      window.location.reload();
+    } else {
+      window.alert("Some error occurred. Please try again.");
     }
+  }
 
-    //Delete Function
+  async function handleDelete(id) {
+    setSubmitting(true);
+    const res = await fetchAPI(`https://localhost:7011/api/Employee/delete/${id}`, "DELETE");
+    setSubmitting(false);
+    setConfirmDeleteId(null);
 
-    const deleteFunction = async() => {
-        const id = selectedStaff.guidId;
-
-        const deleteEmployee = await fetchAPI(`https://localhost:7011/api/Employee/deleteEmployee/${id}`,"DELETE");
-        if(deleteEmployee){
-            alert("Employee removed.");
-            window.location.reload();
-        }
-        else{
-            alert("Something went wrong.");
-        }
+    if (res) {
+      window.location.reload();
+    } else {
+      window.alert("Couldn't remove this staff member. Please try again.");
     }
+  }
 
-
-    // --- MODAL CONTROL HANDLERS ---
-    const openAddModal = () => {
-        setIsAddModalOpen(true);
-    };
-
-    const openEditModal = (staff) => {
-        setSelectedStaff(staff);
-        setIsEditModalOpen(true);
-    };
-
-    const openDeleteModal = (staff) => {
-        setSelectedStaff(staff);
-        setIsDeleteModalOpen(true);
-    };
-
-    const closeModals = () => {
-        setIsAddModalOpen(false);
-        setIsEditModalOpen(false);
-        setIsDeleteModalOpen(false);
-        setSelectedStaff(null);
-    };
-    
-    
-
-    return ( 
-        <div className="in-app-container"> 
-            <header className={styles['staff-header']}>
-                <div className={styles['header-left']}>
-                    <h1 className="text-xl accent-text-white">
-                        Staff <span className="accent-text-primary">Management</span>
-                    </h1>
-                    <p className="text-md accent-text-white">Manage your team members and roles.</p>
-                </div>
-                <button className="btn btn-primary" onClick={openAddModal}>
-                    <FaUserPlus /> Add New Employee
-                </button>
-            </header>
-
-            <div className={styles['staff-controls']}>
-                <div className={styles['search-box']}>
-                    <FaSearch className={styles['search-icon']} />
-                    <input type="text" placeholder="Search employee by name or ID..." />
-                </div>
-                <select className={styles['filter-select']}>
-                    <option value="">All Roles</option>
-                    <option value="admin">Admin</option>
-                    <option value="staff">Staff</option>
-                </select>
-            </div>
-
-            <div className="table-card bg-text-main">
-                {loading ? (
-                    <div className="p-4">Loading staff list...</div>
-                ) : (
-                    <table className="table-universal">
-                        <thead>
-                            <tr>
-                                <th>Employee Name</th>
-                                <th>Role</th>
-                                <th>Phone Number</th>
-                                <th className="text-center">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {employees && employees.length > 0 ? (
-                                employees.map((staff) => (
-                                    <tr key={staff.guidId || staff.id}>
-                                        <td data-label="Employee">
-                                            <div className={styles['user-info']}>
-                                                <div className={styles['user-details']}>
-                                                    <span className={styles['user-name']}>{staff.name}</span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td data-label="Role">
-                                            <span className={styles['role-tag']}>{staff.employeeRole}</span>
-                                        </td>
-                                        <td data-label="PhoneNumber">
-                                            <span>{staff.phoneNumber}</span>
-                                        </td>
-                                        <td data-label="Actions">
-                                            <div className="table-btns-flex">
-                                                <button 
-                                                    className="btn btn-sm btn-primary" 
-                                                    onClick={() => openEditModal(staff)}
-                                                >
-                                                    <FaEdit /> Edit
-                                                </button>
-                                                <button 
-                                                    className="btn btn-sm btn-warn" 
-                                                    onClick={() => openDeleteModal(staff)}
-                                                >
-                                                    <FaTrash /> Delete
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan="4" className="text-center">No staff found.</td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                )}
-            </div>
-
-            {/* ADD STAFF MODAL */}
-            <PopupModal open={isAddModalOpen} onClose={closeModals} title="Add New Staff">
-                <form className="modal-form" onSubmit={(e) => e.preventDefault()}>
-                    <label>Full Name</label>
-                    <input type="text" placeholder="Enter Employee name" onChange={(e) => setAddName(e.target.value)}/>
-
-                    <label>Phone Number</label>
-                    <input type="text" placeholder="Enter Phone number" onChange={(e) => setAddPhoneNumber(e.target.value)}/>
-
-                    <label>Role</label>
-                    <select  onChange={(e) => setAddEmployeeRole(e.target.value)}>
-                        <option value="">Select a role</option>
-                        {employeeRoles.length > 0 ? (
-                                employeeRoles.map((employeeRoles,index) => (
-                                    <option key={index} value={employeeRoles.name || employeeRoles}>
-                                        {employeeRoles.name || employeeRoles}
-                                    </option>
-                                ))
-                            ) : (
-                            <option disabled>Loading the roles...</option>
-                        )}
-                    </select>
-                    <div className="modal-btns">
-                        <button type="button" className="btn btn-dark" onClick={closeModals}>Cancel</button>
-                        <button type="submit" className="btn btn-primary" onClick={() => addNewEmployee()}>Add Member</button>
-                    </div>
-                </form>
-            </PopupModal>
-
-            {/* EDIT STAFF MODAL */}
-            <PopupModal open={isEditModalOpen} onClose={closeModals} title="Edit Staff Member">
-                <form className="modal-form" onSubmit={(e) => e.preventDefault()}>
-                    <label>Full Name</label>
-                    <input type="text" defaultValue={selectedStaff?.name} onChange={(e) => setUpdatedName(e.target.value)}/>
-
-                    <label>Phone Number</label>
-                    <input type="text" defaultValue={selectedStaff?.phoneNumber} onChange={(e) => setUpdatedPhoneNumber(e.target.value)}/>
-
-                    <label>Role</label>
-                    <select defaultValue={selectedStaff?.employeeRole} onChange={(e) => setUpdatedRole(e.target.value)}>
-                        {employeeRoles.length > 0 ? (
-                                employeeRoles.map((employeeRoles,index) => (
-                                    <option key={index} value={employeeRoles.name || employeeRoles}>
-                                        {employeeRoles.name || employeeRoles}
-                                    </option>
-                                ))
-                            ) : (
-                            <option disabled>Loading the roles...</option>
-                        )}
-                    </select>
-                    <div className="modal-btns">
-                        <button type="button" className="btn btn-dark" onClick={closeModals}>Cancel</button>
-                        <button type="submit" className="btn btn-primary" onClick={(e) => onSaveChanges(e)}>Save Changes</button>
-                    </div>
-                </form>
-            </PopupModal>
-
-            {/* DELETE MODAL */}
-            <PopupModal open={isDeleteModalOpen} onClose={closeModals} title="Remove Staff">
-                <p>Are you sure you want to remove <b>{selectedStaff?.name}</b> from the team?</p>
-                <div className="modal-btns">
-                    <button className="btn btn-dark" onClick={closeModals}>Cancel</button>
-                    <button className="btn btn-warn" onClick={deleteFunction}>Confirm Delete</button>
-                </div>
-            </PopupModal>
+  return (
+    <div className="wsw-staff">
+      <header className="wsw-staff__header">
+        <div className="wsw-staff__header-inner">
+          <div>
+            <span className="wsw-staff__eyebrow">Team</span>
+            <h1 className="wsw-staff__title">Staff</h1>
+            <p className="wsw-staff__sub">Manage technicians and staff, by category.</p>
+          </div>
+          <div className="wsw-staff__header-actions">
+            <button type="button" className="wsw-staff__icon-btn">
+              <MdFileDownload size={18} /> Export
+            </button>
+            <button type="button" className="wsw-staff__add-btn" onClick={openAddForm} disabled={isLoading}>
+              <MdAdd size={18} /> Add staff
+            </button>
+          </div>
         </div>
-    );
-};
+      </header>
 
-export default Staffs;
+      <div className="wsw-staff__body">
+        <section className="wsw-staff__stats" aria-label="Staff overview">
+          {stats.map((s) => (
+            <div className="wsw-staff__stat-card" key={s.label}>
+              <span className="wsw-staff__stat-value">{s.value}</span>
+              <span className="wsw-staff__stat-label">{s.label}</span>
+            </div>
+          ))}
+        </section>
+
+        <div className="wsw-staff__toolbar">
+          <div className="wsw-staff__category-tabs" role="tablist" aria-label="Filter by category">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeIndustryId === "All"}
+              className={
+                "wsw-staff__category-tab" + (activeIndustryId === "All" ? " wsw-staff__category-tab--active" : "")
+              }
+              onClick={() => setActiveIndustryId("All")}
+            >
+              All <span className="wsw-staff__tab-count">{categoryCounts.All ?? 0}</span>
+            </button>
+            {industries.map((ind) => (
+              <button
+                type="button"
+                role="tab"
+                key={ind.id}
+                aria-selected={activeIndustryId === ind.id}
+                className={
+                  "wsw-staff__category-tab" + (activeIndustryId === ind.id ? " wsw-staff__category-tab--active" : "")
+                }
+                onClick={() => setActiveIndustryId(ind.id)}
+              >
+                {ind.name} <span className="wsw-staff__tab-count">{categoryCounts[ind.id] ?? 0}</span>
+              </button>
+            ))}
+          </div>
+
+          <input
+            type="search"
+            className="wsw-staff__search"
+            placeholder="Search name, phone or email…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            aria-label="Search staff"
+          />
+        </div>
+
+        <section className="wsw-staff__panel" aria-label="Staff list">
+          {isLoading ? (
+            <div className="wsw-staff__empty">
+              <p className="wsw-staff__empty-title">Loading staff…</p>
+              <p className="wsw-staff__empty-body">Fetching the latest team roster.</p>
+            </div>
+          ) : filteredStaff.length > 0 ? (
+            <div className="wsw-staff__table-wrap">
+              <table className="wsw-staff__table">
+                <thead>
+                  <tr>
+                    <th>Staff</th>
+                    <th>Category</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th aria-label="Actions" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredStaff.map((person) => (
+                    <tr className="wsw-staff__row" key={person.id}>
+                      <td>
+                        <div className="wsw-staff__person">
+                          <span className="wsw-staff__avatar">{initials(person.name)}</span>
+                          <div>
+                            <p className="wsw-staff__person-name">{person.name}</p>
+                            {person.joinedDate && (
+                              <p className="wsw-staff__person-meta">Joined {person.joinedDate}</p>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <span className="wsw-staff__category-tag">{person.industryName}</span>
+                      </td>
+                      <td className="wsw-staff__cell-muted">{person.phone || "—"}</td>
+                      <td className="wsw-staff__cell-muted">{person.email || "—"}</td>
+                      <td>
+                        <span
+                          className={
+                            "wsw-staff__status-pill wsw-staff__status-pill--" +
+                            person.status.toLowerCase().replace(/\s+/g, "-")
+                          }
+                        >
+                          {person.status}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="wsw-staff__row-actions">
+                          <button
+                            type="button"
+                            className="wsw-staff__icon-action"
+                            onClick={() => openEditForm(person)}
+                          >
+                            Edit
+                          </button>
+                          {confirmDeleteId === person.id ? (
+                            <span className="wsw-staff__confirm-inline">
+                              <button
+                                type="button"
+                                className="wsw-staff__icon-action wsw-staff__icon-action--danger"
+                                onClick={() => handleDelete(person.id)}
+                                disabled={submitting}
+                              >
+                                {submitting ? "…" : "Confirm"}
+                              </button>
+                              <button
+                                type="button"
+                                className="wsw-staff__icon-action"
+                                onClick={() => setConfirmDeleteId(null)}
+                              >
+                                Cancel
+                              </button>
+                            </span>
+                          ) : (
+                            <button
+                              type="button"
+                              className="wsw-staff__icon-action wsw-staff__icon-action--danger"
+                              onClick={() => setConfirmDeleteId(person.id)}
+                            >
+                              Delete
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="wsw-staff__empty">
+              <p className="wsw-staff__empty-title">No staff found</p>
+              <p className="wsw-staff__empty-body">
+                Try a different category or search term, or add a new staff member.
+              </p>
+            </div>
+          )}
+        </section>
+      </div>
+
+      {showForm && (
+        <div className="wsw-staff__modal-backdrop" role="dialog" aria-modal="true" aria-label={editingId ? "Edit staff" : "Add staff"}>
+          <div className="wsw-staff__modal">
+            <div className="wsw-staff__modal-head">
+              <h2 className="wsw-staff__modal-title">{editingId ? "Edit staff member" : "Add a new staff member"}</h2>
+              <button type="button" className="wsw-staff__modal-close" onClick={closeForm} aria-label="Close">
+                <MdClose size={20} />
+              </button>
+            </div>
+
+            <form className="wsw-staff__form" onSubmit={handleSubmit} noValidate>
+              <div className="wsw-staff__field">
+                <label className="wsw-staff__label" htmlFor="staff-name">
+                  Full name
+                </label>
+                <input
+                  id="staff-name"
+                  className={"wsw-staff__input" + (errors.name ? " wsw-staff__input--error" : "")}
+                  value={draft.name}
+                  onChange={(e) => updateDraft("name", e.target.value)}
+                  placeholder="e.g. Bikash Rai"
+                />
+                {errors.name && <span className="wsw-staff__error">{errors.name}</span>}
+              </div>
+
+              <div className="wsw-staff__field-row">
+                <div className="wsw-staff__field">
+                  <label className="wsw-staff__label" htmlFor="staff-phone">
+                    Phone number
+                  </label>
+                  <input
+                    id="staff-phone"
+                    type="tel"
+                    className={"wsw-staff__input" + (errors.phone ? " wsw-staff__input--error" : "")}
+                    value={draft.phone}
+                    onChange={(e) => updateDraft("phone", e.target.value)}
+                    placeholder="+977 98-XXXX-XXXX"
+                  />
+                  {errors.phone && <span className="wsw-staff__error">{errors.phone}</span>}
+                </div>
+                <div className="wsw-staff__field">
+                  <label className="wsw-staff__label" htmlFor="staff-email">
+                    Email <span className="wsw-staff__label-optional">(optional)</span>
+                  </label>
+                  <input
+                    id="staff-email"
+                    type="email"
+                    className={"wsw-staff__input" + (errors.email ? " wsw-staff__input--error" : "")}
+                    value={draft.email}
+                    onChange={(e) => updateDraft("email", e.target.value)}
+                    placeholder="name@example.com"
+                  />
+                  {errors.email && <span className="wsw-staff__error">{errors.email}</span>}
+                </div>
+              </div>
+
+              <div className="wsw-staff__field-row">
+                <div className="wsw-staff__field">
+                  <label className="wsw-staff__label" htmlFor="staff-category">
+                    Category
+                  </label>
+                  <select
+                    id="staff-category"
+                    className={"wsw-staff__select" + (errors.industryId ? " wsw-staff__input--error" : "")}
+                    value={draft.industryId}
+                    onChange={(e) => updateDraft("industryId", e.target.value)}
+                  >
+                    <option value="">-- Select category --</option>
+                    {industries.map((ind) => (
+                      <option key={ind.id} value={ind.id}>
+                        {ind.name}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.industryId && <span className="wsw-staff__error">{errors.industryId}</span>}
+                </div>
+                <div className="wsw-staff__field">
+                  <label className="wsw-staff__label" htmlFor="staff-status">
+                    Status
+                  </label>
+                  <select
+                    id="staff-status"
+                    className="wsw-staff__select"
+                    value={draft.status}
+                    onChange={(e) => updateDraft("status", e.target.value)}
+                  >
+                    {STATUS_OPTIONS.map((s) => (
+                      <option key={s} value={s}>
+                        {s}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="wsw-staff__field">
+                <label className="wsw-staff__label" htmlFor="staff-joined">
+                  Joined date <span className="wsw-staff__label-optional">(optional)</span>
+                </label>
+                <input
+                  id="staff-joined"
+                  type="date"
+                  className="wsw-staff__input"
+                  value={draft.joinedDate}
+                  onChange={(e) => updateDraft("joinedDate", e.target.value)}
+                />
+              </div>
+
+              <div className="wsw-staff__modal-actions">
+                <button type="submit" className="wsw-staff__primary-btn" disabled={submitting}>
+                  {submitting ? "Saving…" : editingId ? "Save changes" : "Add staff"}
+                </button>
+                <button type="button" className="wsw-staff__ghost-btn" onClick={closeForm}>
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

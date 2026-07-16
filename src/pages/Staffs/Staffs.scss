@@ -1,6 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@500&family=Inter:wght@400;500;600&display=swap");
 
-.wsw-jobs {
+.wsw-staff {
   --wsw-lime: #D1FE17;
   --wsw-green: #074C3A;
   --wsw-green-dark: #053528;
@@ -104,6 +104,9 @@
   }
 
   &__add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
     background: var(--wsw-lime);
     color: var(--wsw-ink);
     border: none;
@@ -122,6 +125,55 @@
       opacity: 0.5;
       cursor: not-allowed;
     }
+  }
+
+  &__icon-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(248, 250, 234, 0.08);
+    border: 1px solid rgba(248, 250, 234, 0.25);
+    color: var(--wsw-cream);
+    border-radius: 999px;
+    padding: 0.75rem 1.2rem;
+    font-weight: 600;
+    font-size: 0.85rem;
+
+    &:hover {
+      background: rgba(248, 250, 234, 0.16);
+    }
+  }
+
+  /* ---------- Stats ---------- */
+
+  &__stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  &__stat-card {
+    background: var(--wsw-paper);
+    border: 1px solid var(--wsw-line);
+    border-radius: 14px;
+    padding: 1.1rem 1.25rem;
+    box-shadow: 0 16px 32px -26px rgba(1, 10, 8, 0.3);
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  &__stat-value {
+    font-family: var(--wsw-font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--wsw-green);
+  }
+
+  &__stat-label {
+    font-size: 0.8rem;
+    color: var(--wsw-muted);
   }
 
   /* ---------- Body ---------- */
@@ -251,24 +303,64 @@
     white-space: nowrap;
   }
 
-  &__cell-description {
-    color: var(--wsw-muted);
-    font-size: 0.85rem;
-    max-width: 18rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  &__person {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
   }
 
-  &__cell-empty {
-    color: var(--wsw-line);
-  }
-
-  &__cell-price {
+  &__avatar {
+    display: grid;
+    place-items: center;
+    width: 2.3rem;
+    height: 2.3rem;
+    border-radius: 50%;
+    background: var(--wsw-green);
+    color: var(--wsw-lime);
     font-family: var(--wsw-font-mono);
+    font-weight: 600;
+    font-size: 0.72rem;
+    flex-shrink: 0;
+  }
+
+  &__person-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin: 0;
+  }
+
+  &__person-meta {
+    font-size: 0.74rem;
+    color: var(--wsw-muted);
+    margin: 0;
+  }
+
+  &__status-pill {
+    display: inline-flex;
+    font-size: 0.72rem;
     font-weight: 700;
-    color: var(--wsw-green);
+    padding: 0.28rem 0.7rem;
+    border-radius: 999px;
     white-space: nowrap;
+    background: var(--wsw-cream);
+    color: var(--wsw-muted);
+
+    &--active,
+    &--on-duty {
+      background: rgba(7, 76, 58, 0.1);
+      color: var(--wsw-green);
+    }
+
+    &--off-duty {
+      background: var(--wsw-cream);
+      color: var(--wsw-muted);
+      border: 1px solid var(--wsw-line);
+    }
+
+    &--suspended {
+      background: rgba(192, 57, 43, 0.1);
+      color: var(--wsw-red);
+    }
   }
 
   &__category-tag {

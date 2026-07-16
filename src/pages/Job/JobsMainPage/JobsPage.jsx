@@ -1,91 +1,114 @@
 // pages/JobsManagement/JobsPage.jsx
 import React, { useMemo, useState } from "react";
-import { fetchHook } from '../../../hooks/fetchHook';
+import { MdClose } from "react-icons/md";
+import { fetchHook } from "../../../hooks/fetchHook";
+import { fetchAPI } from "../../../utils/fetchAPI";
 import "./JobsPage.css";
-
-
-const CATEGORIES = ["Plumbing", "Electrical", "Home Appliances", "IT Devices"];
-
-const CATEGORY_CODE = {
-  Plumbing: "PLB",
-  Electrical: "ELC",
-  "Home Appliances": "APL",
-  "IT Devices": "ITD",
-};
-
-const INITIAL_JOBS = [
-  { id: "job-1", category: "Plumbing", name: "Leak repair", duration: "45–60 min", price: 800, active: true },
-  { id: "job-2", category: "Plumbing", name: "Pipe installation", duration: "1–2 hrs", price: 1200, active: true },
-  { id: "job-3", category: "Plumbing", name: "Drain cleaning", duration: "30–45 min", price: 600, active: true },
-  { id: "job-4", category: "Plumbing", name: "Bathroom fitting", duration: "2–3 hrs", price: 2500, active: true },
-  { id: "job-5", category: "Electrical", name: "Wiring repair", duration: "1 hr", price: 900, active: true },
-  { id: "job-6", category: "Electrical", name: "Switchboard installation", duration: "1–2 hrs", price: 1000, active: true },
-  { id: "job-7", category: "Electrical", name: "Fan / light installation", duration: "30–45 min", price: 500, active: true },
-  { id: "job-8", category: "Electrical", name: "Short circuit fix", duration: "45–90 min", price: 1100, active: false },
-  { id: "job-9", category: "Home Appliances", name: "AC installation", duration: "2–3 hrs", price: 2800, active: true },
-  { id: "job-10", category: "Home Appliances", name: "Washing machine repair", duration: "1 hr", price: 900, active: true },
-  { id: "job-11", category: "Home Appliances", name: "Refrigerator repair", duration: "1–1.5 hrs", price: 1000, active: true },
-  { id: "job-12", category: "IT Devices", name: "Laptop repair", duration: "1–2 hrs", price: 1000, active: true },
-  { id: "job-13", category: "IT Devices", name: "Wi-Fi / network setup", duration: "45–60 min", price: 800, active: true },
-];
 
 // ---- Helpers --------------------------------------------------------------
 
 function formatRs(value) {
-  return `Rs ${Number(value).toLocaleString()}`;
+  return `Rs ${Number(value || 0).toLocaleString()}`;
 }
 
-function emptyDraft(category) {
-  return { name: "", category: category || CATEGORIES[0], duration: "", price: "" };
+function normalizeDuty(raw) {
+  return {
+    id: raw.dutyId ?? raw.DutyId ?? raw.id ?? raw.Id,
+    name: raw.dutyName ?? raw.DutyName ?? raw.name ?? raw.Name ?? "",
+    industryId: raw.industryId ?? raw.IndustryId ?? raw.industry?.industryId ?? null,
+    industryName: raw.industryName ?? raw.IndustryName ?? raw.industry?.industryName ?? "Uncategorized",
+    duration: raw.duration ?? raw.Duration ?? raw.estimatedDuration ?? "",
+    price: raw.price ?? raw.Price ?? raw.rate ?? raw.Rate ?? 0,
+    description: raw.description ?? raw.Description ?? "",
+  };
+}
+
+function normalizeIndustry(raw) {
+  return {
+    id: raw.industryId ?? raw.IndustryId ?? raw.id ?? raw.Id,
+    name: raw.industryName ?? raw.IndustryName ?? raw.name ?? raw.Name ?? "",
+  };
+}
+
+function emptyDraft(industryId) {
+  return { name: "", industryId: industryId || "", duration: "", price: "", description: "" };
 }
 
 // ---- Component --------------------------------------------------------------
 
 export default function JobsPage() {
+  const { data: rawIndustryData, loading: industriesLoading } = fetchHook(
+    "https://localhost:7011/api/industry/getIndustryData"
+  );
+  const { data: rawDutyData, loading: dutiesLoading } = fetchHook(
+    "https://localhost:7011/getAllDutyData"
+  );
 
-  const { data: industryData } = fetchHook("https://localhost:7011/api/industry/getIndustryData");
-  const { data: dutyData } = fetchHook("https://localhost:7011/getAllDutyData")
-
-  const [activeCategory, setActiveCategory] = useState("All");
+  const [activeIndustryId, setActiveIndustryId] = useState("All");
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [draft, setDraft] = useState(emptyDraft());
   const [errors, setErrors] = useState({});
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
+  // Category creation
+  const [showCategoryForm, setShowCategoryForm] = useState(false);
+  const [categoryDraft, setCategoryDraft] = useState("");
+  const [categoryError, setCategoryError] = useState("");
+  const [categorySubmitting, setCategorySubmitting] = useState(false);
 
+  // Derived, normalized data — computed once per fetch, not re-shaped on every render pass.
+  const industries = useMemo(
+    () => (rawIndustryData || []).map(normalizeIndustry),
+    [rawIndustryData]
+  );
 
+  const jobs = useMemo(
+    () => (rawDutyData || []).map(normalizeDuty),
+    [rawDutyData]
+  );
 
-  
+  const isLoading = industriesLoading || dutiesLoading;
 
   const filteredJobs = useMemo(() => {
     return jobs.filter((job) => {
-      const matchesCategory = activeCategory === "All" || job.category === activeCategory;
+      const matchesCategory = activeIndustryId === "All" || job.industryId === activeIndustryId;
       const matchesSearch =
-        !search.trim() || job.name.toLowerCase().includes(search.trim().toLowerCase());
+        !search.trim() ||
+        job.name.toLowerCase().includes(search.trim().toLowerCase()) ||
+        job.description.toLowerCase().includes(search.trim().toLowerCase());
       return matchesCategory && matchesSearch;
     });
-  }, [jobs, activeCategory, search]);
+  }, [jobs, activeIndustryId, search]);
 
   const categoryCounts = useMemo(() => {
     const counts = { All: jobs.length };
-    industryData.forEach((c) => {
-      counts[c] = jobs.filter((j) => j.category === c).length;
+    industries.forEach((ind) => {
+      counts[ind.id] = jobs.filter((j) => j.industryId === ind.id).length;
     });
     return counts;
-  }, [jobs]);
+  }, [jobs, industries]);
+
+  // ---- Job form --------------------------------------------------------------
 
   function openAddForm() {
     setEditingId(null);
-    setDraft(emptyDraft(activeCategory !== "All" ? activeCategory : CATEGORIES[0]));
+    setDraft(emptyDraft(activeIndustryId !== "All" ? activeIndustryId : industries[0]?.id));
     setErrors({});
     setShowForm(true);
   }
 
   function openEditForm(job) {
     setEditingId(job.id);
-    setDraft({ name: job.name, category: job.category, duration: job.duration, price: String(job.price) });
+    setDraft({
+      name: job.name,
+      industryId: job.industryId,
+      duration: job.duration,
+      price: String(job.price),
+      description: job.description,
+    });
     setErrors({});
     setShowForm(true);
   }
@@ -104,6 +127,7 @@ export default function JobsPage() {
   function validateDraft() {
     const next = {};
     if (!draft.name.trim()) next.name = "Enter a job name";
+    if (!draft.industryId) next.industryId = "Choose a category";
     if (!draft.duration.trim()) next.duration = "Enter an estimated duration";
     const priceNum = Number(draft.price);
     if (!draft.price || Number.isNaN(priceNum) || priceNum <= 0) {
@@ -113,35 +137,96 @@ export default function JobsPage() {
     return Object.keys(next).length === 0;
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     if (!validateDraft()) return;
 
+    setSubmitting(true);
+
     const payload = {
-      name: draft.name.trim(),
-      category: draft.category,
+      dutyName: draft.name.trim(),
+      industryId: draft.industryId,
       duration: draft.duration.trim(),
       price: Number(draft.price),
+      description: draft.description.trim(),
     };
 
-    if (editingId) {
-      setJobs((prev) => prev.map((j) => (j.id === editingId ? { ...j, ...payload } : j)));
+    const editPayload = [
+      { op: "replace", path: "/dutyName", value: draft.name.trim() },
+      { op: "replace", path: "/industryId", value: draft.industryId },
+      { op: "replace", path: "/duration", value: draft.duration.trim() },
+      { op: "replace", path: "/price", value: Number(draft.price) },
+      { op: "replace", path: "/description", value: draft.description.trim() },
+    ];
+
+    const res = editingId
+      ? await fetchAPI(`https://localhost:7011/api/Duty/patch/update-a-duty-data/${editingId}`, "PATCH", editPayload)
+      : await fetchAPI("https://localhost:7011/api/Duty/addNewDuty", "POST", payload);
+
+    setSubmitting(false);
+
+    if (res) {
+      window.alert(editingId ? "Job updated successfully." : "Job added successfully.");
+      window.location.reload();
     } else {
-      setJobs((prev) => [
-        ...prev,
-        { id: `job-${Date.now()}`, active: true, ...payload },
-      ]);
+      window.alert("Some error occurred. Please try again.");
     }
-    closeForm();
   }
 
-  function handleToggleActive(id) {
-    setJobs((prev) => prev.map((j) => (j.id === id ? { ...j, active: !j.active } : j)));
-  }
-
-  function handleDelete(id) {
-    setJobs((prev) => prev.filter((j) => j.id !== id));
+  async function handleDelete(id) {
+    setSubmitting(true);
+    const res = await fetchAPI(`https://localhost:7011/api/Duty/delete/remove-duty-data/${id}`, "DELETE");
+    setSubmitting(false);
     setConfirmDeleteId(null);
+
+    if (res) {
+      window.location.reload();
+    } else {
+      window.alert("Couldn't delete this job. Please try again.");
+    }
+  }
+
+  // ---- Category form --------------------------------------------------------------
+
+  function openCategoryForm() {
+    setCategoryDraft("");
+    setCategoryError("");
+    setShowCategoryForm(true);
+  }
+
+  function closeCategoryForm() {
+    setShowCategoryForm(false);
+    setCategoryDraft("");
+    setCategoryError("");
+  }
+
+  async function handleAddCategory(e) {
+    e.preventDefault();
+    const name = categoryDraft.trim();
+
+    if (!name) {
+      setCategoryError("Enter a category name");
+      return;
+    }
+    if (industries.some((ind) => ind.name.toLowerCase() === name.toLowerCase())) {
+      setCategoryError("This category already exists");
+      return;
+    }
+
+    const payload = {
+      industryName: name,
+    }
+
+    setCategorySubmitting(true);
+    const res = await fetchAPI("https://localhost:7011/api/Industry/addIndustryData", "POST", payload);
+    setCategorySubmitting(false);
+
+    if (res) {
+      window.alert("New category added successfully.");
+      window.location.reload();
+    } else {
+      window.alert("Some error occurred while adding the category. Please try again.");
+    }
   }
 
   return (
@@ -153,9 +238,14 @@ export default function JobsPage() {
             <h1 className="wsw-jobs__title">Jobs & pricing</h1>
             <p className="wsw-jobs__sub">Manage the services customers can book, by category.</p>
           </div>
-          <button type="button" className="wsw-jobs__add-btn" onClick={openAddForm}>
-            + Add job
-          </button>
+          <div className="wsw-jobs__header-actions">
+            <button type="button" className="wsw-jobs__ghost-btn wsw-jobs__ghost-btn--on-dark" onClick={openCategoryForm}>
+              + Add category
+            </button>
+            <button type="button" className="wsw-jobs__add-btn" onClick={openAddForm} disabled={isLoading}>
+              + Add job
+            </button>
+          </div>
         </div>
       </header>
 
@@ -165,26 +255,26 @@ export default function JobsPage() {
             <button
               type="button"
               role="tab"
-              aria-selected={activeCategory === "All"}
+              aria-selected={activeIndustryId === "All"}
               className={
-                "wsw-jobs__category-tab" + (activeCategory === "All" ? " wsw-jobs__category-tab--active" : "")
+                "wsw-jobs__category-tab" + (activeIndustryId === "All" ? " wsw-jobs__category-tab--active" : "")
               }
-              onClick={() => setActiveCategory("All")}
+              onClick={() => setActiveIndustryId("All")}
             >
-              All <span className="wsw-jobs__tab-count">{categoryCounts.All}</span>
+              All <span className="wsw-jobs__tab-count">{categoryCounts.All ?? 0}</span>
             </button>
-            {CATEGORIES.map((c) => (
+            {industries.map((ind) => (
               <button
                 type="button"
                 role="tab"
-                key={c}
-                aria-selected={activeCategory === c}
+                key={ind.id}
+                aria-selected={activeIndustryId === ind.id}
                 className={
-                  "wsw-jobs__category-tab" + (activeCategory === c ? " wsw-jobs__category-tab--active" : "")
+                  "wsw-jobs__category-tab" + (activeIndustryId === ind.id ? " wsw-jobs__category-tab--active" : "")
                 }
-                onClick={() => setActiveCategory(c)}
+                onClick={() => setActiveIndustryId(ind.id)}
               >
-                {c} <span className="wsw-jobs__tab-count">{categoryCounts[c]}</span>
+                {ind.name} <span className="wsw-jobs__tab-count">{categoryCounts[ind.id] ?? 0}</span>
               </button>
             ))}
           </div>
@@ -200,16 +290,21 @@ export default function JobsPage() {
         </div>
 
         <section className="wsw-jobs__panel" aria-label="Job list">
-          {filteredJobs.length > 0 ? (
+          {isLoading ? (
+            <div className="wsw-jobs__empty">
+              <p className="wsw-jobs__empty-title">Loading jobs…</p>
+              <p className="wsw-jobs__empty-body">Fetching the latest catalog and pricing.</p>
+            </div>
+          ) : filteredJobs.length > 0 ? (
             <div className="wsw-jobs__table-wrap">
               <table className="wsw-jobs__table">
                 <thead>
                   <tr>
                     <th>Job</th>
                     <th>Category</th>
+                    <th>Description</th>
                     <th>Duration</th>
                     <th>Price</th>
-                    <th>Status</th>
                     <th aria-label="Actions" />
                   </tr>
                 </thead>
@@ -218,24 +313,13 @@ export default function JobsPage() {
                     <tr className="wsw-jobs__row" key={job.id}>
                       <td className="wsw-jobs__cell-name">{job.name}</td>
                       <td>
-                        <span className="wsw-jobs__category-tag">
-                          {CATEGORY_CODE[job.category]} · {job.category}
-                        </span>
+                        <span className="wsw-jobs__category-tag">{job.industryName}</span>
                       </td>
-                      <td className="wsw-jobs__cell-muted">{job.duration}</td>
+                      <td className="wsw-jobs__cell-description" title={job.description || undefined}>
+                        {job.description ? job.description : <span className="wsw-jobs__cell-empty">—</span>}
+                      </td>
+                      <td className="wsw-jobs__cell-muted">{job.duration ? `${job.duration} mins` : "—"}</td>
                       <td className="wsw-jobs__cell-price">{formatRs(job.price)}</td>
-                      <td>
-                        <button
-                          type="button"
-                          className={
-                            "wsw-jobs__status-toggle" +
-                            (job.active ? " wsw-jobs__status-toggle--active" : "")
-                          }
-                          onClick={() => handleToggleActive(job.id)}
-                        >
-                          {job.active ? "Active" : "Hidden"}
-                        </button>
-                      </td>
                       <td>
                         <div className="wsw-jobs__row-actions">
                           <button
@@ -251,8 +335,9 @@ export default function JobsPage() {
                                 type="button"
                                 className="wsw-jobs__icon-action wsw-jobs__icon-action--danger"
                                 onClick={() => handleDelete(job.id)}
+                                disabled={submitting}
                               >
-                                Confirm
+                                {submitting ? "…" : "Confirm"}
                               </button>
                               <button
                                 type="button"
@@ -295,7 +380,7 @@ export default function JobsPage() {
             <div className="wsw-jobs__modal-head">
               <h2 className="wsw-jobs__modal-title">{editingId ? "Edit job" : "Add a new job"}</h2>
               <button type="button" className="wsw-jobs__modal-close" onClick={closeForm} aria-label="Close">
-                ×
+                <MdClose size={20} />
               </button>
             </div>
 
@@ -306,16 +391,21 @@ export default function JobsPage() {
                 </label>
                 <select
                   id="job-category"
-                  className="wsw-jobs__select"
-                  value={draft.category}
-                  onChange={(e) => updateDraft("category", e.target.value)}
+                  className={"wsw-jobs__select" + (errors.industryId ? " wsw-jobs__input--error" : "")}
+                  value={draft.industryId}
+                  onChange={(e) => updateDraft("industryId", e.target.value)}
                 >
-                  {CATEGORIES.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
+                  <option value="">-- Select category --</option>
+                  {industries.map((ind) => (
+                    <option key={ind.id} value={ind.id}>
+                      {ind.name}
                     </option>
                   ))}
                 </select>
+                {errors.industryId && <span className="wsw-jobs__error">{errors.industryId}</span>}
+                <button type="button" className="wsw-jobs__inline-link" onClick={openCategoryForm}>
+                  + Add a new category
+                </button>
               </div>
 
               <div className="wsw-jobs__field">
@@ -332,17 +422,31 @@ export default function JobsPage() {
                 {errors.name && <span className="wsw-jobs__error">{errors.name}</span>}
               </div>
 
+              <div className="wsw-jobs__field">
+                <label className="wsw-jobs__label" htmlFor="job-description">
+                  Description <span className="wsw-jobs__label-optional">(optional)</span>
+                </label>
+                <textarea
+                  id="job-description"
+                  className="wsw-jobs__textarea"
+                  rows="3"
+                  value={draft.description}
+                  onChange={(e) => updateDraft("description", e.target.value)}
+                  placeholder="What's included in this job, any prerequisites, etc."
+                />
+              </div>
+
               <div className="wsw-jobs__field-row">
                 <div className="wsw-jobs__field">
                   <label className="wsw-jobs__label" htmlFor="job-duration">
-                    Estimated duration
+                    Estimated duration (mins)
                   </label>
                   <input
                     id="job-duration"
                     className={"wsw-jobs__input" + (errors.duration ? " wsw-jobs__input--error" : "")}
                     value={draft.duration}
                     onChange={(e) => updateDraft("duration", e.target.value)}
-                    placeholder="e.g. 45–60 min"
+                    placeholder="e.g. 60"
                   />
                   {errors.duration && <span className="wsw-jobs__error">{errors.duration}</span>}
                 </div>
@@ -366,10 +470,52 @@ export default function JobsPage() {
               </div>
 
               <div className="wsw-jobs__modal-actions">
-                <button type="submit" className="wsw-jobs__primary-btn">
-                  {editingId ? "Save changes" : "Add job"}
+                <button type="submit" className="wsw-jobs__primary-btn" disabled={submitting}>
+                  {submitting ? "Saving…" : editingId ? "Save changes" : "Add job"}
                 </button>
                 <button type="button" className="wsw-jobs__ghost-btn" onClick={closeForm}>
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {showCategoryForm && (
+        <div className="wsw-jobs__modal-backdrop" role="dialog" aria-modal="true" aria-label="Add category">
+          <div className="wsw-jobs__modal wsw-jobs__modal--narrow">
+            <div className="wsw-jobs__modal-head">
+              <h2 className="wsw-jobs__modal-title">Add a new category</h2>
+              <button type="button" className="wsw-jobs__modal-close" onClick={closeCategoryForm} aria-label="Close">
+                <MdClose size={20} />
+              </button>
+            </div>
+
+            <form className="wsw-jobs__form" onSubmit={handleAddCategory} noValidate>
+              <div className="wsw-jobs__field">
+                <label className="wsw-jobs__label" htmlFor="category-name">
+                  Category name
+                </label>
+                <input
+                  id="category-name"
+                  className={"wsw-jobs__input" + (categoryError ? " wsw-jobs__input--error" : "")}
+                  value={categoryDraft}
+                  onChange={(e) => {
+                    setCategoryDraft(e.target.value);
+                    if (categoryError) setCategoryError("");
+                  }}
+                  placeholder="e.g. Landscaping"
+                  autoFocus
+                />
+                {categoryError && <span className="wsw-jobs__error">{categoryError}</span>}
+              </div>
+
+              <div className="wsw-jobs__modal-actions">
+                <button type="submit" className="wsw-jobs__primary-btn" disabled={categorySubmitting}>
+                  {categorySubmitting ? "Adding…" : "Add category"}
+                </button>
+                <button type="button" className="wsw-jobs__ghost-btn" onClick={closeCategoryForm}>
                   Cancel
                 </button>
               </div>

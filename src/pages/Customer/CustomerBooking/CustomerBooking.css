@@ -349,6 +349,18 @@
   font-size: 0.78rem;
   color: #C0392B;
 }
+.wsw-booking-page__loading-note {
+  font-size: 0.9rem;
+  color: var(--wsw-muted);
+  padding: 1rem 0;
+}
+.wsw-booking-page__error--form {
+  background: rgba(192, 57, 43, 0.08);
+  border: 1px solid rgba(192, 57, 43, 0.25);
+  border-radius: 10px;
+  padding: 0.65rem 0.9rem;
+  margin: -0.3rem 0 0;
+}
 .wsw-booking-page__submit {
   align-self: flex-start;
   background: var(--wsw-green);
@@ -361,9 +373,13 @@
   margin-top: 0.5rem;
   transition: background 0.15s ease, transform 0.15s ease;
 }
-.wsw-booking-page__submit:hover {
+.wsw-booking-page__submit:hover:not(:disabled) {
   background: var(--wsw-green-dark);
   transform: translateY(-1px);
+}
+.wsw-booking-page__submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 .wsw-booking-page__submit:focus-visible {
   outline: 2px solid var(--wsw-ink);
