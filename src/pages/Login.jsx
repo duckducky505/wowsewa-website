@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaArrowLeft } from 'react-icons/fa';
 import './AuthStyles.css';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
     const [username, setUsername] = useState("");
@@ -27,9 +27,6 @@ const Login = () => {
             });
 
             if (!response.ok) {
-                // Was: console.log(Error) — logged the Error constructor,
-                // not the actual failure, and never stopped execution, so
-                // a 401 would still fall through to response.json() below.
                 setSubmitting(false);
                 if (response.status === 401) {
                     setError("Incorrect username or password.");
@@ -40,7 +37,6 @@ const Login = () => {
             }
 
             const data = await response.json();
-            localStorage.setItem("Token", data.token);
 
             const decodedToken = JSON.parse(atob(data.token.split(".")[1]));
             const name =
@@ -52,18 +48,15 @@ const Login = () => {
             const guidId =
                 decodedToken.guidId ||
                 decodedToken["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
-
-            // Normalize once, here, at the boundary where the token is
-            // first decoded — everything downstream (ProtectedRoute,
-            // Sidebar's navConfig, AfterLoginLayout) can then assume
-            // lowercase role strings without each one re-normalizing.
             const role = (rawRole || "").toLowerCase();
+            
+            const  user = {
+                guidId: guidId,
+                name : name,
+                role: role,
+            }
 
-            login({
-                id: guidId,
-                name,
-                role,
-            });
+            login(user, data.token);
 
             navigate(`/${role}/dashboard`, { replace: true });
         } catch (err) {

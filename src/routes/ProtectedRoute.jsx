@@ -1,33 +1,30 @@
 import React from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth'; // or wherever your context hook lives
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const ProtectedRoute = ({ allowedRoles }) => {
-    const { user } = useAuth();
+    const { user, isAuthenticated, isLoading } = useAuth();
+    const location = useLocation();
 
-    // 1. If the user object itself hasn't loaded yet or is null
-    if (!user) {
-        return <Navigate to="/login" replace />;
+    if (isLoading) {
+        return <div className="loading-spinner">Loading authentication...</div>;
     }
 
-    // 2. Safely extract and check the role.
-    // Handles cases where it might be user.role (string) or user.roles (array)
-    const userRoles = Array.isArray(user.roles) 
-        ? user.roles 
-        : user.role 
-            ? [user.role] 
-            : [];
+    if (!isAuthenticated) {
+        return <Navigate to="/login" state={{ from: location }} replace />;
+    }
 
-    // 3. If specific roles are required, check if user matches at least one
     if (allowedRoles && allowedRoles.length > 0) {
-        const hasAccess = allowedRoles.some(role => userRoles.includes(role));
-        
-        if (!hasAccess) {
+        const userRole = user?.role?.toLowerCase();
+        const hasRequiredRole = allowedRoles.some(
+            (role) => role.toLowerCase() === userRole
+        );
+
+        if (!hasRequiredRole) {
             return <Navigate to="/unauthorized" replace />;
         }
     }
 
-    // 4. Everything is fine, render the protected component
     return <Outlet />;
 };
 

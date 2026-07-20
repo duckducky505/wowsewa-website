@@ -25,15 +25,12 @@ import ReceptionDashboard from './pages/Reception/Dashboard/ReceptionDashboard';
 import JobsPage from './pages/Job/JobsMainPage/JobsPage';
 import JobsCategory from './pages/Job/JobsCategory/JobsCategory';
 import AdminDashboard from './pages/AdminDashboard/Dashboard/AdminDashboard';
-import { AuthContext } from './context/AuthContext';
-import { useAuth } from "./hooks/useAuth"
+import { AuthProvider } from './context/AuthContext';
 
 const App = () => {
 
-  const {user, login, logout, setUser} = useAuth();
-
   return (
-  <AuthContext.Provider value = {{user, setUser}}>
+  <AuthProvider>
     <BrowserRouter>
       <ScrollToTop />
       <WhatsAppFloat />
@@ -76,7 +73,7 @@ const App = () => {
             </Route>
         </Routes>
     </BrowserRouter>
-    </AuthContext.Provider>
+    </AuthProvider>
   );
 };
 

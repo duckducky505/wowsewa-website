@@ -3,13 +3,11 @@ import React, { useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar/Sidebar";
 import Header from "../components/Header/Header";
-import { useAuth } from "../hooks/useAuth";
 import "./AfterLoginLayout.css";
+import { useAuth } from "../context/AuthContext";
 
 export default function AfterLoginLayout() {
-  // Was only destructuring `logout` — `user` and `role` were referenced
-  // below without ever being declared, which throws at render time.
-  const { user, role, logout } = useAuth();
+  const {user, logout } = useAuth();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -18,10 +16,12 @@ export default function AfterLoginLayout() {
     navigate("/login", { replace: true });
   }
 
+  const userRole = user?.role;
+
   return (
     <div className="wsw-app-layout">
       <Sidebar
-        role={role}
+        role={userRole}
         user={user}
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
@@ -31,7 +31,7 @@ export default function AfterLoginLayout() {
       <div className="wsw-app-layout__main">
         <Header
           user={user}
-          role={role}
+          role={userRole}
           onMenuClick={() => setSidebarOpen(true)}
           onLogout={handleLogout}
         />
