@@ -45,7 +45,7 @@ function emptyDraft() {
 
 // ---- Component --------------------------------------------------------------
 
-export default function StaffPage() {
+export default function Staffs() {
   const { data: rawEmployeeData, loading: staffLoading } = fetchHook(
     "https://localhost:7011/api/Employee/getEmployeesDetail"
   );

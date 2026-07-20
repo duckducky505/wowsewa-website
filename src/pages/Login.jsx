@@ -1,44 +1,78 @@
 import React, { useState } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaArrowLeft } from 'react-icons/fa';
 import './AuthStyles.css';
+import { useAuth } from '../hooks/useAuth';
 
 const Login = () => {
-    
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+    const [submitting, setSubmitting] = useState(false);
     const navigate = useNavigate();
+    const { login } = useAuth();
 
+    const LoginAPI = async (e) => {
+        e.preventDefault();
+        setError("");
+        setSubmitting(true);
 
-    const LoginAPI = async(e) => {
-            e.preventDefault();
-
-        try{
-            const response= await fetch("https://localhost:7011/api/Login",{
-                method:"POST",
-                headers:{
-                    "Content-Type":"application/json",
+        try {
+            const response = await fetch("https://localhost:7011/api/Login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
                 },
-                body:JSON.stringify({username,password}),      //{username,pass} written like this because json.stringify expects one object not multiple variables, it will stringify only the first one.
+                body: JSON.stringify({ username, password }),
             });
 
-            if(!response.ok){console.log(Error)}
+            if (!response.ok) {
+                // Was: console.log(Error) — logged the Error constructor,
+                // not the actual failure, and never stopped execution, so
+                // a 401 would still fall through to response.json() below.
+                setSubmitting(false);
+                if (response.status === 401) {
+                    setError("Incorrect username or password.");
+                } else {
+                    setError("Something went wrong. Please try again.");
+                }
+                return;
+            }
+
             const data = await response.json();
-            localStorage.setItem("Token",data.token);
+            localStorage.setItem("Token", data.token);
 
-            const token  = localStorage.getItem("Token");
+            const decodedToken = JSON.parse(atob(data.token.split(".")[1]));
+            const name =
+                decodedToken.name ||
+                decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/name"];
+            const rawRole =
+                decodedToken.role ||
+                decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+            const guidId =
+                decodedToken.guidId ||
+                decodedToken["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
 
-            const decodedToken = JSON.parse(atob(token.split(".")[1]));
-            const role = decodedToken.role || decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+            // Normalize once, here, at the boundary where the token is
+            // first decoded — everything downstream (ProtectedRoute,
+            // Sidebar's navConfig, AfterLoginLayout) can then assume
+            // lowercase role strings without each one re-normalizing.
+            const role = (rawRole || "").toLowerCase();
 
-            if(role === "Admin") {navigate("/admin/dashboard");}
-            
-            else {navigate("/customer/dashboard");}
+            login({
+                id: guidId,
+                name,
+                role,
+            });
 
-
+            navigate(`/${role}/dashboard`, { replace: true });
+        } catch (err) {
+            setError("Couldn't reach the server. Please try again.");
+            console.error(err);
+        } finally {
+            setSubmitting(false);
         }
-        catch(error){console.log(error.message)};
-    }
+    };
 
     return (
         <div className="auth-page-wrapper">
@@ -54,17 +88,35 @@ const Login = () => {
                         <p>Manage your home and office services effortlessly.</p>
                     </div>
 
-                    <form className="auth-form">
+                    <form className="auth-form" onSubmit={LoginAPI}>
                         <div className="form-group">
                             <label>Username</label>
-                            <input type="text" placeholder="Enter your username" required onChange={(e) => setUsername(e.target.value)}/>
+                            <input
+                                type="text"
+                                placeholder="Enter your username"
+                                required
+                                value={username}
+                                autoComplete='current-username'
+                                onChange={(e) => setUsername(e.target.value)}
+                            />
                         </div>
                         <div className="form-group">
                             <label>Password</label>
-                            <input type="password" placeholder="••••••••" required onChange={(e) => setPassword(e.target.value)}/>
+                            <input 
+                                type="password"
+                                placeholder="••••••••" 
+                                required 
+                                // Capital 'C' fixes the React warning
+                                autoComplete="current-password" 
+                                value={password} 
+                                onChange={(e) => setPassword(e.target.value)} 
+                                />
                         </div>
-                        <button type="submit" className="btn btn-primary btn-block btn-large" onClick={LoginAPI}>
-                            Login Now
+
+                        {error && <p className="auth-error">{error}</p>}
+
+                        <button type="submit" className="btn btn-primary btn-block btn-large" disabled={submitting}>
+                            {submitting ? "Logging in…" : "Login Now"}
                         </button>
                     </form>
 

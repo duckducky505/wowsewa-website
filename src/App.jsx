@@ -18,7 +18,6 @@ import HoldingSheet from './pages/HoldingSheet/HoldingSheet';
 import CashFlowPage from './pages/CashFlow/Cashflow';
 import ScrollToTop from './components/ScrollToTop/ScrollToTop';
 import WhatsAppFloat from './components/Whattsapp/Whattsapp';
-import CashFlow from './pages/CashFlow/Cashflow';
 import CustomerDashboard from './pages/Customer/CustomerDashboard/CustomerDashboard';
 import CustomerBooking from './pages/Customer/CustomerBooking/CustomerBooking';
 import CustomerSettings from './pages/Customer/Settings/CustomerSettings';
@@ -26,53 +25,58 @@ import ReceptionDashboard from './pages/Reception/Dashboard/ReceptionDashboard';
 import JobsPage from './pages/Job/JobsMainPage/JobsPage';
 import JobsCategory from './pages/Job/JobsCategory/JobsCategory';
 import AdminDashboard from './pages/AdminDashboard/Dashboard/AdminDashboard';
+import { AuthContext } from './context/AuthContext';
+import { useAuth } from "./hooks/useAuth"
 
 const App = () => {
+
+  const {user, login, logout, setUser} = useAuth();
+
   return (
+  <AuthContext.Provider value = {{user, setUser}}>
     <BrowserRouter>
-    <ScrollToTop />
-    <WhatsAppFloat />
-      <Routes>
-        {/* Public routes */}
-        <Route path="/login"  element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+      <ScrollToTop />
+      <WhatsAppFloat />
+        <Routes>
+          {/* Public routes */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
 
-
-        {/* Admin protected routes */}
-        <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
-          <Route element={<AfterLoginLayout />}>
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            <Route path="/admin/booking"   element={<Bookings />} />
-            <Route path="/admin/CashFlow"   element={<CashFlow />} />
-            <Route path="/admin/HoldingSheet"   element={<HoldingSheet />} />
-            <Route path="/admin/jobs"   element={<JobsPage />} />
-            <Route path="/admin/staffs"    element={<Staffs />} />
-            <Route path="/admin/users"     element={<Users />} />
-            <Route path="/admin/settings"  element={<div>Settings</div>} />
+          {/* Marketing/General layouts */}
+          <Route element={<MainLayout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/home" element={<Home />} />
+            <Route path="/amc" element={<AMC />} />
+            <Route path="/services" element={<Services />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/wow-privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
           </Route>
-        </Route>
 
-        {/* Customer protected routes */} 
-        <Route element={<ProtectedRoute allowedRoles={["customer"]} />}>
-          <Route element={<AfterLoginLayout />}>
-            <Route path="/customer/dashboard"   element={<CustomerDashboard />} />
-            <Route path="/customer/my-bookings" element={<CustomerBooking />} />
-            <Route path="/customer/reception" element={<ReceptionDashboard />} />
-            <Route path="/customer/settings"    element={<CustomerSettings/>} />
-          </Route>
-        </Route>
-        
-        <Route element={<MainLayout />}>
-          <Route path="/"                    element={<Home />} />
-          <Route path="/home"                element={<Home />} />
-          <Route path="/amc"                 element={<AMC />} />
-          <Route path="/services"            element={<Services />} />
-          <Route path="/about"               element={<About />} />
-          <Route path="/wow-privacy"         element={<PrivacyPolicy />} />
-          <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
-        </Route>
-      </Routes>
+            {/* Core Protected Routes Wrapper */}
+            <Route element={<ProtectedRoute />}>
+              <Route element={<AfterLoginLayout />}>
+
+                {/* Admin-only pages */}
+                <Route element={<ProtectedRoute allow={["admin"]} />}>
+                  <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                  <Route path="/admin/jobs" element={<JobsPage />} />
+                  <Route path="/admin/staff" element={<Staffs />} />
+                  <Route path="/admin/cashflow" element={<CashFlowPage />} />
+                  <Route path="/admin/holding-sheet" element={<HoldingSheet />} />
+                </Route>
+
+                {/* Customer protected routes */} 
+                <Route element={<ProtectedRoute allow={["customer"]} />}>
+                  <Route path="/book" element={<CustomerBooking />} />
+                  <Route path="/customer/dashboard" element={<CustomerDashboard />} />
+                  <Route path="/settings" element={<CustomerSettings />} />
+                </Route>
+              </Route>
+            </Route>
+        </Routes>
     </BrowserRouter>
+    </AuthContext.Provider>
   );
 };
 

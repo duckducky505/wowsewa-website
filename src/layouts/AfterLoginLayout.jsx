@@ -1,36 +1,45 @@
 // layouts/AfterLoginLayout.jsx
-import { Outlet } from "react-router-dom";
+import React, { useState } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar/Sidebar";
-import './AfterLoginLayout.css';
-import { MdMenu } from 'react-icons/md';
-import { useState } from "react";
+import Header from "../components/Header/Header";
+import { useAuth } from "../hooks/useAuth";
+import "./AfterLoginLayout.css";
 
-const AfterLoginLayout = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+export default function AfterLoginLayout() {
+  // Was only destructuring `logout` — `user` and `role` were referenced
+  // below without ever being declared, which throws at render time.
+  const { user, role, logout } = useAuth();
+  const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const toggleSidebar = () => setIsSidebarOpen(prev => !prev);
-  const closeSidebar  = () => setIsSidebarOpen(false);
+  function handleLogout() {
+    logout();
+    navigate("/login", { replace: true });
+  }
 
   return (
-    <div className="all-app-container">
-      <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+    <div className="wsw-app-layout">
+      <Sidebar
+        role={role}
+        user={user}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        onLogout={handleLogout}
+      />
 
-      <div
-        className={`all-main-content ${isSidebarOpen ? 'all-overlay-active' : ''}`}
-        onClick={isSidebarOpen ? closeSidebar : undefined}
-      >
-        <button
-          className="all-hamburger-btn"
-          onClick={e => { e.stopPropagation(); toggleSidebar(); }}
-          aria-label="Toggle navigation"
-        >
-          <MdMenu size={26} />
-        </button>
+      <div className="wsw-app-layout__main">
+        <Header
+          user={user}
+          role={role}
+          onMenuClick={() => setSidebarOpen(true)}
+          onLogout={handleLogout}
+        />
 
-        <Outlet />
+        <main className="wsw-app-layout__content">
+          <Outlet />
+        </main>
       </div>
     </div>
   );
-};
-
-export default AfterLoginLayout;
+}

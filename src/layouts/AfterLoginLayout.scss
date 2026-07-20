@@ -1,80 +1,17 @@
-/* AfterLoginLayout — light admin shell (Sass source of truth) */
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap');
-
-.all-app-container {
+.wsw-app-layout {
   display: flex;
-  width: 100%;
   min-height: 100vh;
-  background: #eef1f5;
-  font-family: 'Sora', sans-serif;
-}
+  background: #F8FAEA;
 
-.all-main-content {
-  flex-grow: 1;
-  min-height: 100vh;
-  background: #f4f6f8;
-  position: relative;
-  transition: margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-  padding: 28px 36px;
-}
-
-@media (min-width: 769px) {
-  .all-main-content {
-    margin-left: 270px;
-    padding: 36px 44px;
-  }
-}
-
-@media (max-width: 768px) {
-  .all-main-content {
-    padding: 76px 18px 28px;
-    margin-left: 0;
-  }
-}
-
-.all-main-content.all-overlay-active::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background: rgba(22, 32, 43, 0.45);
-  backdrop-filter: blur(3px);
-  z-index: 1500;
-  animation: all-fade-overlay 0.25s ease forwards;
-}
-
-@keyframes all-fade-overlay {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.all-hamburger-btn {
-  display: none;
-}
-
-@media (max-width: 768px) {
-  .all-hamburger-btn {
+  &__main {
+    flex: 1;
+    min-width: 0;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    position: fixed;
-    top: 14px;
-    right: 16px;
-    z-index: 2500;
-    width: 46px;
-    height: 46px;
-    border-radius: 12px;
-    border: 1px solid #e2e6ec;
-    background: #ffffff;
-    color: #16202b;
-    cursor: pointer;
-    transition: background 0.2s ease, transform 0.15s ease;
-    box-shadow: 0 6px 18px rgba(22, 32, 43, 0.12);
+    flex-direction: column;
   }
-  .all-hamburger-btn:hover {
-    background: var(--primary-color, #d1fe17);
-    transform: scale(1.06);
-  }
-  .all-hamburger-btn:active {
-    transform: scale(0.96);
+
+  &__content {
+    flex: 1;
+    min-width: 0;
   }
 }
