@@ -26,6 +26,8 @@ import JobsPage from './pages/Job/JobsMainPage/JobsPage';
 import JobsCategory from './pages/Job/JobsCategory/JobsCategory';
 import AdminDashboard from './pages/AdminDashboard/Dashboard/AdminDashboard';
 import { AuthProvider } from './context/AuthContext';
+import ReceptionBookings from './pages/Reception/Bookings/ReceptionBooking';
+import CustomerHistory from './pages/Customer/CustomerHistory/CustomerHistory';
 
 const App = () => {
 
@@ -65,9 +67,13 @@ const App = () => {
 
                 {/* Customer protected routes */} 
                 <Route element={<ProtectedRoute allow={["customer"]} />}>
-                  <Route path="/book" element={<CustomerBooking />} />
                   <Route path="/customer/dashboard" element={<CustomerDashboard />} />
+                  <Route path="customer/booking" element={<CustomerBooking />} />
+                  <Route path="/customer/history" element={<CustomerHistory />} />
                   <Route path="/settings" element={<CustomerSettings />} />
+                  <Route path="/reception/dashboard" element={<ReceptionDashboard/>} />
+                  <Route path="/reception/bookings" element={<ReceptionBookings/>} />
+
                 </Route>
               </Route>
             </Route>

@@ -1,74 +1,67 @@
 import React, { useMemo, useState } from "react";
 import "./ReceptionDashboard.css";
+import { fetchHook } from "../../../hooks/fetchHook";
+import { fetchAPI } from "../../../utils/fetchAPI";
 
-// ---- Mock data --------------------------------------------------------------
+// ---- Helpers --------------------------------------------------------------
 
-const CATEGORIES = ["Plumbing", "Electrical", "Home Appliances", "IT Devices"];
+function initials(name) {
+  return (name || "")
+    .split(" ")
+    .filter(Boolean)
+    .map((n) => n[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+}
 
-const TECHNICIANS = [
-  { id: "tech-1", name: "Bikash Rai", skill: "Electrical", status: "on-job", jobCode: "WS-ELC-7734" },
-  { id: "tech-2", name: "Anita Gurung", skill: "Plumbing", status: "available", jobCode: null },
-  { id: "tech-3", name: "Suman Shrestha", skill: "IT Devices", status: "available", jobCode: null },
-  { id: "tech-4", name: "Rita Karki", skill: "Home Appliances", status: "on-job", jobCode: "WS-APL-2210" },
-  { id: "tech-5", name: "Deepak Thapa", skill: "Plumbing", status: "off-duty", jobCode: null },
-  { id: "tech-6", name: "Prakash Lama", skill: "Electrical", status: "available", jobCode: null },
-];
+function isToday(dateStr) {
+  if (!dateStr) return false;
+  const d = new Date(dateStr);
+  const now = new Date();
+  return (
+    d.getFullYear() === now.getFullYear() &&
+    d.getMonth() === now.getMonth() &&
+    d.getDate() === now.getDate()
+  );
+}
 
-const INITIAL_QUEUE = [
-  {
-    id: "q-1",
-    code: "WS-PLB-4821",
-    customer: "Nirmala Adhikari",
-    phone: "+977 98-2233-1100",
-    category: "Plumbing",
-    service: "Leak repair",
-    address: "Sundhara, Kathmandu",
-    slot: "Today · 4:00 PM – 6:00 PM",
-    source: "App",
-    assignedTo: null,
-    priority: "normal",
-  },
-  {
-    id: "q-2",
-    code: "WS-ITD-6602",
-    customer: "Rajan Basnet",
-    phone: "+977 98-4411-7788",
-    category: "IT Devices",
-    service: "Wi-Fi / network setup",
-    address: "Chabahil, Kathmandu",
-    slot: "Tomorrow · 10:00 AM – 12:00 PM",
-    source: "Phone",
-    assignedTo: null,
-    priority: "normal",
-  },
-  {
-    id: "q-3",
-    code: "WS-ELC-9310",
-    customer: "Sabina Maharjan",
-    phone: "+977 98-1122-3344",
-    category: "Electrical",
-    service: "Short circuit fix",
-    address: "Patan, Lalitpur",
-    slot: "Today · 6:00 PM – 8:00 PM",
-    source: "Phone",
-    assignedTo: null,
-    priority: "urgent",
-  },
-];
+function normalizeIndustry(raw) {
+  return {
+    id: raw.industryId ?? raw.IndustryId ?? raw.id ?? raw.Id,
+    name: raw.industryName ?? raw.IndustryName ?? raw.name ?? raw.Name ?? "",
+  };
+}
 
-const SCHEDULE_TODAY = [
-  { time: "9:00 AM", technician: "Anita Gurung", customer: "Kiran Joshi", service: "Bathroom fitting", status: "Completed" },
-  { time: "11:00 AM", technician: "Rita Karki", customer: "Manisha Rai", service: "Refrigerator repair", status: "Completed" },
-  { time: "2:00 PM", technician: "Bikash Rai", customer: "Sagar Thapa", service: "Switchboard installation", status: "In progress" },
-  { time: "4:00 PM", technician: "Rita Karki", customer: "Sagar Thapa", service: "AC installation", status: "Confirmed" },
-  { time: "4:00 PM", technician: "Unassigned", customer: "Nirmala Adhikari", service: "Leak repair", status: "Needs assignment" },
-];
+function normalizeEmployee(raw) {
+  return {
+    id: raw.guidId ?? raw.GuidId ?? raw.id ?? raw.Id,
+    name: raw.name ?? raw.Name ?? raw.fullName ?? raw.FullName ?? "",
+    industryId: raw.industryId ?? raw.IndustryId ?? raw.industry?.industryId ?? null,
+    industryName: raw.industryName ?? raw.IndustryName ?? raw.industry?.industryName ?? "Unassigned",
+    rawStatus: raw.status ?? raw.Status ?? "Active",
+  };
+}
 
-const CALL_LOG = [
-  { id: "c-1", customer: "Sabina Maharjan", time: "10 min ago", note: "Reported sparking sound near switchboard", tag: "New booking" },
-  { id: "c-2", customer: "Kiran Joshi", time: "42 min ago", note: "Confirmed technician arrival window", tag: "Follow-up" },
-  { id: "c-3", customer: "Unknown caller", time: "1 hr ago", note: "Asked about IT device repair pricing", tag: "Inquiry" },
-];
+function normalizeBooking(raw) {
+  return {
+    id: raw.bookingId,
+    code: raw.bookingCode,
+    customer: raw.customerName,
+    phone: raw.phoneNumber,
+    category: raw.industry.industryName,  
+    industryId: raw.industryId,
+    service: raw.duty.dutyName,
+    address: raw.address,
+    date: raw.preferredDate,
+    slot: raw.preferredTime,
+    source: raw.source ?? raw.Source ?? "App",
+    status: raw.status ?? raw.Status ?? "Pending",
+    priority: raw.priority ?? raw.Priority ?? "normal",
+    technicianId: raw.technicianId ?? raw.TechnicianId ?? null,
+    technicianName: raw.technicianName ?? raw.TechnicianName ?? null,
+  };
+}
 
 const STATUS_LABEL = {
   available: "Available",
@@ -76,41 +69,66 @@ const STATUS_LABEL = {
   "off-duty": "Off duty",
 };
 
-// ---- Helpers --------------------------------------------------------------
-
-function initials(name) {
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-}
-
-function matchingTechnicians(category) {
-  return TECHNICIANS.filter((t) => t.skill === category && t.status !== "off-duty");
-}
-
 // ---- Component --------------------------------------------------------------
 
 export default function ReceptionistPage() {
-  const [queue, setQueue] = useState(INITIAL_QUEUE);
-  const [technicians, setTechnicians] = useState(TECHNICIANS);
   const [view, setView] = useState("queue");
   const [showNewBooking, setShowNewBooking] = useState(false);
   const [search, setSearch] = useState("");
+  const [assigningId, setAssigningId] = useState(null);
+  const [dismissingId, setDismissingId] = useState(null);
 
-  const stats = useMemo(() => {
-    const available = technicians.filter((t) => t.status === "available").length;
-    const pending = queue.length;
-    const urgent = queue.filter((q) => q.priority === "urgent").length;
-    return [
-      { label: "Needs assignment", value: pending },
-      { label: "Urgent", value: urgent },
-      { label: "Technicians available", value: available },
-      { label: "Jobs today", value: SCHEDULE_TODAY.length },
-    ];
-  }, [queue, technicians]);
+  const { data: rawBookings, loading: bookingsLoading } = fetchHook(
+    "https://localhost:7011/api/Booking/getBookings"
+  );
+  const { data: rawEmployees, loading: staffLoading } = fetchHook(
+    "https://localhost:7011/api/Employee/getEmployeesDetail"
+  );
+  const { data: rawIndustries, loading: industriesLoading } = fetchHook(
+    "https://localhost:7011/api/industry/getIndustryData"
+  );
+
+  const bookings = useMemo(() => (rawBookings || []).map(normalizeBooking), [rawBookings]);
+  const industries = useMemo(() => (rawIndustries || []).map(normalizeIndustry), [rawIndustries]);
+
+  // Pending bookings need a technician assigned — this is the queue.
+  const queue = useMemo(
+    () => bookings.filter((b) => b.status === "Pending" && !b.technicianId),
+    [bookings]
+  );
+
+  // Today's schedule only shows jobs actually in motion or wrapped up today —
+  // not pending ones, which already live in the queue above.
+  const todaysSchedule = useMemo(
+    () =>
+      bookings.filter(
+        (b) => isToday(b.date) && (b.status === "In progress" || b.status === "Completed")
+      ),
+    [bookings]
+  );
+
+  // A technician counts as "on a job" if they have an in-progress booking
+  // right now, "off duty" if HR marked them that way, otherwise available.
+  const technicians = useMemo(() => {
+    const employees = (rawEmployees || []).map(normalizeEmployee);
+    return employees.map((emp) => {
+      const activeJob = bookings.find(
+        (b) => b.technicianId === emp.id && b.status === "In progress"
+      );
+      let status = "available";
+      if (activeJob) status = "on-job";
+      else if (["Off duty", "Suspended"].includes(emp.rawStatus)) status = "off-duty";
+
+      return {
+        id: emp.id,
+        name: emp.name,
+        skill: emp.industryName,
+        industryId: emp.industryId,
+        status,
+        jobCode: activeJob?.code ?? null,
+      };
+    });
+  }, [rawEmployees, bookings]);
 
   const filteredQueue = useMemo(() => {
     if (!search.trim()) return queue;
@@ -123,22 +141,81 @@ export default function ReceptionistPage() {
     );
   }, [queue, search]);
 
-  function handleAssign(queueId, technicianId) {
-    const tech = technicians.find((t) => t.id === technicianId);
-    if (!tech) return;
-    setQueue((prev) =>
-      prev.map((item) => (item.id === queueId ? { ...item, assignedTo: tech.name } : item))
-    );
-    setTechnicians((prev) =>
-      prev.map((t) =>
-        t.id === technicianId ? { ...t, status: "on-job" } : t
-      )
-    );
+  const stats = useMemo(() => {
+    const available = technicians.filter((t) => t.status === "available").length;
+    const urgent = queue.filter((q) => q.priority === "urgent").length;
+    return [
+      { label: "Needs assignment", value: queue.length },
+      { label: "Urgent", value: urgent },
+      { label: "Technicians available", value: available },
+      { label: "Jobs today", value: todaysSchedule.length },
+    ];
+  }, [queue, technicians, todaysSchedule]);
+
+  function matchingTechnicians(industryId) {
+    return technicians.filter((t) => t.industryId === industryId && t.status !== "off-duty");
   }
 
-  function handleDismiss(queueId) {
-    setQueue((prev) => prev.filter((item) => item.id !== queueId));
+  async function handleAssign(booking, technicianId) {
+    const tech = technicians.find((t) => t.id === technicianId);
+    if (!tech) return;
+
+    setAssigningId(booking.id);
+    const res = await fetchAPI(
+      `https://localhost:7011/api/Booking/updateBookingDetails/${booking.id}`,
+      "PATCH",
+      [
+        { op: "replace", path: "/technicianId", value: technicianId },
+        { op: "replace", path: "/status", value: "Confirmed" },
+      ]
+    );
+    setAssigningId(null);
+
+    if (res) {
+      window.location.reload();
+    } else {
+      window.alert("Couldn't assign this technician. Please try again.");
+    }
   }
+
+  async function handleCancel(booking) {
+    if (!window.confirm(`Cancel the booking for ${booking.customer}?`)) return;
+    setDismissingId(booking.id);
+    const res = await fetchAPI(`https://localhost:7011/api/Booking/deleteBooking/${booking.id}`, "DELETE");
+    setDismissingId(null);
+
+    if (res) {
+      window.location.reload();
+    } else {
+      window.alert("Couldn't cancel this booking. Please try again.");
+    }
+  }
+
+  async function handleCreateBooking(form) {
+    const payload = {
+      customerName: form.customer,
+      phone: form.phone,
+      industryId: form.industryId,
+      service: form.service,
+      address: form.address,
+      preferredDate: form.date,
+      timeSlot: form.slot,
+      source: "Phone",
+      priority: form.priority,
+      status: "Pending",
+    };
+
+    const res = await fetchAPI("https://localhost:7011/api/Booking/addBooking", "POST", payload);
+
+    if (res) {
+      window.alert("Booking added to the queue.");
+      window.location.reload();
+    } else {
+      window.alert("Couldn't create this booking. Please try again.");
+    }
+  }
+
+  const isLoading = bookingsLoading || staffLoading || industriesLoading;
 
   return (
     <div className="wsw-receptionist">
@@ -198,7 +275,11 @@ export default function ReceptionistPage() {
               </button>
             </div>
 
-            {view === "queue" ? (
+            {isLoading ? (
+              <section className="wsw-receptionist__panel" aria-label="Loading">
+                <p className="wsw-receptionist__loading-note">Loading bookings…</p>
+              </section>
+            ) : view === "queue" ? (
               <section className="wsw-receptionist__panel" aria-label="Bookings needing assignment">
                 {filteredQueue.length > 0 ? (
                   <ul className="wsw-receptionist__queue-list">
@@ -206,8 +287,11 @@ export default function ReceptionistPage() {
                       <QueueRow
                         key={item.id}
                         item={item}
+                        options={matchingTechnicians(item.industryId)}
                         onAssign={handleAssign}
-                        onDismiss={handleDismiss}
+                        onCancel={handleCancel}
+                        assigning={assigningId === item.id}
+                        cancelling={dismissingId === item.id}
                       />
                     ))}
                   </ul>
@@ -222,27 +306,36 @@ export default function ReceptionistPage() {
               </section>
             ) : (
               <section className="wsw-receptionist__panel" aria-label="Today's schedule">
-                <ul className="wsw-receptionist__schedule-list">
-                  {SCHEDULE_TODAY.map((row, i) => (
-                    <li className="wsw-receptionist__schedule-row" key={i}>
-                      <span className="wsw-receptionist__schedule-time">{row.time}</span>
-                      <div className="wsw-receptionist__schedule-main">
-                        <p className="wsw-receptionist__schedule-service">{row.service}</p>
-                        <p className="wsw-receptionist__schedule-meta">
-                          {row.customer} · {row.technician}
-                        </p>
-                      </div>
-                      <span
-                        className={
-                          "wsw-receptionist__status wsw-receptionist__status--" +
-                          row.status.toLowerCase().replace(/\s+/g, "-")
-                        }
-                      >
-                        {row.status}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
+                {todaysSchedule.length > 0 ? (
+                  <ul className="wsw-receptionist__schedule-list">
+                    {todaysSchedule.map((row) => (
+                      <li className="wsw-receptionist__schedule-row" key={row.id}>
+                        <span className="wsw-receptionist__schedule-time">{row.slot}</span>
+                        <div className="wsw-receptionist__schedule-main">
+                          <p className="wsw-receptionist__schedule-service">{row.service}</p>
+                          <p className="wsw-receptionist__schedule-meta">
+                            {row.customer} · {row.technicianName || "Unassigned"}
+                          </p>
+                        </div>
+                        <span
+                          className={
+                            "wsw-receptionist__status wsw-receptionist__status--" +
+                            row.status.toLowerCase().replace(/\s+/g, "-")
+                          }
+                        >
+                          {row.status}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="wsw-receptionist__empty">
+                    <p className="wsw-receptionist__empty-title">Nothing in progress yet</p>
+                    <p className="wsw-receptionist__empty-body">
+                      Jobs that are in progress or completed today will show up here.
+                    </p>
+                  </div>
+                )}
               </section>
             )}
 
@@ -250,20 +343,9 @@ export default function ReceptionistPage() {
               <div className="wsw-receptionist__panel-head">
                 <h2 className="wsw-receptionist__panel-title">Recent calls</h2>
               </div>
-              <ul className="wsw-receptionist__call-list">
-                {CALL_LOG.map((c) => (
-                  <li className="wsw-receptionist__call-row" key={c.id}>
-                    <span className="wsw-receptionist__call-avatar">{initials(c.customer)}</span>
-                    <div className="wsw-receptionist__call-main">
-                      <p className="wsw-receptionist__call-customer">
-                        {c.customer} <span className="wsw-receptionist__call-time">· {c.time}</span>
-                      </p>
-                      <p className="wsw-receptionist__call-note">{c.note}</p>
-                    </div>
-                    <span className="wsw-receptionist__call-tag">{c.tag}</span>
-                  </li>
-                ))}
-              </ul>
+              {/* No call-log endpoint yet — this stays a placeholder until phone
+                  system integration exists. */}
+              <p className="wsw-receptionist__loading-note">Call log integration coming soon.</p>
             </section>
           </div>
 
@@ -272,22 +354,26 @@ export default function ReceptionistPage() {
               <div className="wsw-receptionist__panel-head">
                 <h2 className="wsw-receptionist__panel-title">Technicians</h2>
               </div>
-              <ul className="wsw-receptionist__roster-list">
-                {technicians.map((t) => (
-                  <li className="wsw-receptionist__roster-row" key={t.id}>
-                    <span className="wsw-receptionist__roster-avatar">{initials(t.name)}</span>
-                    <div className="wsw-receptionist__roster-main">
-                      <p className="wsw-receptionist__roster-name">{t.name}</p>
-                      <p className="wsw-receptionist__roster-skill">{t.skill}</p>
-                    </div>
-                    <span
-                      className={"wsw-receptionist__roster-status wsw-receptionist__roster-status--" + t.status}
-                    >
-                      {STATUS_LABEL[t.status]}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+              {staffLoading ? (
+                <p className="wsw-receptionist__loading-note">Loading roster…</p>
+              ) : (
+                <ul className="wsw-receptionist__roster-list">
+                  {technicians.map((t) => (
+                    <li className="wsw-receptionist__roster-row" key={t.id}>
+                      <span className="wsw-receptionist__roster-avatar">{initials(t.name)}</span>
+                      <div className="wsw-receptionist__roster-main">
+                        <p className="wsw-receptionist__roster-name">{t.name}</p>
+                        <p className="wsw-receptionist__roster-skill">{t.skill}</p>
+                      </div>
+                      <span
+                        className={"wsw-receptionist__roster-status wsw-receptionist__roster-status--" + t.status}
+                      >
+                        {STATUS_LABEL[t.status]}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </section>
           </aside>
         </div>
@@ -295,11 +381,9 @@ export default function ReceptionistPage() {
 
       {showNewBooking && (
         <NewBookingModal
+          industries={industries}
           onClose={() => setShowNewBooking(false)}
-          onCreate={(booking) => {
-            setQueue((prev) => [booking, ...prev]);
-            setShowNewBooking(false);
-          }}
+          onCreate={handleCreateBooking}
         />
       )}
     </div>
@@ -308,9 +392,8 @@ export default function ReceptionistPage() {
 
 // ---- Subcomponents --------------------------------------------------------------
 
-function QueueRow({ item, onAssign, onDismiss }) {
+function QueueRow({ item, options, onAssign, onCancel, assigning, cancelling }) {
   const [pickedTech, setPickedTech] = useState("");
-  const options = matchingTechnicians(item.category);
 
   return (
     <li
@@ -336,76 +419,66 @@ function QueueRow({ item, onAssign, onDismiss }) {
         </p>
       </div>
 
-      {item.assignedTo ? (
-        <div className="wsw-receptionist__assigned-note">
-          Assigned to <strong>{item.assignedTo}</strong>
-        </div>
-      ) : (
-        <div className="wsw-receptionist__queue-actions">
-          <select
-            className="wsw-receptionist__assign-select"
-            value={pickedTech}
-            onChange={(e) => setPickedTech(e.target.value)}
-            aria-label={`Assign technician for ${item.customer}`}
-          >
-            <option value="">Assign technician…</option>
-            {options.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.name} ({STATUS_LABEL[t.status]})
-              </option>
-            ))}
-          </select>
-          <button
-            type="button"
-            className="wsw-receptionist__assign-btn"
-            disabled={!pickedTech}
-            onClick={() => onAssign(item.id, pickedTech)}
-          >
-            Assign
-          </button>
-          <button type="button" className="wsw-receptionist__dismiss-btn" onClick={() => onDismiss(item.id)}>
-            Dismiss
-          </button>
-        </div>
-      )}
+      <div className="wsw-receptionist__queue-actions">
+        <select
+          className="wsw-receptionist__assign-select"
+          value={pickedTech}
+          onChange={(e) => setPickedTech(e.target.value)}
+          aria-label={`Assign technician for ${item.customer}`}
+        >
+          <option value="">Assign technician…</option>
+          {options.map((t) => (
+            <option key={t.id} value={t.id}>
+              {t.name} ({STATUS_LABEL[t.status]})
+            </option>
+          ))}
+        </select>
+        <button
+          type="button"
+          className="wsw-receptionist__assign-btn"
+          disabled={!pickedTech || assigning}
+          onClick={() => onAssign(item, pickedTech)}
+        >
+          {assigning ? "Assigning…" : "Assign"}
+        </button>
+        <button
+          type="button"
+          className="wsw-receptionist__dismiss-btn"
+          onClick={() => onCancel(item)}
+          disabled={cancelling}
+        >
+          {cancelling ? "…" : "Cancel"}
+        </button>
+      </div>
     </li>
   );
 }
 
-function NewBookingModal({ onClose, onCreate }) {
+function NewBookingModal({ industries, onClose, onCreate }) {
   const [form, setForm] = useState({
     customer: "",
     phone: "",
-    category: CATEGORIES[0],
+    industryId: industries[0]?.id ?? "",
     service: "",
     address: "",
+    date: "",
     slot: "",
     priority: "normal",
   });
+  const [submitting, setSubmitting] = useState(false);
 
   function update(field, value) {
     setForm((prev) => ({ ...prev, [field]: value }));
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     if (!form.customer.trim() || !form.phone.trim() || !form.service.trim() || !form.address.trim() || !form.slot.trim()) {
       return;
     }
-    const code = `WS-${form.category.slice(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
-    onCreate({
-      id: `q-${Date.now()}`,
-      code,
-      customer: form.customer,
-      phone: form.phone,
-      category: form.category,
-      service: form.service,
-      address: form.address,
-      slot: form.slot,
-      source: "Phone",
-      assignedTo: null,
-      priority: form.priority,
-    });
+    setSubmitting(true);
+    await onCreate(form);
+    setSubmitting(false);
   }
 
   return (
@@ -432,12 +505,12 @@ function NewBookingModal({ onClose, onCreate }) {
               <select
                 id="m-category"
                 className="wsw-receptionist__select"
-                value={form.category}
-                onChange={(e) => update("category", e.target.value)}
+                value={form.industryId}
+                onChange={(e) => update("industryId", e.target.value)}
               >
-                {CATEGORIES.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
+                {industries.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
                   </option>
                 ))}
               </select>
@@ -446,7 +519,11 @@ function NewBookingModal({ onClose, onCreate }) {
           </div>
 
           <ModalField id="m-address" label="Service address" value={form.address} onChange={(v) => update("address", v)} />
-          <ModalField id="m-slot" label="Requested slot" value={form.slot} onChange={(v) => update("slot", v)} placeholder="e.g. Today · 4:00 PM – 6:00 PM" />
+
+          <div className="wsw-receptionist__field-row">
+            <ModalField id="m-date" label="Date" value={form.date} onChange={(v) => update("date", v)} type="date" />
+            <ModalField id="m-slot" label="Requested slot" value={form.slot} onChange={(v) => update("slot", v)} placeholder="e.g. 4:00 PM – 6:00 PM" />
+          </div>
 
           <div className="wsw-receptionist__field">
             <label className="wsw-receptionist__label" htmlFor="m-priority">
@@ -464,8 +541,8 @@ function NewBookingModal({ onClose, onCreate }) {
           </div>
 
           <div className="wsw-receptionist__modal-actions">
-            <button type="submit" className="wsw-receptionist__primary-btn">
-              Add to queue
+            <button type="submit" className="wsw-receptionist__primary-btn" disabled={submitting}>
+              {submitting ? "Adding…" : "Add to queue"}
             </button>
             <button type="button" className="wsw-receptionist__ghost-btn" onClick={onClose}>
               Cancel

@@ -126,7 +126,8 @@ const CashFlow = () => {
   const onField = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
 
   const openAdd = () => {
-    setForm(blankForm);
+    const today = new Date().toISOString().split('T')[0]; // "2026-04-26"
+    setForm({ ...blankForm, createdDate: today });
     setMode('add');
   };
 

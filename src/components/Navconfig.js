@@ -10,8 +10,8 @@ import {
 const ALL_NAV_ITEMS = [
   // ---- Customer ----
   { key: "dashboard-customer", label: "Dashboard", path: "/customer/dashboard", icon: MdSpaceDashboard, roles: ["customer"], group: "Workspace" },
-  { key: "book", label: "Book a service", path: "/book", icon: MdCalendarMonth, roles: ["customer"], group: "Workspace" },
-  { key: "history", label: "Booking history", path: "/history", icon: MdHistory, roles: ["customer"], group: "Workspace" },
+  { key: "book", label: "Book a service", path: "customer/booking", icon: MdCalendarMonth, roles: ["customer"], group: "Workspace" },
+  { key: "history", label: "Booking history", path: "/customer/history", icon: MdHistory, roles: ["customer"], group: "Workspace" },
   { key: "settings", label: "Settings", path: "/settings", icon: MdSettings, roles: ["customer"], group: "Account" },
 
   // ---- Receptionist ----

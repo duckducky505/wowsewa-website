@@ -1,122 +1,177 @@
 import React, { useMemo, useState } from "react";
 import "./CustomerDashboard.css";
+import { fetchHook } from "../../../hooks/fetchHook";
+import { fetchAPI } from "../../../utils/fetchAPI";
+import { useAuth } from "../../../context/AuthContext";
 
-// ---- Mock data --------------------------------------------------------------
-// In production these come from the API — shaped here to match that contract.
-
-const CUSTOMER = {
+const MOCK_PROFILE = {
   name: "Sagar Thapa",
-  phone: "+977 98‑1234‑5678",
+  phone: "+977 98-1234-5678",
   email: "sagar.thapa@example.com",
   memberSince: "Mar 2024",
 };
 
-const ADDRESSES = [
+const MOCK_ADDRESSES = [
   { id: "addr-1", label: "Home", address: "Baneshwor Height, Kathmandu", primary: true },
   { id: "addr-2", label: "Office", address: "Durbar Marg, Kathmandu", primary: false },
-];
-
-const ACTIVE_JOB = {
-  code: "WS-ELC-7734",
-  service: "Switchboard installation",
-  category: "Electrical",
-  address: "Baneshwor Height, Kathmandu",
-  date: "Today",
-  slot: "2:00 PM – 4:00 PM",
-  technician: { name: "Bikash Rai", rating: 4.9, phone: "+977 98‑7654‑3210" },
-  stage: 2, // index into JOB_STAGES
-};
-
-const JOB_STAGES = ["Booked", "Confirmed", "Technician en route", "In progress", "Completed"];
-
-const UPCOMING_BOOKINGS = [
-  {
-    code: "WS-ELC-7734",
-    service: "Switchboard installation",
-    category: "Electrical",
-    date: "Today",
-    slot: "2:00 PM – 4:00 PM",
-    status: "En route",
-    address: "Baneshwor Height, Kathmandu",
-  },
-  {
-    code: "WS-APL-2210",
-    service: "AC installation",
-    category: "Home Appliances",
-    date: "Fri, Jul 17",
-    slot: "10:00 AM – 12:00 PM",
-    status: "Confirmed",
-    address: "Baneshwor Height, Kathmandu",
-  },
-];
-
-const BOOKING_HISTORY = [
-  {
-    code: "WS-PLB-1182",
-    service: "Leak repair",
-    category: "Plumbing",
-    date: "Jun 28, 2026",
-    price: "Rs 850",
-    status: "Completed",
-    rated: 5,
-  },
-  {
-    code: "WS-ITD-9043",
-    service: "Wi‑Fi / network setup",
-    category: "IT Devices",
-    date: "Jun 12, 2026",
-    price: "Rs 800",
-    status: "Completed",
-    rated: 4,
-  },
-  {
-    code: "WS-APL-5521",
-    service: "Refrigerator repair",
-    category: "Home Appliances",
-    date: "May 30, 2026",
-    price: "Rs 1,000",
-    status: "Completed",
-    rated: null,
-  },
-  {
-    code: "WS-ELC-3387",
-    service: "Fan / light installation",
-    category: "Electrical",
-    date: "May 09, 2026",
-    price: "Rs 500",
-    status: "Cancelled",
-    rated: null,
-  },
-];
-
-const STATS = [
-  { label: "Upcoming", value: UPCOMING_BOOKINGS.length },
-  { label: "Completed jobs", value: 11 },
-  { label: "This year, spent", value: "Rs 9,450" },
-  { label: "Saved addresses", value: ADDRESSES.length },
 ];
 
 // ---- Helpers --------------------------------------------------------------
 
 function initials(name) {
-  return name
+  return (name || "")
     .split(" ")
+    .filter(Boolean)
     .map((n) => n[0])
     .join("")
     .slice(0, 2)
     .toUpperCase();
 }
 
+function formatRs(value) {
+  return `Rs ${Number(value || 0).toLocaleString()}`;
+}
+
+function statusClass(status) {
+  return (status || "").toLowerCase().replace(/\s+/g, "-");
+}
+
+function normalizeStage(raw, i) {
+  if (typeof raw === "string") return raw;
+  return raw.stageName ?? raw.StageName ?? raw.name ?? raw.Name ?? `Stage ${i + 1}`;
+}
+
+function normalizeBooking(raw) {
+  return {
+    id: raw.bookingId,
+    code: raw.bookingCode,
+    service: raw.duty?.dutyName ?? "",
+    category: raw.industry?.industryName ?? "",
+    date: raw.preferredDate,
+    slot: raw.preferredTime,
+    address: raw.address,
+    price: raw.price,
+    status: raw.bookingStatus ?? raw.status ?? "Pending",
+    rated: raw.rating ?? raw.Rating ?? null,
+    technician: raw.technician
+      ? {
+          name: raw.technician.name ?? "",
+          rating: raw.technician.rating ?? null,
+          phone: raw.technician.phone ?? "",
+        }
+      : null,
+  };
+}
+
 // ---- Component --------------------------------------------------------------
 
 export default function CustomerDashboard() {
+  const { user } = useAuth();
+  const guidId = user?.guidId ?? null;
+
   const [tab, setTab] = useState("upcoming");
   const [ratingDraft, setRatingDraft] = useState({});
+  const [cancellingId, setCancellingId] = useState(null);
 
-  const historyRated = useMemo(
-    () => BOOKING_HISTORY.filter((b) => b.status === "Completed" && b.rated === null),
-    []
+  const { data: rawStages, loading: stagesLoading } = fetchHook(
+    "https://localhost:7011/api/Booking/getBookingStatus"
   );
+
+  const { data: rawPending, loading: pendingLoading } = fetchHook(
+    guidId ? `https://localhost:7011/api/Booking/upcoming/getUserSpecificBooking/${guidId}` : null
+  );
+
+  const { data: rawHistory, loading: historyLoading } = fetchHook(
+    guidId ? `https://localhost:7011/api/Booking/history/getUserSpecificBooking/${guidId}` : null
+  );
+
+  const { data: rawCancelled, loading: cancelledLoading } = fetchHook(
+    guidId ? `https://localhost:7011/api/Booking/cancelled/getUserSpecificBooking/${guidId}` : null
+  );
+
+  const stages = useMemo(
+    () =>
+      (rawStages || [])
+        .map(normalizeStage)
+        .filter((s) => s.toLowerCase() !== "cancelled"),
+    [rawStages]
+  );
+
+  const pendingBookings = useMemo(
+    () => (rawPending || []).map(normalizeBooking).filter((b) => b.status.toLowerCase() !== "cancelled"),
+    [rawPending]
+  );
+
+  const historyBookings = useMemo(() => {
+    const completed = (rawHistory || []).map(normalizeBooking);
+    const cancelled = (rawCancelled || []).map(normalizeBooking);
+    return [...completed, ...cancelled].sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+  }, [rawHistory, rawCancelled]);
+
+  // Soonest pending booking stands in as the "active job" card — never
+  // cancelled, since pendingBookings above already filters those out.
+  const activeJob = useMemo(() => {
+    if (pendingBookings.length === 0) return null;
+    return [...pendingBookings].sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+    )[0];
+  }, [pendingBookings]);
+
+  // Where the active job's status actually sits along the tracker — e.g.
+  // "Pending" lights up just the first dot, "Completed" fills the whole
+  // bar. Falls back to 0 (start of the bar) if the status string doesn't
+  // match any known stage, rather than crashing or showing nothing lit.
+  const activeStageIndex = useMemo(() => {
+    if (!activeJob) return 0;
+    const idx = stages.findIndex((s) => s.toLowerCase() === activeJob.status.toLowerCase());
+    return idx === -1 ? 0 : idx;
+  }, [activeJob, stages]);
+
+  const stats = useMemo(() => {
+    const completedThisYear = historyBookings.filter((b) => {
+      if (b.status.toLowerCase() !== "completed") return false;
+      return new Date(b.date).getFullYear() === new Date().getFullYear();
+    });
+    const spent = completedThisYear.reduce((sum, b) => sum + Number(b.price || 0), 0);
+
+    return [
+      { label: "Upcoming", value: pendingBookings.length },
+      { label: "Completed jobs", value: historyBookings.filter((b) => b.status.toLowerCase() === "completed").length },
+      { label: "This year, spent", value: formatRs(spent) },
+      { label: "Saved addresses", value: MOCK_ADDRESSES.length },
+    ];
+  }, [pendingBookings, historyBookings]);
+
+  const isLoadingUpcoming = pendingLoading || stagesLoading;
+  const isLoadingHistory = historyLoading || cancelledLoading;
+
+  async function submitRating(booking, rating) {
+    setRatingDraft((prev) => ({ ...prev, [booking.code]: rating }));
+    const res = await fetchAPI(
+      `https://localhost:7011/api/Booking/updateBookingDetails/${booking.id}`,
+      "PATCH",
+      [{ op: "replace", path: "/rating", value: rating }]
+    );
+    if (!res) {
+      window.alert("Couldn't save your rating. Please try again.");
+      setRatingDraft((prev) => ({ ...prev, [booking.code]: 0 }));
+    }
+  }
+
+  async function handleCancelBooking(booking) {
+    if (!window.confirm(`Cancel your ${booking.service} booking?`)) return;
+    setCancellingId(booking.id);
+    const res = await fetchAPI(`https://localhost:7011/api/Booking/deleteBooking/${booking.id}`, "DELETE");
+    setCancellingId(null);
+
+    if (res) {
+      window.location.reload();
+    } else {
+      window.alert("Couldn't cancel this booking. Please try again.");
+    }
+  }
 
   return (
     <div className="wsw-dashboard">
@@ -124,10 +179,10 @@ export default function CustomerDashboard() {
         <div className="wsw-dashboard__header-inner">
           <div className="wsw-dashboard__greeting">
             <span className="wsw-dashboard__eyebrow">Your account</span>
-            <h1 className="wsw-dashboard__title">Welcome back, {CUSTOMER.name.split(" ")[0]}</h1>
-            <p className="wsw-dashboard__subtitle">
-              Here's what's happening with your services.
-            </p>
+            <h1 className="wsw-dashboard__title">
+              Welcome back, {MOCK_PROFILE.name.split(" ")[0]}
+            </h1>
+            <p className="wsw-dashboard__subtitle">Here's what's happening with your services.</p>
           </div>
           <button type="button" className="wsw-dashboard__new-booking">
             + New booking
@@ -137,7 +192,7 @@ export default function CustomerDashboard() {
 
       <div className="wsw-dashboard__body">
         <section className="wsw-dashboard__stats" aria-label="Account overview">
-          {STATS.map((s) => (
+          {stats.map((s) => (
             <div className="wsw-dashboard__stat-card" key={s.label}>
               <span className="wsw-dashboard__stat-value">{s.value}</span>
               <span className="wsw-dashboard__stat-label">{s.label}</span>
@@ -147,55 +202,69 @@ export default function CustomerDashboard() {
 
         <div className="wsw-dashboard__grid">
           <div className="wsw-dashboard__main">
-            {ACTIVE_JOB && (
-              <section className="wsw-dashboard__panel" aria-label="Active job status">
-                <div className="wsw-dashboard__panel-head">
-                  <h2 className="wsw-dashboard__panel-title">Active job</h2>
-                  <span className="wsw-dashboard__job-code">{ACTIVE_JOB.code}</span>
-                </div>
-
-                <div className="wsw-dashboard__active-job">
-                  <div className="wsw-dashboard__active-job-info">
-                    <h3 className="wsw-dashboard__active-job-service">{ACTIVE_JOB.service}</h3>
-                    <p className="wsw-dashboard__active-job-meta">
-                      {ACTIVE_JOB.category} · {ACTIVE_JOB.date}, {ACTIVE_JOB.slot}
-                    </p>
-                    <p className="wsw-dashboard__active-job-address">{ACTIVE_JOB.address}</p>
-                  </div>
-
-                  <div className="wsw-dashboard__technician">
-                    <span className="wsw-dashboard__technician-avatar">
-                      {initials(ACTIVE_JOB.technician.name)}
-                    </span>
-                    <div>
-                      <p className="wsw-dashboard__technician-name">{ACTIVE_JOB.technician.name}</p>
-                      <p className="wsw-dashboard__technician-rating">★ {ACTIVE_JOB.technician.rating}</p>
-                    </div>
-                    <a
-                      className="wsw-dashboard__technician-call"
-                      href={`tel:${ACTIVE_JOB.technician.phone.replace(/[^\d+]/g, "")}`}
-                    >
-                      Call
-                    </a>
-                  </div>
-                </div>
-
-                <ol className="wsw-dashboard__stage-tracker" aria-label="Job progress">
-                  {JOB_STAGES.map((stage, i) => (
-                    <li
-                      key={stage}
-                      className={
-                        "wsw-dashboard__stage" +
-                        (i < ACTIVE_JOB.stage ? " wsw-dashboard__stage--done" : "") +
-                        (i === ACTIVE_JOB.stage ? " wsw-dashboard__stage--current" : "")
-                      }
-                    >
-                      <span className="wsw-dashboard__stage-dot" />
-                      <span className="wsw-dashboard__stage-label">{stage}</span>
-                    </li>
-                  ))}
-                </ol>
+            {isLoadingUpcoming ? (
+              <section className="wsw-dashboard__panel" aria-label="Loading">
+                <p className="wsw-dashboard__loading-note">Loading your bookings…</p>
               </section>
+            ) : (
+              activeJob && (
+                <section className="wsw-dashboard__panel" aria-label="Active job status">
+                  <div className="wsw-dashboard__panel-head">
+                    <h2 className="wsw-dashboard__panel-title">Active job</h2>
+                    <span className="wsw-dashboard__job-code">{activeJob.code}</span>
+                  </div>
+
+                  <div className="wsw-dashboard__active-job">
+                    <div className="wsw-dashboard__active-job-info">
+                      <h3 className="wsw-dashboard__active-job-service">{activeJob.service}</h3>
+                      <p className="wsw-dashboard__active-job-meta">
+                        {activeJob.category} · {activeJob.date}, {activeJob.slot}
+                      </p>
+                      <p className="wsw-dashboard__active-job-address">{activeJob.address}</p>
+                    </div>
+
+                    {activeJob.technician && (
+                      <div className="wsw-dashboard__technician">
+                        <span className="wsw-dashboard__technician-avatar">
+                          {initials(activeJob.technician.name)}
+                        </span>
+                        <div>
+                          <p className="wsw-dashboard__technician-name">{activeJob.technician.name}</p>
+                          {activeJob.technician.rating && (
+                            <p className="wsw-dashboard__technician-rating">★ {activeJob.technician.rating}</p>
+                          )}
+                        </div>
+                        {activeJob.technician.phone && (
+                          <a
+                            className="wsw-dashboard__technician-call"
+                            href={`tel:${activeJob.technician.phone.replace(/[^\d+]/g, "")}`}
+                          >
+                            Call
+                          </a>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {stages.length > 0 && (
+                    <ol className="wsw-dashboard__stage-tracker" aria-label="Job progress">
+                      {stages.map((stage, i) => (
+                        <li
+                          key={stage}
+                          className={
+                            "wsw-dashboard__stage" +
+                            (i < activeStageIndex ? " wsw-dashboard__stage--done" : "") +
+                            (i === activeStageIndex ? " wsw-dashboard__stage--current" : "")
+                          }
+                        >
+                          <span className="wsw-dashboard__stage-dot" />
+                          <span className="wsw-dashboard__stage-label">{stage}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  )}
+                </section>
+              )
             )}
 
             <section className="wsw-dashboard__panel" aria-label="Bookings">
@@ -206,9 +275,7 @@ export default function CustomerDashboard() {
                     type="button"
                     role="tab"
                     aria-selected={tab === "upcoming"}
-                    className={
-                      "wsw-dashboard__tab" + (tab === "upcoming" ? " wsw-dashboard__tab--active" : "")
-                    }
+                    className={"wsw-dashboard__tab" + (tab === "upcoming" ? " wsw-dashboard__tab--active" : "")}
                     onClick={() => setTab("upcoming")}
                   >
                     Upcoming
@@ -217,9 +284,7 @@ export default function CustomerDashboard() {
                     type="button"
                     role="tab"
                     aria-selected={tab === "history"}
-                    className={
-                      "wsw-dashboard__tab" + (tab === "history" ? " wsw-dashboard__tab--active" : "")
-                    }
+                    className={"wsw-dashboard__tab" + (tab === "history" ? " wsw-dashboard__tab--active" : "")}
                     onClick={() => setTab("history")}
                   >
                     History
@@ -228,9 +293,11 @@ export default function CustomerDashboard() {
               </div>
 
               {tab === "upcoming" ? (
-                UPCOMING_BOOKINGS.length > 0 ? (
+                isLoadingUpcoming ? (
+                  <p className="wsw-dashboard__loading-note">Loading upcoming bookings…</p>
+                ) : pendingBookings.length > 0 ? (
                   <ul className="wsw-dashboard__booking-list">
-                    {UPCOMING_BOOKINGS.map((b) => (
+                    {pendingBookings.map((b) => (
                       <li className="wsw-dashboard__booking-row" key={b.code}>
                         <div className="wsw-dashboard__booking-main">
                           <span className="wsw-dashboard__booking-service">{b.service}</span>
@@ -240,16 +307,16 @@ export default function CustomerDashboard() {
                           <span className="wsw-dashboard__booking-address">{b.address}</span>
                         </div>
                         <div className="wsw-dashboard__booking-side">
-                          <span
-                            className={
-                              "wsw-dashboard__status wsw-dashboard__status--" +
-                              b.status.toLowerCase().replace(/\s+/g, "-")
-                            }
-                          >
+                          <span className={"wsw-dashboard__status wsw-dashboard__status--" + statusClass(b.status)}>
                             {b.status}
                           </span>
-                          <button type="button" className="wsw-dashboard__link-btn">
-                            Manage
+                          <button
+                            type="button"
+                            className="wsw-dashboard__link-btn"
+                            onClick={() => handleCancelBooking(b)}
+                            disabled={cancellingId === b.id}
+                          >
+                            {cancellingId === b.id ? "Cancelling…" : "Cancel"}
                           </button>
                         </div>
                       </li>
@@ -261,39 +328,30 @@ export default function CustomerDashboard() {
                     body="When you book a service, it'll show up here with live status updates."
                   />
                 )
-              ) : (
+              ) : isLoadingHistory ? (
+                <p className="wsw-dashboard__loading-note">Loading history…</p>
+              ) : historyBookings.length > 0 ? (
                 <ul className="wsw-dashboard__booking-list">
-                  {BOOKING_HISTORY.map((b) => (
+                  {historyBookings.map((b) => (
                     <li className="wsw-dashboard__booking-row" key={b.code}>
                       <div className="wsw-dashboard__booking-main">
                         <span className="wsw-dashboard__booking-service">{b.service}</span>
                         <span className="wsw-dashboard__booking-meta">
-                          {b.category} · {b.date} · {b.price}
+                          {b.category} · {b.date} · {formatRs(b.price)}
                         </span>
                         <span className="wsw-dashboard__booking-code">{b.code}</span>
                       </div>
                       <div className="wsw-dashboard__booking-side">
-                        <span
-                          className={
-                            "wsw-dashboard__status wsw-dashboard__status--" +
-                            b.status.toLowerCase().replace(/\s+/g, "-")
-                          }
-                        >
+                        <span className={"wsw-dashboard__status wsw-dashboard__status--" + statusClass(b.status)}>
                           {b.status}
                         </span>
-                        {b.status === "Completed" && b.rated === null && (
-                          <RatingPicker
-                            code={b.code}
-                            value={ratingDraft[b.code] || 0}
-                            onRate={(rating) =>
-                              setRatingDraft((prev) => ({ ...prev, [b.code]: rating }))
-                            }
-                          />
+                        {b.status.toLowerCase() === "completed" && b.rated === null && !ratingDraft[b.code] && (
+                          <RatingPicker value={0} onRate={(rating) => submitRating(b, rating)} />
                         )}
-                        {b.status === "Completed" && b.rated !== null && (
-                          <span className="wsw-dashboard__rated">★ {b.rated} rated</span>
+                        {b.status.toLowerCase() === "completed" && (b.rated !== null || ratingDraft[b.code]) && (
+                          <span className="wsw-dashboard__rated">★ {b.rated ?? ratingDraft[b.code]} rated</span>
                         )}
-                        {b.status === "Completed" && (
+                        {b.status.toLowerCase() === "completed" && (
                           <button type="button" className="wsw-dashboard__link-btn">
                             Rebook
                           </button>
@@ -302,6 +360,8 @@ export default function CustomerDashboard() {
                     </li>
                   ))}
                 </ul>
+              ) : (
+                <EmptyState title="No past bookings" body="Completed and cancelled bookings will show up here." />
               )}
             </section>
           </div>
@@ -310,20 +370,20 @@ export default function CustomerDashboard() {
             <section className="wsw-dashboard__panel wsw-dashboard__panel--compact" aria-label="Account details">
               <h2 className="wsw-dashboard__panel-title">Account</h2>
               <div className="wsw-dashboard__profile">
-                <span className="wsw-dashboard__profile-avatar">{initials(CUSTOMER.name)}</span>
+                <span className="wsw-dashboard__profile-avatar">{initials(MOCK_PROFILE.name)}</span>
                 <div>
-                  <p className="wsw-dashboard__profile-name">{CUSTOMER.name}</p>
-                  <p className="wsw-dashboard__profile-since">Customer since {CUSTOMER.memberSince}</p>
+                  <p className="wsw-dashboard__profile-name">{MOCK_PROFILE.name}</p>
+                  <p className="wsw-dashboard__profile-since">Customer since {MOCK_PROFILE.memberSince}</p>
                 </div>
               </div>
               <dl className="wsw-dashboard__detail-list">
                 <div className="wsw-dashboard__detail-item">
                   <dt>Phone</dt>
-                  <dd>{CUSTOMER.phone}</dd>
+                  <dd>{MOCK_PROFILE.phone}</dd>
                 </div>
                 <div className="wsw-dashboard__detail-item">
                   <dt>Email</dt>
-                  <dd>{CUSTOMER.email}</dd>
+                  <dd>{MOCK_PROFILE.email}</dd>
                 </div>
               </dl>
               <button type="button" className="wsw-dashboard__link-btn">
@@ -339,7 +399,7 @@ export default function CustomerDashboard() {
                 </button>
               </div>
               <ul className="wsw-dashboard__address-list">
-                {ADDRESSES.map((a) => (
+                {MOCK_ADDRESSES.map((a) => (
                   <li className="wsw-dashboard__address-row" key={a.id}>
                     <div>
                       <p className="wsw-dashboard__address-label">
@@ -397,9 +457,7 @@ function RatingPicker({ value, onRate }) {
           key={n}
           role="radio"
           aria-checked={value === n}
-          className={
-            "wsw-dashboard__rating-star" + (n <= value ? " wsw-dashboard__rating-star--filled" : "")
-          }
+          className={"wsw-dashboard__rating-star" + (n <= value ? " wsw-dashboard__rating-star--filled" : "")}
           onClick={() => onRate(n)}
         >
           ★
