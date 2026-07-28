@@ -1,6 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@500&family=Inter:wght@400;500;600&display=swap");
 
-.wsw-job-categories {
+.wsw-recpay {
   --wsw-lime: #D1FE17;
   --wsw-green: #074C3A;
   --wsw-green-dark: #053528;
@@ -31,7 +31,7 @@
   &__header {
     background: var(--wsw-green);
     color: var(--wsw-cream);
-    padding: 2.25rem 1.5rem 4rem;
+    padding: 2rem 1.5rem 4rem;
     position: relative;
     overflow: hidden;
 
@@ -56,17 +56,30 @@
     flex-wrap: wrap;
   }
 
+  &__back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(248,250,234,0.08);
+    border: 1px solid rgba(248,250,234,0.25);
+    color: var(--wsw-cream);
+    border-radius: 999px;
+    padding: 0.45rem 0.95rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+
+    &:hover { background: rgba(248,250,234,0.16); }
+  }
+
   &__eyebrow {
-    display: inline-block;
+    display: block;
     font-family: var(--wsw-font-mono);
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--wsw-lime);
-    border: 1px solid rgba(209,254,23,0.4);
-    border-radius: 999px;
-    padding: 0.3rem 0.75rem;
-    margin-bottom: 0.9rem;
+    margin-bottom: 0.5rem;
   }
 
   &__title {
@@ -82,6 +95,8 @@
     margin: 0;
   }
 
+  &__header-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+
   &__add-btn {
     display: inline-flex;
     align-items: center;
@@ -90,10 +105,9 @@
     color: var(--wsw-ink);
     border: none;
     border-radius: 999px;
-    padding: 0.75rem 1.4rem;
+    padding: 0.75rem 1.3rem;
     font-weight: 700;
-    font-size: 0.9rem;
-    white-space: nowrap;
+    font-size: 0.88rem;
     transition: transform 0.15s ease;
 
     &:hover { transform: translateY(-1px); }
@@ -107,56 +121,65 @@
     padding: 0 1.5rem;
     position: relative;
     z-index: 2;
+  }
+
+  &__toolbar {
     display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-
-  &__stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    justify-content: space-between;
+    align-items: center;
     gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.25rem;
   }
 
-  &__stat-card {
+  &__tabs {
+    display: flex;
+    gap: 0.3rem;
     background: var(--wsw-paper);
     border: 1px solid var(--wsw-line);
-    border-radius: 16px;
-    padding: 1.25rem 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-    box-shadow: 0 16px 32px -26px rgba(1,10,8,0.3);
+    border-radius: 999px;
+    padding: 0.3rem;
   }
 
-  &__stat-value {
-    font-family: var(--wsw-font-display);
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: var(--wsw-green);
-  }
-
-  &__stat-label {
-    font-family: var(--wsw-font-mono);
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
+  &__tab {
+    background: none;
+    border: none;
+    border-radius: 999px;
+    padding: 0.5rem 0.95rem;
+    font-size: 0.82rem;
+    font-weight: 600;
     color: var(--wsw-muted);
+
+    &--active { background: var(--wsw-green); color: var(--wsw-lime); }
   }
 
-  /* ---------- Toolbar ---------- */
+  &__toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
 
-  &__toolbar { display: flex; }
+  &__toggle-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.82rem;
+    color: var(--wsw-muted);
+    cursor: pointer;
+
+    input { accent-color: var(--wsw-green); cursor: pointer; }
+  }
 
   &__search {
     font-family: inherit;
     font-size: 0.85rem;
-    padding: 0.65rem 1rem;
+    padding: 0.6rem 0.95rem;
     border-radius: 999px;
     border: 1px solid var(--wsw-line);
     background: var(--wsw-paper);
     color: var(--wsw-ink);
-    min-width: 18rem;
+    min-width: 14rem;
 
     &:focus-visible { outline: 2px solid var(--wsw-green); outline-offset: 1px; }
   }
@@ -173,18 +196,20 @@
 
   &__table-wrap { overflow-x: auto; }
 
-  &__table, &__summary-table {
+  &__table {
     width: 100%;
     border-collapse: collapse;
     text-align: left;
+    min-width: 62rem;
 
     th {
       font-size: 0.7rem;
       text-transform: uppercase;
       letter-spacing: 0.06em;
       color: var(--wsw-muted);
-      padding: 1rem 1.1rem 0.75rem;
+      padding: 1rem 0.9rem 0.7rem;
       font-weight: 700;
+      white-space: nowrap;
     }
   }
 
@@ -195,42 +220,41 @@
     &:hover { background: var(--wsw-cream); }
 
     td {
-      padding: 0.9rem 1.1rem;
-      font-size: 0.9rem;
+      padding: 0.85rem 0.9rem;
+      font-size: 0.86rem;
       vertical-align: middle;
+      white-space: nowrap;
     }
   }
 
-  &__code-tag {
-    font-family: var(--wsw-font-mono);
-    font-size: 0.74rem;
-    color: var(--wsw-muted);
-    background: var(--wsw-cream);
-    border: 1px solid var(--wsw-line);
+  &__cell-strong { font-weight: 600; }
+  &__cell-muted { color: var(--wsw-muted); font-size: 0.82rem; white-space: normal; }
+  &__cell-amount { font-family: var(--wsw-font-mono); font-weight: 700; color: var(--wsw-green); }
+  &__cell-negative { font-family: var(--wsw-font-mono); font-weight: 700; color: var(--wsw-red); }
+
+  &__type-tag {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.22rem 0.6rem;
     border-radius: 999px;
-    padding: 0.25rem 0.65rem;
-    white-space: nowrap;
+
+    &--receivable { background: rgba(7,76,58,0.1); color: var(--wsw-green); }
+    &--payable { background: rgba(232,163,61,0.18); color: #8a5a12; }
   }
 
-  &__job {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
+  &__status-pill {
+    display: inline-flex;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.24rem 0.6rem;
+    border-radius: 999px;
+    background: var(--wsw-cream);
+    color: var(--wsw-muted);
 
-  &__job-icon {
-    display: grid;
-    place-items: center;
-    width: 2.4rem;
-    height: 2.4rem;
-    border-radius: 10px;
-    background: var(--wsw-lime);
-    color: var(--wsw-ink);
-    font-size: 1rem;
-    flex-shrink: 0;
+    &--paid { background: rgba(7,76,58,0.1); color: var(--wsw-green); }
+    &--partial { background: rgba(232,163,61,0.18); color: #8a5a12; }
+    &--pending { background: rgba(192,57,43,0.1); color: var(--wsw-red); }
   }
-
-  &__job-name { font-weight: 600; }
 
   &__row-actions { display: flex; gap: 0.5rem; }
 
@@ -241,8 +265,8 @@
     background: none;
     border: 1px solid var(--wsw-line);
     border-radius: 999px;
-    padding: 0.4rem 0.85rem;
-    font-size: 0.78rem;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.76rem;
     font-weight: 600;
     color: var(--wsw-ink);
 
@@ -252,36 +276,6 @@
       color: var(--wsw-red);
       &:hover { border-color: var(--wsw-red); background: var(--wsw-red-bg); color: var(--wsw-red); }
     }
-  }
-
-  /* ---------- Section header (cash flow) ---------- */
-
-  &__section-head { margin-top: 0.5rem; }
-
-  &__section-title {
-    font-family: var(--wsw-font-display);
-    font-size: 1.15rem;
-    font-weight: 600;
-    margin: 0 0 0.25rem;
-  }
-
-  &__section-sub {
-    font-size: 0.85rem;
-    color: var(--wsw-muted);
-    margin: 0;
-  }
-
-  /* ---------- Summary table specifics ---------- */
-
-  &__num-col { text-align: right; font-family: var(--wsw-font-mono); }
-  &__cat-name { font-weight: 600; color: var(--wsw-green); }
-  &__net-negative { color: var(--wsw-red); }
-
-  &__total-row {
-    border-top: 2px solid var(--wsw-green);
-    font-weight: 700;
-
-    td { padding: 0.9rem 1.1rem; }
   }
 
   /* ---------- Empty / loading ---------- */
@@ -303,16 +297,16 @@
     border-radius: 18px;
     padding: 1.75rem;
     width: 100%;
-    max-width: 28rem;
+    max-width: 32rem;
     max-height: 90vh;
     overflow-y: auto;
     box-shadow: 0 30px 60px -20px rgba(1,10,8,0.5);
 
-    &--narrow { max-width: 24rem; }
+    &--narrow { max-width: 26rem; }
   }
 
   &__modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
-  &__modal-title { font-family: var(--wsw-font-display); font-size: 1.1rem; font-weight: 600; margin: 0; }
+  &__modal-title { font-family: var(--wsw-font-display); font-size: 1.15rem; font-weight: 600; margin: 0; }
   &__modal-close { background: none; border: none; color: var(--wsw-muted); display: grid; place-items: center; padding: 0.2rem; &:hover { color: var(--wsw-ink); } }
   &__modal-actions { display: flex; gap: 0.7rem; margin-top: 0.3rem; }
   &__confirm-copy { font-size: 0.9rem; color: var(--wsw-muted); line-height: 1.55; margin: 0 0 1.25rem; strong { color: var(--wsw-ink); } }
@@ -320,10 +314,11 @@
   /* ---------- Form ---------- */
 
   &__form { display: flex; flex-direction: column; gap: 1.1rem; }
+  &__field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; @media (max-width: 480px) { grid-template-columns: 1fr; } }
   &__field { display: flex; flex-direction: column; gap: 0.4rem; }
   &__label { font-size: 0.82rem; font-weight: 600; }
 
-  &__input {
+  &__input, &__select, &__textarea {
     font-family: inherit;
     font-size: 0.95rem;
     padding: 0.65rem 0.8rem;
@@ -334,6 +329,21 @@
     width: 100%;
 
     &:focus-visible { outline: 2px solid var(--wsw-green); outline-offset: 1px; border-color: var(--wsw-green); }
+  }
+
+  &__textarea { resize: vertical; min-height: 4rem; }
+
+  &__preview {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--wsw-cream);
+    border: 1px solid var(--wsw-line);
+    border-radius: 10px;
+    padding: 0.7rem 0.9rem;
+    font-size: 0.85rem;
+
+    strong { font-family: var(--wsw-font-mono); }
   }
 
   &__primary-btn {

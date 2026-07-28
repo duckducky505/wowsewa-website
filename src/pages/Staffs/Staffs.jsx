@@ -5,8 +5,6 @@ import { fetchHook } from "../../hooks/fetchHook";
 import { fetchAPI } from "../../utils/fetchAPI";
 import "./Staffs.css";
 
-const STATUS_OPTIONS = ["Active", "On duty", "Off duty", "Suspended"];
-
 // ---- Helpers --------------------------------------------------------------
 
 function initials(name) {
@@ -21,14 +19,12 @@ function initials(name) {
 
 function normalizeEmployee(raw) {
   return {
-    id: raw.guidId ?? raw.GuidId ?? raw.id ?? raw.Id,
-    name: raw.name ?? raw.Name ?? raw.fullName ?? raw.FullName ?? "",
-    phone: raw.phone ?? raw.Phone ?? raw.phoneNumber ?? raw.PhoneNumber ?? "",
-    email: raw.email ?? raw.Email ?? "",
-    industryId: raw.industryId ?? raw.IndustryId ?? raw.industry?.industryId ?? null,
-    industryName: raw.industryName ?? raw.IndustryName ?? raw.industry?.industryName ?? "Unassigned",
-    status: raw.status ?? raw.Status ?? "Active",
-    joinedDate: raw.joinedDate ?? raw.JoinedDate ?? raw.createdDate ?? raw.CreatedDate ?? "",
+    id: raw.guidId,
+    name: raw.name,
+    phone: raw.phoneNumber,
+    industryId: raw.industryId,
+    industryName: raw.industry?.industryName ?? raw.IndustryName ?? raw.industry?.industryName ?? "Unassigned",
+    joinedDate: raw.joinedDate,
   };
 }
 
@@ -40,7 +36,7 @@ function normalizeIndustry(raw) {
 }
 
 function emptyDraft() {
-  return { name: "", phone: "", email: "", industryId: "", status: "Active", joinedDate: "" };
+  return { name: "", phone: "", industryId: "", joinedDate: "" };
 }
 
 // ---- Component --------------------------------------------------------------
@@ -81,8 +77,7 @@ export default function Staffs() {
       const matchesSearch =
         !q ||
         s.name.toLowerCase().includes(q) ||
-        s.phone.toLowerCase().includes(q) ||
-        s.email.toLowerCase().includes(q);
+        s.phone.toLowerCase().includes(q);
       return matchesCategory && matchesSearch;
     });
   }, [staff, activeIndustryId, search]);
@@ -96,10 +91,8 @@ export default function Staffs() {
   }, [staff, industries]);
 
   const stats = useMemo(() => {
-    const active = staff.filter((s) => s.status === "Active" || s.status === "On duty").length;
     return [
       { label: "Total staff", value: staff.length },
-      { label: "Active now", value: active },
       { label: "Categories covered", value: new Set(staff.map((s) => s.industryId).filter(Boolean)).size },
     ];
   }, [staff]);
@@ -116,9 +109,7 @@ export default function Staffs() {
     setDraft({
       name: person.name,
       phone: person.phone,
-      email: person.email,
       industryId: person.industryId ?? "",
-      status: person.status,
       joinedDate: person.joinedDate,
     });
     setErrors({});
@@ -140,9 +131,6 @@ export default function Staffs() {
     const next = {};
     if (!draft.name.trim()) next.name = "Enter the staff member's name";
     if (!/^[0-9+\s-]{7,15}$/.test(draft.phone.trim())) next.phone = "Enter a valid phone number";
-    if (draft.email.trim() && !/^\S+@\S+\.\S+$/.test(draft.email.trim())) {
-      next.email = "Enter a valid email, or leave it blank";
-    }
     if (!draft.industryId) next.industryId = "Choose a category";
     setErrors(next);
     return Object.keys(next).length === 0;
@@ -156,25 +144,21 @@ export default function Staffs() {
 
     const payload = {
       name: draft.name.trim(),
-      phone: draft.phone.trim(),
-      email: draft.email.trim(),
-      industryId: draft.industryId,
-      status: draft.status,
-      joinedDate: draft.joinedDate,
+      phoneNumber: draft.phone.trim(),
+      industryId: parseInt(draft.industryId, 10), 
+      joinedDate: draft.joinedDate || new Date().toISOString().split("T")[0],
     };
 
     const editPayload = [
       { op: "replace", path: "/name", value: payload.name },
-      { op: "replace", path: "/phone", value: payload.phone },
-      { op: "replace", path: "/email", value: payload.email },
+      { op: "replace", path: "/phoneNumber", value: payload.phoneNumber },
       { op: "replace", path: "/industryId", value: payload.industryId },
-      { op: "replace", path: "/status", value: payload.status },
       { op: "replace", path: "/joinedDate", value: payload.joinedDate },
     ];
 
     const res = editingId
-      ? await fetchAPI(`https://localhost:7011/api/Employee/update-employee-data/${editingId}`, "PATCH", editPayload)
-      : await fetchAPI("https://localhost:7011/api/Employee/addNewEmployee", "POST", payload);
+      ? await fetchAPI(`https://localhost:7011/api/Employee/UpdateEmployee/${editingId}`, "PATCH", editPayload)
+      : await fetchAPI("https://localhost:7011/api/Employee/AddEmployee", "POST", payload);
 
     setSubmitting(false);
 
@@ -188,7 +172,7 @@ export default function Staffs() {
 
   async function handleDelete(id) {
     setSubmitting(true);
-    const res = await fetchAPI(`https://localhost:7011/api/Employee/delete/${id}`, "DELETE");
+    const res = await fetchAPI(`https://localhost:7011/api/Employee/deleteEmployee/${id}`, "DELETE");
     setSubmitting(false);
     setConfirmDeleteId(null);
 
@@ -261,7 +245,7 @@ export default function Staffs() {
           <input
             type="search"
             className="wsw-staff__search"
-            placeholder="Search name, phone or email…"
+            placeholder="Search name or phone…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             aria-label="Search staff"
@@ -282,8 +266,6 @@ export default function Staffs() {
                     <th>Staff</th>
                     <th>Category</th>
                     <th>Phone</th>
-                    <th>Email</th>
-                    <th>Status</th>
                     <th aria-label="Actions" />
                   </tr>
                 </thead>
@@ -305,17 +287,6 @@ export default function Staffs() {
                         <span className="wsw-staff__category-tag">{person.industryName}</span>
                       </td>
                       <td className="wsw-staff__cell-muted">{person.phone || "—"}</td>
-                      <td className="wsw-staff__cell-muted">{person.email || "—"}</td>
-                      <td>
-                        <span
-                          className={
-                            "wsw-staff__status-pill wsw-staff__status-pill--" +
-                            person.status.toLowerCase().replace(/\s+/g, "-")
-                          }
-                        >
-                          {person.status}
-                        </span>
-                      </td>
                       <td>
                         <div className="wsw-staff__row-actions">
                           <button
@@ -395,79 +366,44 @@ export default function Staffs() {
                 {errors.name && <span className="wsw-staff__error">{errors.name}</span>}
               </div>
 
-              <div className="wsw-staff__field-row">
-                <div className="wsw-staff__field">
-                  <label className="wsw-staff__label" htmlFor="staff-phone">
-                    Phone number
-                  </label>
-                  <input
-                    id="staff-phone"
-                    type="tel"
-                    className={"wsw-staff__input" + (errors.phone ? " wsw-staff__input--error" : "")}
-                    value={draft.phone}
-                    onChange={(e) => updateDraft("phone", e.target.value)}
-                    placeholder="+977 98-XXXX-XXXX"
-                  />
-                  {errors.phone && <span className="wsw-staff__error">{errors.phone}</span>}
-                </div>
-                <div className="wsw-staff__field">
-                  <label className="wsw-staff__label" htmlFor="staff-email">
-                    Email <span className="wsw-staff__label-optional">(optional)</span>
-                  </label>
-                  <input
-                    id="staff-email"
-                    type="email"
-                    className={"wsw-staff__input" + (errors.email ? " wsw-staff__input--error" : "")}
-                    value={draft.email}
-                    onChange={(e) => updateDraft("email", e.target.value)}
-                    placeholder="name@example.com"
-                  />
-                  {errors.email && <span className="wsw-staff__error">{errors.email}</span>}
-                </div>
+              <div className="wsw-staff__field">
+                <label className="wsw-staff__label" htmlFor="staff-phone">
+                  Phone number
+                </label>
+                <input
+                  id="staff-phone"
+                  type="tel"
+                  className={"wsw-staff__input" + (errors.phone ? " wsw-staff__input--error" : "")}
+                  value={draft.phone}
+                  onChange={(e) => updateDraft("phone", e.target.value)}
+                  placeholder="+977 98-XXXX-XXXX"
+                />
+                {errors.phone && <span className="wsw-staff__error">{errors.phone}</span>}
               </div>
 
-              <div className="wsw-staff__field-row">
-                <div className="wsw-staff__field">
-                  <label className="wsw-staff__label" htmlFor="staff-category">
-                    Category
-                  </label>
-                  <select
-                    id="staff-category"
-                    className={"wsw-staff__select" + (errors.industryId ? " wsw-staff__input--error" : "")}
-                    value={draft.industryId}
-                    onChange={(e) => updateDraft("industryId", e.target.value)}
-                  >
-                    <option value="">-- Select category --</option>
-                    {industries.map((ind) => (
-                      <option key={ind.id} value={ind.id}>
-                        {ind.name}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.industryId && <span className="wsw-staff__error">{errors.industryId}</span>}
-                </div>
-                <div className="wsw-staff__field">
-                  <label className="wsw-staff__label" htmlFor="staff-status">
-                    Status
-                  </label>
-                  <select
-                    id="staff-status"
-                    className="wsw-staff__select"
-                    value={draft.status}
-                    onChange={(e) => updateDraft("status", e.target.value)}
-                  >
-                    {STATUS_OPTIONS.map((s) => (
-                      <option key={s} value={s}>
-                        {s}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+              <div className="wsw-staff__field">
+                <label className="wsw-staff__label" htmlFor="staff-category">
+                  Category
+                </label>
+                <select
+                  id="staff-category"
+                  className={"wsw-staff__select" + (errors.industryId ? " wsw-staff__input--error" : "")}
+                  value={draft.industryId}
+                  onChange={(e) => updateDraft("industryId", e.target.value)}
+                >
+                  <option value="">-- Select category --</option>
+                  {industries.map((ind) => (
+                    <option key={ind.id} value={ind.id}>
+                      {ind.name}
+                    </option>
+                  ))}
+                </select>
+                {errors.industryId && <span className="wsw-staff__error">{errors.industryId}</span>}
               </div>
 
               <div className="wsw-staff__field">
                 <label className="wsw-staff__label" htmlFor="staff-joined">
-                  Joined date <span className="wsw-staff__label-optional">(optional)</span>
+                  Joined date <span className="wsw-staff__label-optional"></span>
                 </label>
                 <input
                   id="staff-joined"

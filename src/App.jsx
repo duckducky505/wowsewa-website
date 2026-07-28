@@ -28,6 +28,7 @@ import AdminDashboard from './pages/AdminDashboard/Dashboard/AdminDashboard';
 import { AuthProvider } from './context/AuthContext';
 import ReceptionBookings from './pages/Reception/Bookings/ReceptionBooking';
 import CustomerHistory from './pages/Customer/CustomerHistory/CustomerHistory';
+import ReceivablePayablePage from './pages/Receivable/Receivablepayable';
 
 const App = () => {
 
@@ -60,9 +61,11 @@ const App = () => {
                 <Route element={<ProtectedRoute allow={["admin"]} />}>
                   <Route path="/admin/dashboard" element={<AdminDashboard />} />
                   <Route path="/admin/jobs" element={<JobsPage />} />
+                  <Route path="/admin/Category" element={<JobsCategory />} />
                   <Route path="/admin/staff" element={<Staffs />} />
                   <Route path="/admin/cashflow" element={<CashFlowPage />} />
                   <Route path="/admin/holding-sheet" element={<HoldingSheet />} />
+                  <Route path="/admin/receivable-payable" element={<ReceivablePayablePage />} />
                 </Route>
 
                 {/* Customer protected routes */} 

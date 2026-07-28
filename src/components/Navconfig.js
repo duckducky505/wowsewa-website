@@ -21,9 +21,11 @@ const ALL_NAV_ITEMS = [
   // ---- Admin ----
   { key: "dashboard-admin", label: "Dashboard", path: "/admin/dashboard", icon: MdSpaceDashboard, roles: ["admin"], group: "Overview" },
   { key: "jobs", label: "Jobs & pricing", path: "/admin/jobs", icon: MdBuild, roles: ["admin"], group: "Operations" },
+  { key: "jobs-category", label: "Jobs Category", path: "/admin/Category", icon: MdBuild, roles: ["admin"], group: "Operations" },
   { key: "staff", label: "Staffs", path: "/admin/staff", icon: MdPeopleAlt, roles: ["admin"], group: "Operations" },
   { key: "cashflow", label: "Cash Flow", path: "/admin/cashflow", icon: MdAccountBalanceWallet, roles: ["admin"], group: "Finance" },
-  { key: "holding", label: "HoldingSheet", path: "/admin/holding-sheet", icon: MdReceiptLong, roles: ["admin"], group: "Finance" },
+  { key: "holding", label: "Holding Sheet", path: "/admin/holding-sheet", icon: MdReceiptLong, roles: ["admin"], group: "Finance" },
+  { key: "receivable", label: "Receivable Payable", path: "/admin/receivable-payable", icon: MdReceiptLong, roles: ["admin"], group: "Finance" },
 
   // ---- Shared ----
   { key: "support", label: "Support", path: "/support", icon: MdSupportAgent, roles: ["customer", "receptionist", "admin"], group: "Account" },
