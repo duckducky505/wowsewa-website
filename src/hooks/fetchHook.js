@@ -2,8 +2,6 @@ import { useEffect, useState } from "react"
 import { fetchAPI } from "../utils/fetchAPI";
 
 export const fetchHook = (url) => {
-
-    
     const [data, setData] = useState(null);
     const [ loading, setLoading ] = useState(true);
 

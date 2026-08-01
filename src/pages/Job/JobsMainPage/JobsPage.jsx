@@ -30,6 +30,24 @@ function normalizeIndustry(raw) {
   };
 }
 
+// Matches the shape returned by GET /detailed-duties-summary: per-duty
+// booking counts and income, already sorted by income server-side.
+function normalizeDutySummary(raw) {
+  return {
+    dutyId: raw.dutyId ?? raw.DutyId,
+    dutyName: raw.dutyName ?? raw.DutyName ?? "",
+    description: raw.description ?? raw.Description ?? "",
+    duration: raw.duration ?? raw.Duration ?? "",
+    price: raw.price ?? raw.Price ?? 0,
+    industryId: raw.industryId ?? raw.IndustryId ?? null,
+    industryName: raw.industryName ?? raw.IndustryName ?? "",
+    totalBookings: raw.totalBookings ?? raw.TotalBookings ?? 0,
+    completedBookingsCount: raw.completedBookingsCount ?? raw.CompletedBookingsCount ?? 0,
+    pendingBookingsCount: raw.pendingBookingsCount ?? raw.PendingBookingsCount ?? 0,
+    totalIncomeGenerated: raw.totalIncomeGenerated ?? raw.TotalIncomeGenerated ?? 0,
+  };
+}
+
 function emptyDraft(industryId) {
   return { name: "", industryId: industryId || "", duration: "", price: "", description: "" };
 }
@@ -42,6 +60,9 @@ export default function JobsPage() {
   );
   const { data: rawDutyData, loading: dutiesLoading } = fetchHook(
     "https://localhost:7011/getAllDutyData"
+  );
+  const { data: rawSummaryData, loading: summaryLoading } = fetchHook(
+    "https://localhost:7011/api/Duty/detailed-duties-summary"
   );
 
   const [activeIndustryId, setActiveIndustryId] = useState("All");
@@ -70,6 +91,11 @@ export default function JobsPage() {
     [rawDutyData]
   );
 
+  const dutySummary = useMemo(
+    () => (rawSummaryData || []).map(normalizeDutySummary),
+    [rawSummaryData]
+  );
+
   const isLoading = industriesLoading || dutiesLoading;
 
   const filteredJobs = useMemo(() => {
@@ -90,6 +116,20 @@ export default function JobsPage() {
     });
     return counts;
   }, [jobs, industries]);
+
+  const summaryTotals = useMemo(
+    () =>
+      dutySummary.reduce(
+        (acc, row) => ({
+          totalBookings: acc.totalBookings + (row.totalBookings || 0),
+          completed: acc.completed + (row.completedBookingsCount || 0),
+          pending: acc.pending + (row.pendingBookingsCount || 0),
+          income: acc.income + (row.totalIncomeGenerated || 0),
+        }),
+        { totalBookings: 0, completed: 0, pending: 0, income: 0 }
+      ),
+    [dutySummary]
+  );
 
   // ---- Job form --------------------------------------------------------------
 
@@ -215,7 +255,7 @@ export default function JobsPage() {
 
     const payload = {
       industryName: name,
-    }
+    };
 
     setCategorySubmitting(true);
     const res = await fetchAPI("https://localhost:7011/api/Industry/addIndustryData", "POST", payload);
@@ -371,6 +411,73 @@ export default function JobsPage() {
               </p>
             </div>
           )}
+        </section>
+
+        {/* ---------- Duty performance summary ---------- */}
+        <div className="wsw-jobs__section-head">
+          <h2 className="wsw-jobs__section-title">Duty performance summary</h2>
+          <p className="wsw-jobs__section-sub">Bookings and income generated per job, highest earners first.</p>
+        </div>
+
+        <section className="wsw-jobs__panel" aria-label="Duty performance summary">
+          <div className="wsw-jobs__table-wrap">
+            <table className="wsw-jobs__summary-table">
+              <thead>
+                <tr>
+                  <th>Job</th>
+                  <th>Category</th>
+                  <th className="wsw-jobs__num-col">Price</th>
+                  <th className="wsw-jobs__num-col">Total bookings</th>
+                  <th className="wsw-jobs__num-col">Completed</th>
+                  <th className="wsw-jobs__num-col">Pending</th>
+                  <th className="wsw-jobs__num-col">Income generated</th>
+                </tr>
+              </thead>
+              <tbody>
+                {summaryLoading ? (
+                  <tr>
+                    <td colSpan={7}>
+                      <p className="wsw-jobs__loading-note">Loading performance summary…</p>
+                    </td>
+                  </tr>
+                ) : dutySummary.length > 0 ? (
+                  dutySummary.map((row) => (
+                    <tr className="wsw-jobs__row" key={row.dutyId}>
+                      <td className="wsw-jobs__cell-name">{row.dutyName}</td>
+                      <td>
+                        <span className="wsw-jobs__category-tag">{row.industryName}</span>
+                      </td>
+                      <td className="wsw-jobs__num-col">{formatRs(row.price)}</td>
+                      <td className="wsw-jobs__num-col">{row.totalBookings}</td>
+                      <td className="wsw-jobs__num-col wsw-jobs__num-completed">{row.completedBookingsCount}</td>
+                      <td className="wsw-jobs__num-col wsw-jobs__num-pending">{row.pendingBookingsCount}</td>
+                      <td className="wsw-jobs__num-col wsw-jobs__cell-price">{formatRs(row.totalIncomeGenerated)}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={7}>
+                      <div className="wsw-jobs__empty">
+                        <p className="wsw-jobs__empty-title">No bookings recorded yet</p>
+                        <p className="wsw-jobs__empty-body">Performance data will show up here once jobs get booked.</p>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+              {dutySummary.length > 0 && (
+                <tfoot>
+                  <tr className="wsw-jobs__total-row">
+                    <td colSpan={3}>Total</td>
+                    <td className="wsw-jobs__num-col">{summaryTotals.totalBookings}</td>
+                    <td className="wsw-jobs__num-col wsw-jobs__num-completed">{summaryTotals.completed}</td>
+                    <td className="wsw-jobs__num-col wsw-jobs__num-pending">{summaryTotals.pending}</td>
+                    <td className="wsw-jobs__num-col wsw-jobs__cell-price">{formatRs(summaryTotals.income)}</td>
+                  </tr>
+                </tfoot>
+              )}
+            </table>
+          </div>
         </section>
       </div>
 

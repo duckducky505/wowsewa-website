@@ -1,5 +1,5 @@
 // pages/AdminDashboard/AdminDashboard.jsx
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   MdNotificationsNone, MdFileDownload, MdTrendingUp,
@@ -12,36 +12,7 @@ import {
 import './AdminDashboard.css';
 import { fetchHook } from '../../../hooks/fetchHook';
 
-const MOCK_DATA_PROFLES = {
-  monthly: {
-    kpis: [
-      { label: "Total Income", value: "Rs. 1,450,000", delta: "+12.3%", up: true },
-      { label: "Total Expense", value: "Rs. 620,000", delta: "-3.1%", up: false },
-      { label: "Net Profit", value: "Rs. 830,000", delta: "+24.8%", up: true }
-    ],
-    chart: [
-      { name: 'Week 1', income: 320000, expense: 150000 },
-      { name: 'Week 2', income: 410000, expense: 180000 },
-      { name: 'Week 3', income: 370000, expense: 140000 },
-      { name: 'Week 4', income: 350000, expense: 150000 }
-    ]
-  },
-  yearly: {
-    kpis: [
-      { label: "Total Income", value: "Rs. 18,240,000", delta: "+18.5%", up: true },
-      { label: "Total Expense", value: "Rs. 7,890,000", delta: "+5.2%", up: false },
-      { label: "Net Profit", value: "Rs. 10,350,000", delta: "+31.4%", up: true }
-    ],
-    chart: [
-      { name: 'Jan', income: 1200000, expense: 550000 },
-      { name: 'Feb', income: 1350000, expense: 590000 },
-      { name: 'Mar', income: 1450000, expense: 620000 },
-      { name: 'Apr', income: 1100000, expense: 510000 },
-      { name: 'May', income: 1600000, expense: 680000 },
-      { name: 'Jun', income: 1550000, expense: 640000 }
-    ]
-  }
-};
+const MONTH_NAMES = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 // Custom tooltip for the cash flow bar chart — dark ledger-card style to match brand
 const CustomTooltip = ({ active, payload, label }) => {
@@ -61,54 +32,99 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
+function formatRs(value) {
+  return `Rs. ${Number(value || 0).toLocaleString()}`;
+}
+
+function computeDelta(current, previous) {
+  if (!previous) return { delta: 'N/A', up: current >= 0 };
+  const pct = ((current - previous) / Math.abs(previous)) * 100;
+  return { delta: `${pct >= 0 ? '+' : ''}${pct.toFixed(1)}%`, up: pct >= 0 };
+}
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
-  const [timeFrame, setTimeFrame] = useState('monthly');
   const [activeIndex, setActiveIndex] = useState(null);
 
-  const { data: categories_data } = fetchHook("https://localhost:7011/api/AdminDashboard/donut/industry-category");
+  const today = new Date();
+  const [selectedYear, setSelectedYear] = useState(today.getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState(today.getMonth() + 1); // 1-12
 
-  const monthNames = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const yearOptions = useMemo(() => {
+    const years = [];
+    for (let y = today.getFullYear(); y >= today.getFullYear() - 4; y--) years.push(y);
+    return years;
+  }, [today]);
 
-  const currentYear = new Date().getFullYear();
-  const chartUrl = timeFrame === 'monthly'
-    ? `https://localhost:7011/api/AdminDashboard/monthly/charts-data/${currentYear}`
-    : `https://localhost:7011/api/AdminDashboard/monthly/charts-data/${currentYear}`;
+  const { data: rawChartData } = fetchHook(
+    `https://localhost:7011/api/AdminDashboard/monthly/charts-data/${selectedYear}`
+  );
 
-  const { data: rawChartData } = fetchHook(chartUrl);
+  const { data: categories_data } = fetchHook(
+    `https://localhost:7011/api/AdminDashboard/donut/industry-category?year=${selectedYear}&month=${selectedMonth}`
+  );
 
-  const barChartData = timeFrame === 'monthly'
-    ? monthNames.slice(1).map((monthStr, index) => {
-        const currentMonthNum = index + 1;
-        const foundData = (rawChartData || []).find(item =>
-          item && (item.monthNumber == currentMonthNum || item.MonthNumber == currentMonthNum)
-        );
+  const { data: cashFlowData } = fetchHook('https://localhost:7011/api/CashFlow/get/allCashFlowData');
+  const { data: holdingData } = fetchHook('https://localhost:7011/api/HoldingSheet/get/holding-sheet-data');
 
-        return {
-          name: monthStr,
-          Earnings: foundData ? (foundData.income ?? foundData.Income ?? 0) : 0,
-          Expenses: foundData ? (foundData.expense ?? foundData.Expense ?? 0) : 0
-        };
-      })
-    : (rawChartData || []).map(item => ({
-        name: item.year ?? item.Year ?? "",
-        Earnings: item.income ?? item.Income ?? 0,
-        Expenses: item.expense ?? item.Expense ?? 0
-      }));
+  // Every month of the selected year, zero-filled where the API has no
+  // entry — the bar chart always shows all 12 bars, with the selected
+  // month visually emphasized rather than the chart being replaced.
+  const barChartData = useMemo(() => {
+    return MONTH_NAMES.slice(1).map((monthStr, index) => {
+      const monthNum = index + 1;
+      const found = (rawChartData || []).find(
+        (item) => item && (item.monthNumber == monthNum || item.MonthNumber == monthNum)
+      );
+      return {
+        name: monthStr,
+        monthNum,
+        Earnings: found ? (found.income ?? found.Income ?? 0) : 0,
+        Expenses: found ? (found.expense ?? found.Expense ?? 0) : 0,
+      };
+    });
+  }, [rawChartData]);
 
-  const activeProfile = MOCK_DATA_PROFLES[timeFrame];
-  const kpis = activeProfile.kpis;
+  // KPIs are derived from the single selected month, not the whole year —
+  // this is what actually changes when the admin picks a different
+  // month/year, rather than a static mock profile.
+  const kpis = useMemo(() => {
+    const current = barChartData.find((m) => m.monthNum === selectedMonth) || { Earnings: 0, Expenses: 0 };
+
+    const prevMonthNum = selectedMonth === 1 ? 12 : selectedMonth - 1;
+    const prevYear = selectedMonth === 1 ? selectedYear - 1 : selectedYear;
+    // Only looked up within the currently-loaded year's data — if the
+    // selected month is January, the previous month lives in a year we
+    // haven't fetched, so there's no delta to compare against.
+    const previous =
+      prevYear === selectedYear
+        ? barChartData.find((m) => m.monthNum === prevMonthNum)
+        : null;
+
+    const income = current.Earnings;
+    const expense = current.Expenses;
+    const net = income - expense;
+
+    const incomeDelta = computeDelta(income, previous?.Earnings);
+    const expenseDelta = computeDelta(expense, previous?.Expenses);
+    const netDelta = computeDelta(net, previous ? previous.Earnings - previous.Expenses : null);
+
+    return [
+      { label: 'Total Income', value: formatRs(income), ...incomeDelta },
+      { label: 'Total Expense', value: formatRs(expense), ...expenseDelta },
+      { label: 'Net Profit', value: formatRs(net), ...netDelta },
+    ];
+  }, [barChartData, selectedMonth, selectedYear]);
 
   // Brand-aligned donut palette: lime, deep green, amber, muted green, ink
   const categoryColors = ['#D1FE17', '#074C3A', '#E8A33D', '#4E9C7F', '#010A08'];
   const categoryData = categories_data?.map((item, idx) => ({
     name: item.industryName,
     value: item.totalEarnings,
-    color: categoryColors[idx % categoryColors.length]
+    color: categoryColors[idx % categoryColors.length],
   }));
 
-  const { data: cashFlowData } = fetchHook("https://localhost:7011/api/CashFlow/get/allCashFlowData");
-  const { data: holdingData } = fetchHook("https://localhost:7011/api/HoldingSheet/get/holding-sheet-data");
+  const selectedMonthLabel = `${MONTH_NAMES[selectedMonth]} ${selectedYear}`;
 
   return (
     <div className="wsw-admin fade-in-animation">
@@ -133,6 +149,36 @@ const AdminDashboard = () => {
       </header>
 
       <div className="wsw-admin__body">
+        {/* PERIOD PICKER */}
+        <section className="wsw-admin__period-bar" aria-label="Reporting period">
+          <div className="wsw-admin__period-label">
+            <MdCalendarToday size={15} />
+            <span>Showing data for <strong>{selectedMonthLabel}</strong></span>
+          </div>
+          <div className="wsw-admin__period-controls">
+            <select
+              className="wsw-admin__select wsw-admin__select--boxed"
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(Number(e.target.value))}
+              aria-label="Month"
+            >
+              {MONTH_NAMES.slice(1).map((m, i) => (
+                <option key={m} value={i + 1}>{m}</option>
+              ))}
+            </select>
+            <select
+              className="wsw-admin__select wsw-admin__select--boxed"
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(Number(e.target.value))}
+              aria-label="Year"
+            >
+              {yearOptions.map((y) => (
+                <option key={y} value={y}>{y}</option>
+              ))}
+            </select>
+          </div>
+        </section>
+
         {/* KPI STRIP */}
         <section className="wsw-admin__kpi-strip" aria-label="Key financial metrics">
           {kpis.map((k, i) => (
@@ -140,7 +186,7 @@ const AdminDashboard = () => {
               <span className="wsw-admin__kpi-label">{k.label}</span>
               <span className="wsw-admin__kpi-value">{k.value}</span>
               <span className={"wsw-admin__kpi-delta " + (k.up ? "wsw-admin__kpi-delta--up" : "wsw-admin__kpi-delta--down")}>
-                {k.up ? <MdTrendingUp size={14} /> : <MdTrendingDown size={14} />} {k.delta}
+                {k.delta !== 'N/A' && (k.up ? <MdTrendingUp size={14} /> : <MdTrendingDown size={14} />)} {k.delta}
               </span>
             </div>
           ))}
@@ -152,18 +198,7 @@ const AdminDashboard = () => {
             <div className="wsw-admin__card-head">
               <div>
                 <h3 className="wsw-admin__card-title">Cash Flow Run-Rate</h3>
-                <p className="wsw-admin__card-sub">Inflow vs outflow operational comparison</p>
-              </div>
-              <div className="wsw-admin__filter-toggle">
-                <MdCalendarToday className="wsw-admin__filter-icon" />
-                <select
-                  value={timeFrame}
-                  onChange={(e) => setTimeFrame(e.target.value)}
-                  className="wsw-admin__select"
-                >
-                  <option value="monthly">Monthly View</option>
-                  <option value="yearly">Yearly View</option>
-                </select>
+                <p className="wsw-admin__card-sub">{selectedYear} by month · {MONTH_NAMES[selectedMonth]} highlighted</p>
               </div>
             </div>
             <ResponsiveContainer width="100%" height={300}>
@@ -173,8 +208,24 @@ const AdminDashboard = () => {
                 <YAxis stroke="#5C6B60" tickLine={false} axisLine={false} />
                 <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(7, 76, 58, 0.05)' }} />
                 <Legend />
-                <Bar dataKey="Earnings" fill="#074C3A" radius={[4, 4, 0, 0]} barSize={12} />
-                <Bar dataKey="Expenses" fill="#E8A33D" radius={[4, 4, 0, 0]} barSize={12} />
+                <Bar dataKey="Earnings" radius={[4, 4, 0, 0]} barSize={12}>
+                  {barChartData.map((entry) => (
+                    <Cell
+                      key={`earn-${entry.monthNum}`}
+                      fill="#074C3A"
+                      opacity={entry.monthNum === selectedMonth ? 1 : 0.35}
+                    />
+                  ))}
+                </Bar>
+                <Bar dataKey="Expenses" radius={[4, 4, 0, 0]} barSize={12}>
+                  {barChartData.map((entry) => (
+                    <Cell
+                      key={`exp-${entry.monthNum}`}
+                      fill="#E8A33D"
+                      opacity={entry.monthNum === selectedMonth ? 1 : 0.35}
+                    />
+                  ))}
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -183,7 +234,7 @@ const AdminDashboard = () => {
             <div className="wsw-admin__card-head">
               <div>
                 <h3 className="wsw-admin__card-title">By Category</h3>
-                <p className="wsw-admin__card-sub">Share of volume revenue</p>
+                <p className="wsw-admin__card-sub">Share of volume revenue · {selectedMonthLabel}</p>
               </div>
             </div>
             <div className="wsw-admin__donut-wrap">
@@ -211,20 +262,24 @@ const AdminDashboard = () => {
                   </Pie>
                 </PieChart>
               </ResponsiveContainer>
-              <ul className="wsw-admin__legend-list">
-                {categoryData?.map((d, i) => (
-                  <li
-                    key={d.name}
-                    className="wsw-admin__legend-item"
-                    onMouseEnter={() => setActiveIndex(i)}
-                    onMouseLeave={() => setActiveIndex(null)}
-                  >
-                    <span className="wsw-admin__legend-dot" style={{ background: d.color }} />
-                    <span className="wsw-admin__legend-name">{d.name}</span>
-                    <span className="wsw-admin__legend-val">Rs {d.value}</span>
-                  </li>
-                ))}
-              </ul>
+              {categoryData?.length > 0 ? (
+                <ul className="wsw-admin__legend-list">
+                  {categoryData.map((d, i) => (
+                    <li
+                      key={d.name}
+                      className="wsw-admin__legend-item"
+                      onMouseEnter={() => setActiveIndex(i)}
+                      onMouseLeave={() => setActiveIndex(null)}
+                    >
+                      <span className="wsw-admin__legend-dot" style={{ background: d.color }} />
+                      <span className="wsw-admin__legend-name">{d.name}</span>
+                      <span className="wsw-admin__legend-val">Rs {d.value}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="wsw-admin__empty-note">No category data for {selectedMonthLabel}.</p>
+              )}
             </div>
           </div>
         </div>
@@ -283,7 +338,7 @@ const AdminDashboard = () => {
                 <h3 className="wsw-admin__card-title">Employee Holding Sheets</h3>
                 <p className="wsw-admin__card-sub">Active hand-to-hand balances</p>
               </div>
-              <button className="wsw-admin__view-more-btn" onClick={() => navigate('/admin/HoldingSheet')}>
+              <button className="wsw-admin__view-more-btn" onClick={() => navigate('/admin/holding-sheet')}>
                 View More <MdArrowOutward size={14} />
               </button>
             </div>

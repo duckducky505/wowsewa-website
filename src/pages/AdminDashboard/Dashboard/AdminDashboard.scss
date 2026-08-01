@@ -160,6 +160,62 @@
     z-index: 2;
   }
 
+  /* ---------- Period picker ---------- */
+
+  &__period-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    background: var(--wsw-paper);
+    border: 1px solid var(--wsw-line);
+    border-radius: 14px;
+    padding: 0.85rem 1.25rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 16px 32px -26px rgba(1, 10, 8, 0.3);
+  }
+
+  &__period-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--wsw-muted);
+
+    strong {
+      color: var(--wsw-ink);
+      font-weight: 700;
+    }
+
+    svg {
+      color: var(--wsw-green);
+      flex-shrink: 0;
+    }
+  }
+
+  &__period-controls {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  &__select--boxed {
+    background: var(--wsw-cream);
+    border: 1px solid var(--wsw-line);
+    border-radius: 10px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--wsw-ink);
+    cursor: pointer;
+    font-family: inherit;
+
+    &:focus-visible {
+      outline: 2px solid var(--wsw-green);
+      outline-offset: 1px;
+    }
+  }
+
   /* ---------- KPI strip ---------- */
 
   &__kpi-strip {
@@ -273,32 +329,6 @@
     margin: 0;
   }
 
-  &__filter-toggle {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: var(--wsw-cream);
-    border: 1px solid var(--wsw-line);
-    border-radius: 10px;
-    padding: 0.5rem 0.85rem;
-  }
-
-  &__filter-icon {
-    color: var(--wsw-green);
-    font-size: 0.9rem;
-  }
-
-  &__select {
-    background: transparent;
-    border: none;
-    color: var(--wsw-ink);
-    font-size: 0.85rem;
-    font-weight: 600;
-    outline: none;
-    cursor: pointer;
-    font-family: inherit;
-  }
-
   &__donut-wrap {
     display: flex;
     flex-direction: column;
@@ -347,6 +377,13 @@
     color: var(--wsw-ink);
     font-family: var(--wsw-font-mono);
     font-size: 0.8rem;
+  }
+
+  &__empty-note {
+    font-size: 0.82rem;
+    color: var(--wsw-muted);
+    text-align: center;
+    margin-top: 1rem;
   }
 
   /* ---------- Tooltip ---------- */

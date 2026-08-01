@@ -1,7 +1,12 @@
+const token = localStorage.getItem("Token");
+
 export const fetchAPI = async (url, method, body = null) => {
     const sideBody = {
         method: method,
-        headers: { "Content-Type": "application/json" }
+        headers: { "Content-Type": "application/json",
+                    "Authorization" : `Bearer ${token}`
+
+         },
     };
     
     if (body) sideBody.body = JSON.stringify(body);

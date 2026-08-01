@@ -113,6 +113,9 @@
   padding: 0 1.5rem;
   position: relative;
   z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 .wsw-jobs {
   /* ---------- Toolbar ---------- */
@@ -123,7 +126,6 @@
   align-items: center;
   gap: 1rem;
   flex-wrap: wrap;
-  margin-bottom: 1.25rem;
 }
 .wsw-jobs__category-tabs {
   display: flex;
@@ -182,13 +184,13 @@
 .wsw-jobs__table-wrap {
   overflow-x: auto;
 }
-.wsw-jobs__table {
+.wsw-jobs__table, .wsw-jobs__summary-table {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
   min-width: 56rem;
 }
-.wsw-jobs__table th {
+.wsw-jobs__table th, .wsw-jobs__summary-table th {
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -281,7 +283,7 @@
   gap: 0.4rem;
 }
 .wsw-jobs {
-  /* ---------- Empty state ---------- */
+  /* ---------- Empty / loading ---------- */
 }
 .wsw-jobs__empty {
   text-align: center;
@@ -295,6 +297,49 @@
   font-size: 0.85rem;
   color: var(--wsw-muted);
   margin: 0;
+}
+.wsw-jobs__loading-note {
+  text-align: center;
+  padding: 1.5rem 1rem;
+  color: var(--wsw-muted);
+  font-size: 0.88rem;
+}
+.wsw-jobs {
+  /* ---------- Duty performance summary ---------- */
+}
+.wsw-jobs__section-head {
+  margin-top: 0.5rem;
+}
+.wsw-jobs__section-title {
+  font-family: var(--wsw-font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem;
+}
+.wsw-jobs__section-sub {
+  font-size: 0.85rem;
+  color: var(--wsw-muted);
+  margin: 0;
+}
+.wsw-jobs__num-col {
+  text-align: right;
+  font-family: var(--wsw-font-mono);
+  white-space: nowrap;
+}
+.wsw-jobs__num-completed {
+  color: var(--wsw-green);
+  font-weight: 600;
+}
+.wsw-jobs__num-pending {
+  color: var(--wsw-amber);
+  font-weight: 600;
+}
+.wsw-jobs__total-row {
+  border-top: 2px solid var(--wsw-green);
+  font-weight: 700;
+}
+.wsw-jobs__total-row td {
+  padding: 0.9rem 1.1rem;
 }
 .wsw-jobs {
   /* ---------- Modal ---------- */

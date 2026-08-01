@@ -132,6 +132,9 @@
     padding: 0 1.5rem;
     position: relative;
     z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
   }
 
   /* ---------- Toolbar ---------- */
@@ -142,7 +145,6 @@
     align-items: center;
     gap: 1rem;
     flex-wrap: wrap;
-    margin-bottom: 1.25rem;
   }
 
   &__category-tabs {
@@ -209,7 +211,8 @@
     overflow-x: auto;
   }
 
-  &__table {
+  &__table,
+  &__summary-table {
     width: 100%;
     border-collapse: collapse;
     text-align: left;
@@ -325,7 +328,7 @@
     gap: 0.4rem;
   }
 
-  /* ---------- Empty state ---------- */
+  /* ---------- Empty / loading ---------- */
 
   &__empty {
     text-align: center;
@@ -341,6 +344,57 @@
     font-size: 0.85rem;
     color: var(--wsw-muted);
     margin: 0;
+  }
+
+  &__loading-note {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    color: var(--wsw-muted);
+    font-size: 0.88rem;
+  }
+
+  /* ---------- Duty performance summary ---------- */
+
+  &__section-head {
+    margin-top: 0.5rem;
+  }
+
+  &__section-title {
+    font-family: var(--wsw-font-display);
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem;
+  }
+
+  &__section-sub {
+    font-size: 0.85rem;
+    color: var(--wsw-muted);
+    margin: 0;
+  }
+
+  &__num-col {
+    text-align: right;
+    font-family: var(--wsw-font-mono);
+    white-space: nowrap;
+  }
+
+  &__num-completed {
+    color: var(--wsw-green);
+    font-weight: 600;
+  }
+
+  &__num-pending {
+    color: var(--wsw-amber);
+    font-weight: 600;
+  }
+
+  &__total-row {
+    border-top: 2px solid var(--wsw-green);
+    font-weight: 700;
+
+    td {
+      padding: 0.9rem 1.1rem;
+    }
   }
 
   /* ---------- Modal ---------- */
