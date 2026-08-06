@@ -2,7 +2,8 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { MdClose, MdChevronLeft, MdChevronRight, MdLogout } from "react-icons/md";
-import { getGroupedNavForRole, ROLE_LABELS } from "../Navconfig";
+import { getGroupedNavForRole, ROLE_LABELS } from "../navConfig";
+import logo from "../../assets/images/wowLogo.png";
 import "./Sidebar.css";
 
 function initials(name) {
@@ -31,8 +32,17 @@ export default function Sidebar({ role, user, isOpen, onClose, onLogout }) {
         }
         aria-label="Primary navigation"
       >
+        <button
+          type="button"
+          className="wsw-sidebar__collapse-handle"
+          onClick={() => setCollapsed((v) => !v)}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
+          {collapsed ? <MdChevronRight size={15} /> : <MdChevronLeft size={15} />}
+        </button>
+
         <div className="wsw-sidebar__brand">
-          <span className="wsw-sidebar__brand-mark">WS</span>
+          <img src={logo} alt="WowSewa" className="wsw-sidebar__logo" />
           {!collapsed && (
             <div className="wsw-sidebar__brand-text">
               <span className="wsw-sidebar__brand-name">WowSewa</span>
@@ -45,8 +55,9 @@ export default function Sidebar({ role, user, isOpen, onClose, onLogout }) {
         </div>
 
         <nav className="wsw-sidebar__nav">
-          {groups.map(({ group, items }) => (
+          {groups.map(({ group, items }, i) => (
             <div className="wsw-sidebar__group" key={group}>
+              {i > 0 && <div className="wsw-sidebar__group-divider" aria-hidden="true" />}
               {!collapsed && <p className="wsw-sidebar__group-label">{group}</p>}
               {items.map((item) => (
                 <NavLink
@@ -58,8 +69,9 @@ export default function Sidebar({ role, user, isOpen, onClose, onLogout }) {
                     "wsw-sidebar__link" + (isActive ? " wsw-sidebar__link--active" : "")
                   }
                 >
-                  <span className="wsw-sidebar__link-bar" aria-hidden="true" />
-                  <item.icon size={19} className="wsw-sidebar__link-icon" />
+                  <span className="wsw-sidebar__link-icon-chip">
+                    <item.icon size={17} className="wsw-sidebar__link-icon" />
+                  </span>
                   {!collapsed && <span className="wsw-sidebar__link-label">{item.label}</span>}
                 </NavLink>
               ))}
@@ -67,22 +79,13 @@ export default function Sidebar({ role, user, isOpen, onClose, onLogout }) {
           ))}
         </nav>
 
-        <button
-          type="button"
-          className="wsw-sidebar__collapse-toggle"
-          onClick={() => setCollapsed((v) => !v)}
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        >
-          {collapsed ? <MdChevronRight size={18} /> : <MdChevronLeft size={18} />}
-        </button>
-
         {user && (
           <div className="wsw-sidebar__user-card">
-            <span className="wsw-sidebar__user-avatar">{initials(user.name)}</span>
+            <span className="wsw-sidebar__user-avatar">{initials(user?.name)}</span>
             {!collapsed && (
               <div className="wsw-sidebar__user-info">
-                <p className="wsw-sidebar__user-name">{user.name}</p>
-                <p className="wsw-sidebar__user-email">{user.email}</p>
+                <p className="wsw-sidebar__user-name">{user?.name}</p>
+                <p className="wsw-sidebar__user-email">{user?.email}</p>
               </div>
             )}
             {!collapsed && (

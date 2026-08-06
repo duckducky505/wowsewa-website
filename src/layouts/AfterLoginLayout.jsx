@@ -7,21 +7,43 @@ import "./AfterLoginLayout.css";
 import { useAuth } from "../context/AuthContext";
 
 export default function AfterLoginLayout() {
-  const {user, logout } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const token = localStorage.getItem("Token");
+  const decodedToken = JSON.parse(atob(token.split(".")[1]));
+
+
+  const name =
+    decodedToken.name ||
+    decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/name"];
+
+  const userEmail =
+      decodedToken.email ||
+      decodedToken["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"];
+
+  const rawRole =
+      decodedToken.role ||
+      decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+
+  const guidId =
+      decodedToken.guidId ||
+      decodedToken["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
+
+
+  const role = (rawRole || "").toLowerCase();
+  
 
   function handleLogout() {
     logout();
     navigate("/login", { replace: true });
   }
 
-  const userRole = user?.role;
-
   return (
     <div className="wsw-app-layout">
       <Sidebar
-        role={userRole}
+        role={role}
         user={user}
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
@@ -31,7 +53,7 @@ export default function AfterLoginLayout() {
       <div className="wsw-app-layout__main">
         <Header
           user={user}
-          role={userRole}
+          role={role}
           onMenuClick={() => setSidebarOpen(true)}
           onLogout={handleLogout}
         />

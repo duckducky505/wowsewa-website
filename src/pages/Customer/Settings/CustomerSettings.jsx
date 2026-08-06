@@ -1,63 +1,41 @@
-import React, { useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import "./CustomerSettings.css";
-
-// ---- Mock data --------------------------------------------------------------
-
-const INITIAL_PROFILE = {
-  fullName: "Sagar Thapa",
-  phone: "+977 98-1234-5678",
-  email: "sagar.thapa@example.com",
-  language: "English",
-};
-
-const INITIAL_ADDRESSES = [
-  { id: "addr-1", label: "Home", address: "Baneshwor Height, Kathmandu", primary: true },
-  { id: "addr-2", label: "Office", address: "Durbar Marg, Kathmandu", primary: false },
-];
-
-const INITIAL_NOTIFICATIONS = {
-  bookingUpdates: { sms: true, email: true, push: true },
-  technicianEnRoute: { sms: true, email: false, push: true },
-  promotions: { sms: false, email: true, push: false },
-  receipts: { sms: false, email: true, push: false },
-};
-
-const NOTIFICATION_LABELS = {
-  bookingUpdates: { title: "Booking updates", body: "Confirmations, reschedules and cancellations" },
-  technicianEnRoute: { title: "Technician en route", body: "Alerts when your technician is on the way" },
-  promotions: { title: "Offers & promotions", body: "Seasonal discounts and new service launches" },
-  receipts: { title: "Receipts & invoices", body: "Payment confirmations after every job" },
-};
-
-const PAYMENT_METHODS = [
-  { id: "pm-1", type: "eSewa", detail: "Linked · sagar.t@esewa", primary: true },
-  { id: "pm-2", type: "Cash on service", detail: "Pay the technician directly", primary: false },
-];
+import { fetchHook } from "../../../hooks/fetchHook";
+import { fetchAPI } from "../../../utils/fetchAPI";
+import { useAuth } from "../../../context/AuthContext";
 
 const NAV_ITEMS = [
   { id: "profile", label: "Profile" },
   { id: "security", label: "Security" },
-  { id: "addresses", label: "Addresses" },
-  { id: "notifications", label: "Notifications" },
-  { id: "payment", label: "Payment methods" },
   { id: "privacy", label: "Privacy & data" },
 ];
 
 // ---- Helpers --------------------------------------------------------------
 
 function initials(name) {
-  return name
+  return (name || "")
     .split(" ")
+    .filter(Boolean)
     .map((n) => n[0])
     .join("")
     .slice(0, 2)
     .toUpperCase();
 }
 
+function normalizeProfile(raw) {
+  return {
+    name: raw.name ?? raw.Name ?? raw.fullName ?? raw.FullName ?? "",
+    phone: raw.phone ?? raw.Phone ?? raw.phoneNumber ?? raw.PhoneNumber ?? "",
+    email: raw.email ?? raw.Email ?? raw.emailAddress ?? raw.EmailAddress ?? "",
+  };
+}
+
 // ---- Component --------------------------------------------------------------
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("profile");
+  const { user, logout } = useAuth();
+  const guidId = user?.guidId ?? null;
 
   return (
     <div className="wsw-settings">
@@ -65,7 +43,7 @@ export default function SettingsPage() {
         <div className="wsw-settings__header-inner">
           <span className="wsw-settings__eyebrow">Account</span>
           <h1 className="wsw-settings__title">Settings</h1>
-          <p className="wsw-settings__subtitle">Manage your profile, security and preferences.</p>
+          <p className="wsw-settings__subtitle">Manage your profile, security and privacy.</p>
         </div>
       </header>
 
@@ -89,18 +67,15 @@ export default function SettingsPage() {
             ))}
           </ul>
 
-          <button type="button" className="wsw-settings__logout">
+          <button type="button" className="wsw-settings__logout" onClick={logout}>
             Log out
           </button>
         </nav>
 
         <div className="wsw-settings__content">
-          {activeTab === "profile" && <ProfileSection />}
-          {activeTab === "security" && <SecuritySection />}
-          {activeTab === "addresses" && <AddressesSection />}
-          {activeTab === "notifications" && <NotificationsSection />}
-          {activeTab === "payment" && <PaymentSection />}
-          {activeTab === "privacy" && <PrivacySection />}
+          {activeTab === "profile" && <ProfileSection guidId={guidId} />}
+          {activeTab === "security" && <SecuritySection guidId={guidId} />}
+          {activeTab === "privacy" && <PrivacySection guidId={guidId} logout={logout} />}
         </div>
       </div>
     </div>
@@ -109,27 +84,56 @@ export default function SettingsPage() {
 
 // ---- Profile --------------------------------------------------------------
 
-function ProfileSection() {
-  const [profile, setProfile] = useState(INITIAL_PROFILE);
-  const [draft, setDraft] = useState(INITIAL_PROFILE);
-  const [saved, setSaved] = useState(false);
+function ProfileSection({ guidId }) {
+  const { data: rawProfile, loading } = fetchHook(
+    guidId ? `https://localhost:7011/api/User/UserSpecificAccountInfo/${guidId}` : null
+  );
 
-  const isDirty = JSON.stringify(profile) !== JSON.stringify(draft);
+  const profile = useMemo(() => (rawProfile ? normalizeProfile(rawProfile) : null), [rawProfile]);
+  const [draft, setDraft] = useState(null);
+  const [saved, setSaved] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (profile && !draft) setDraft(profile);
+  }, [profile, draft]);
+
+  const isDirty = profile && draft && JSON.stringify(profile) !== JSON.stringify(draft);
 
   function updateField(field, value) {
     setDraft((prev) => ({ ...prev, [field]: value }));
     setSaved(false);
   }
 
-  function handleSave(e) {
+  async function handleSave(e) {
     e.preventDefault();
-    setProfile(draft);
-    setSaved(true);
+    if (!draft) return;
+    setSubmitting(true);
+
+    const res = await fetchAPI(`https://localhost:7011/api/User/UpdateUserDetails/${guidId}`, "PATCH", [
+      { op: "replace", path: "/Name", value: draft.name },
+      { op: "replace", path: "/Email", value: draft.email },
+    ]);
+    setSubmitting(false);
+
+    if (res) {
+      setSaved(true);
+    } else {
+      window.alert("Couldn't save your changes. Please try again.");
+    }
   }
 
   function handleReset() {
     setDraft(profile);
     setSaved(false);
+  }
+
+  if (loading || !draft) {
+    return (
+      <section className="wsw-settings__panel" aria-label="Profile">
+        <p className="wsw-settings__hint">Loading profile…</p>
+      </section>
+    );
   }
 
   return (
@@ -140,7 +144,7 @@ function ProfileSection() {
       </div>
 
       <div className="wsw-settings__avatar-row">
-        <span className="wsw-settings__avatar">{initials(profile.fullName)}</span>
+        <span className="wsw-settings__avatar">{initials(draft.name)}</span>
         <div>
           <button type="button" className="wsw-settings__ghost-btn">
             Change photo
@@ -150,60 +154,26 @@ function ProfileSection() {
       </div>
 
       <form className="wsw-settings__form" onSubmit={handleSave}>
-        <div className="wsw-settings__field-row">
-          <Field id="fullName" label="Full name" value={draft.fullName} onChange={(v) => updateField("fullName", v)} />
-          <div className="wsw-settings__field">
-            <label className="wsw-settings__label" htmlFor="language">
-              Preferred language
-            </label>
-            <select
-              id="language"
-              className="wsw-settings__select"
-              value={draft.language}
-              onChange={(e) => updateField("language", e.target.value)}
-            >
-              <option>English</option>
-              <option>नेपाली</option>
-            </select>
-          </div>
-        </div>
+        <Field id="fullName" label="Full name" value={draft.name} onChange={(v) => updateField("name", v)} />
 
         <div className="wsw-settings__field-row">
-          <div className="wsw-settings__field">
-            <label className="wsw-settings__label" htmlFor="phone">
-              Phone number
-            </label>
-            <div className="wsw-settings__input-with-badge">
-              <input
-                id="phone"
-                type="tel"
-                className="wsw-settings__input"
-                value={draft.phone}
-                onChange={(e) => updateField("phone", e.target.value)}
-              />
-              <span className="wsw-settings__verified-badge">Verified</span>
-            </div>
-          </div>
           <div className="wsw-settings__field">
             <label className="wsw-settings__label" htmlFor="email">
               Email address
             </label>
-            <div className="wsw-settings__input-with-badge">
-              <input
-                id="email"
-                type="email"
-                className="wsw-settings__input"
-                value={draft.email}
-                onChange={(e) => updateField("email", e.target.value)}
-              />
-              <span className="wsw-settings__verified-badge">Verified</span>
-            </div>
+            <input
+              id="email"
+              type="email"
+              className="wsw-settings__input"
+              value={draft.email}
+              onChange={(e) => updateField("email", e.target.value)}
+            />
           </div>
         </div>
 
         <div className="wsw-settings__form-actions">
-          <button type="submit" className="wsw-settings__primary-btn" disabled={!isDirty}>
-            Save changes
+          <button type="submit" className="wsw-settings__primary-btn" disabled={!isDirty || submitting}>
+            {submitting ? "Saving…" : "Save changes"}
           </button>
           {isDirty && (
             <button type="button" className="wsw-settings__ghost-btn" onClick={handleReset}>
@@ -219,11 +189,11 @@ function ProfileSection() {
 
 // ---- Security --------------------------------------------------------------
 
-function SecuritySection() {
+function SecuritySection({ guidId }) {
   const [passwords, setPasswords] = useState({ current: "", next: "", confirm: "" });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  const [twoFactor, setTwoFactor] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   function updatePassword(field, value) {
     setPasswords((prev) => ({ ...prev, [field]: value }));
@@ -231,7 +201,7 @@ function SecuritySection() {
     setSuccess(false);
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     if (!passwords.current || !passwords.next) {
       setError("Fill in your current and new password");
@@ -245,8 +215,20 @@ function SecuritySection() {
       setError("New password and confirmation don't match");
       return;
     }
-    setPasswords({ current: "", next: "", confirm: "" });
-    setSuccess(true);
+
+    setSubmitting(true);
+    const res = await fetchAPI(`https://localhost:7011/api/User/ChangePass/${guidId}`, "PATCH", {
+      currentPassword: passwords.current,
+      newPassword: passwords.next,
+    });
+    setSubmitting(false);
+
+    if (res) {
+      setPasswords({ current: "", next: "", confirm: "" });
+      setSuccess(true);
+    } else {
+      setError("Couldn't update your password. Check your current password and try again.");
+    }
   }
 
   return (
@@ -286,258 +268,34 @@ function SecuritySection() {
         {success && <p className="wsw-settings__saved-note">Password updated</p>}
 
         <div className="wsw-settings__form-actions">
-          <button type="submit" className="wsw-settings__primary-btn">
-            Update password
+          <button type="submit" className="wsw-settings__primary-btn" disabled={submitting}>
+            {submitting ? "Updating…" : "Update password"}
           </button>
         </div>
       </form>
-
-      <div className="wsw-settings__divider" />
-
-      <div className="wsw-settings__toggle-row">
-        <div>
-          <h3 className="wsw-settings__subhead">Two-factor authentication</h3>
-          <p className="wsw-settings__hint">Add an SMS code step when signing in from a new device.</p>
-        </div>
-        <Toggle checked={twoFactor} onChange={setTwoFactor} label="Two-factor authentication" />
-      </div>
-
-      <div className="wsw-settings__divider" />
-
-      <div>
-        <h3 className="wsw-settings__subhead">Active sessions</h3>
-        <ul className="wsw-settings__session-list">
-          <li className="wsw-settings__session-row">
-            <div>
-              <p className="wsw-settings__session-device">Chrome on Windows · Kathmandu</p>
-              <p className="wsw-settings__hint">This device · active now</p>
-            </div>
-            <span className="wsw-settings__current-badge">Current</span>
-          </li>
-          <li className="wsw-settings__session-row">
-            <div>
-              <p className="wsw-settings__session-device">WowSewa app on Android · Kathmandu</p>
-              <p className="wsw-settings__hint">Last active 2 days ago</p>
-            </div>
-            <button type="button" className="wsw-settings__ghost-btn wsw-settings__ghost-btn--danger">
-              Log out
-            </button>
-          </li>
-        </ul>
-      </div>
-    </section>
-  );
-}
-
-// ---- Addresses --------------------------------------------------------------
-
-function AddressesSection() {
-  const [addresses, setAddresses] = useState(INITIAL_ADDRESSES);
-  const [showForm, setShowForm] = useState(false);
-  const [newAddress, setNewAddress] = useState({ label: "", address: "" });
-
-  function handleSetPrimary(id) {
-    setAddresses((prev) => prev.map((a) => ({ ...a, primary: a.id === id })));
-  }
-
-  function handleRemove(id) {
-    setAddresses((prev) => prev.filter((a) => a.id !== id));
-  }
-
-  function handleAdd(e) {
-    e.preventDefault();
-    if (!newAddress.label.trim() || !newAddress.address.trim()) return;
-    setAddresses((prev) => [
-      ...prev,
-      { id: `addr-${Date.now()}`, label: newAddress.label, address: newAddress.address, primary: prev.length === 0 },
-    ]);
-    setNewAddress({ label: "", address: "" });
-    setShowForm(false);
-  }
-
-  return (
-    <section className="wsw-settings__panel" aria-label="Addresses">
-      <div className="wsw-settings__panel-head">
-        <h2 className="wsw-settings__panel-title">Addresses</h2>
-        <p className="wsw-settings__panel-desc">Service locations technicians can be sent to.</p>
-      </div>
-
-      <ul className="wsw-settings__address-list">
-        {addresses.map((a) => (
-          <li className="wsw-settings__address-row" key={a.id}>
-            <div>
-              <p className="wsw-settings__address-label">
-                {a.label}
-                {a.primary && <span className="wsw-settings__primary-tag">Primary</span>}
-              </p>
-              <p className="wsw-settings__hint">{a.address}</p>
-            </div>
-            <div className="wsw-settings__address-actions">
-              {!a.primary && (
-                <button type="button" className="wsw-settings__ghost-btn" onClick={() => handleSetPrimary(a.id)}>
-                  Make primary
-                </button>
-              )}
-              <button
-                type="button"
-                className="wsw-settings__ghost-btn wsw-settings__ghost-btn--danger"
-                onClick={() => handleRemove(a.id)}
-              >
-                Remove
-              </button>
-            </div>
-          </li>
-        ))}
-        {addresses.length === 0 && (
-          <p className="wsw-settings__hint">No saved addresses yet. Add one so booking is faster next time.</p>
-        )}
-      </ul>
-
-      {showForm ? (
-        <form className="wsw-settings__form wsw-settings__form--inline" onSubmit={handleAdd}>
-          <div className="wsw-settings__field-row">
-            <Field
-              id="new-address-label"
-              label="Label"
-              value={newAddress.label}
-              onChange={(v) => setNewAddress((prev) => ({ ...prev, label: v }))}
-              placeholder="Home, Office, Parents' house…"
-            />
-            <Field
-              id="new-address-text"
-              label="Address"
-              value={newAddress.address}
-              onChange={(v) => setNewAddress((prev) => ({ ...prev, address: v }))}
-              placeholder="Street, area, city"
-            />
-          </div>
-          <div className="wsw-settings__form-actions">
-            <button type="submit" className="wsw-settings__primary-btn">
-              Save address
-            </button>
-            <button type="button" className="wsw-settings__ghost-btn" onClick={() => setShowForm(false)}>
-              Cancel
-            </button>
-          </div>
-        </form>
-      ) : (
-        <button type="button" className="wsw-settings__ghost-btn" onClick={() => setShowForm(true)}>
-          + Add new address
-        </button>
-      )}
-    </section>
-  );
-}
-
-// ---- Notifications --------------------------------------------------------------
-
-function NotificationsSection() {
-  const [prefs, setPrefs] = useState(INITIAL_NOTIFICATIONS);
-
-  function toggle(key, channel) {
-    setPrefs((prev) => ({
-      ...prev,
-      [key]: { ...prev[key], [channel]: !prev[key][channel] },
-    }));
-  }
-
-  return (
-    <section className="wsw-settings__panel" aria-label="Notifications">
-      <div className="wsw-settings__panel-head">
-        <h2 className="wsw-settings__panel-title">Notifications</h2>
-        <p className="wsw-settings__panel-desc">Choose how you'd like to hear from us.</p>
-      </div>
-
-      <div className="wsw-settings__notif-table" role="table">
-        <div className="wsw-settings__notif-header" role="row">
-          <span role="columnheader">Type</span>
-          <span role="columnheader">SMS</span>
-          <span role="columnheader">Email</span>
-          <span role="columnheader">Push</span>
-        </div>
-        {Object.keys(prefs).map((key) => (
-          <div className="wsw-settings__notif-row" role="row" key={key}>
-            <div className="wsw-settings__notif-type">
-              <p>{NOTIFICATION_LABELS[key].title}</p>
-              <span className="wsw-settings__hint">{NOTIFICATION_LABELS[key].body}</span>
-            </div>
-            {["sms", "email", "push"].map((channel) => (
-              <span key={channel} className="wsw-settings__notif-cell">
-                <Toggle
-                  checked={prefs[key][channel]}
-                  onChange={() => toggle(key, channel)}
-                  label={`${NOTIFICATION_LABELS[key].title} via ${channel}`}
-                  compact
-                />
-              </span>
-            ))}
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-// ---- Payment --------------------------------------------------------------
-
-function PaymentSection() {
-  const [methods, setMethods] = useState(PAYMENT_METHODS);
-
-  function handleSetPrimary(id) {
-    setMethods((prev) => prev.map((m) => ({ ...m, primary: m.id === id })));
-  }
-
-  function handleRemove(id) {
-    setMethods((prev) => prev.filter((m) => m.id !== id));
-  }
-
-  return (
-    <section className="wsw-settings__panel" aria-label="Payment methods">
-      <div className="wsw-settings__panel-head">
-        <h2 className="wsw-settings__panel-title">Payment methods</h2>
-        <p className="wsw-settings__panel-desc">Used to pay for completed jobs.</p>
-      </div>
-
-      <ul className="wsw-settings__payment-list">
-        {methods.map((m) => (
-          <li className="wsw-settings__payment-row" key={m.id}>
-            <div>
-              <p className="wsw-settings__address-label">
-                {m.type}
-                {m.primary && <span className="wsw-settings__primary-tag">Default</span>}
-              </p>
-              <p className="wsw-settings__hint">{m.detail}</p>
-            </div>
-            <div className="wsw-settings__address-actions">
-              {!m.primary && (
-                <button type="button" className="wsw-settings__ghost-btn" onClick={() => handleSetPrimary(m.id)}>
-                  Make default
-                </button>
-              )}
-              <button
-                type="button"
-                className="wsw-settings__ghost-btn wsw-settings__ghost-btn--danger"
-                onClick={() => handleRemove(m.id)}
-              >
-                Remove
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
-
-      <button type="button" className="wsw-settings__ghost-btn">
-        + Add payment method
-      </button>
     </section>
   );
 }
 
 // ---- Privacy / danger zone --------------------------------------------------------------
 
-function PrivacySection() {
+function PrivacySection({ guidId, logout }) {
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [deleteInput, setDeleteInput] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  async function handleConfirmDelete() {
+    setSubmitting(true);
+    const res = await fetchAPI(`https://localhost:7011/api/Customer/deleteAccount/${guidId}`, "DELETE");
+    setSubmitting(false);
+
+    if (res) {
+      window.alert("Your account has been deleted.");
+      logout();
+    } else {
+      window.alert("Couldn't delete your account. Please try again.");
+    }
+  }
 
   return (
     <section className="wsw-settings__panel" aria-label="Privacy and data">
@@ -545,18 +303,6 @@ function PrivacySection() {
         <h2 className="wsw-settings__panel-title">Privacy & data</h2>
         <p className="wsw-settings__panel-desc">Control what WowSewa keeps about you.</p>
       </div>
-
-      <div className="wsw-settings__data-row">
-        <div>
-          <h3 className="wsw-settings__subhead">Download your data</h3>
-          <p className="wsw-settings__hint">Get a copy of your bookings, addresses and account details.</p>
-        </div>
-        <button type="button" className="wsw-settings__ghost-btn">
-          Request export
-        </button>
-      </div>
-
-      <div className="wsw-settings__divider" />
 
       <div className="wsw-settings__danger-zone">
         <h3 className="wsw-settings__subhead wsw-settings__subhead--danger">Delete account</h3>
@@ -584,8 +330,13 @@ function PrivacySection() {
               onChange={(e) => setDeleteInput(e.target.value)}
             />
             <div className="wsw-settings__form-actions">
-              <button type="button" className="wsw-settings__danger-btn" disabled={deleteInput !== "DELETE"}>
-                Confirm deletion
+              <button
+                type="button"
+                className="wsw-settings__danger-btn"
+                disabled={deleteInput !== "DELETE" || submitting}
+                onClick={handleConfirmDelete}
+              >
+                {submitting ? "Deleting…" : "Confirm deletion"}
               </button>
               <button
                 type="button"
@@ -622,24 +373,5 @@ function Field({ id, label, value, onChange, type = "text", placeholder }) {
         placeholder={placeholder}
       />
     </div>
-  );
-}
-
-function Toggle({ checked, onChange, label, compact }) {
-  return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      aria-label={label}
-      className={
-        "wsw-settings__toggle" +
-        (checked ? " wsw-settings__toggle--on" : "") +
-        (compact ? " wsw-settings__toggle--compact" : "")
-      }
-      onClick={() => onChange(!checked)}
-    >
-      <span className="wsw-settings__toggle-knob" />
-    </button>
   );
 }

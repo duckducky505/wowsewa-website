@@ -4,22 +4,11 @@ import { fetchHook } from "../../../hooks/fetchHook";
 import { fetchAPI } from "../../../utils/fetchAPI";
 import { useAuth } from "../../../context/AuthContext";
 
-const MOCK_PROFILE = {
-  name: "Sagar Thapa",
-  phone: "+977 98-1234-5678",
-  email: "sagar.thapa@example.com",
-  memberSince: "Mar 2024",
-};
-
-const MOCK_ADDRESSES = [
-  { id: "addr-1", label: "Home", address: "Baneshwor Height, Kathmandu", primary: true },
-  { id: "addr-2", label: "Office", address: "Durbar Marg, Kathmandu", primary: false },
-];
-
 // ---- Helpers --------------------------------------------------------------
 
 function initials(name) {
-  return (name || "")
+  if (!name) return "";
+  return name
     .split(" ")
     .filter(Boolean)
     .map((n) => n[0])
@@ -29,35 +18,39 @@ function initials(name) {
 }
 
 function formatRs(value) {
-  return `Rs ${Number(value || 0).toLocaleString()}`;
+  if (value === null || value === undefined) return "";
+  return `Rs ${Number(value).toLocaleString()}`;
 }
 
 function statusClass(status) {
-  return (status || "").toLowerCase().replace(/\s+/g, "-");
+  if (!status) return "";
+  return status.toLowerCase().replace(/\s+/g, "-");
 }
 
-function normalizeStage(raw, i) {
+function normalizeStage(raw) {
+  if (!raw) return "";
   if (typeof raw === "string") return raw;
-  return raw.stageName ?? raw.StageName ?? raw.name ?? raw.Name ?? `Stage ${i + 1}`;
+  return raw.stageName ?? raw.StageName ?? raw.name ?? raw.Name;
 }
 
 function normalizeBooking(raw) {
+  if (!raw) return null;
   return {
     id: raw.bookingId,
     code: raw.bookingCode,
-    service: raw.duty?.dutyName ?? "",
-    category: raw.industry?.industryName ?? "",
+    service: raw.duty?.dutyName,
+    category: raw.industry?.industryName,
     date: raw.preferredDate,
     slot: raw.preferredTime,
     address: raw.address,
     price: raw.price,
-    status: raw.bookingStatus ?? raw.status ?? "Pending",
-    rated: raw.rating ?? raw.Rating ?? null,
+    status: raw.bookingStatus ?? raw.status,
+    rated: raw.rating ?? raw.Rating,
     technician: raw.technician
       ? {
-          name: raw.technician.name ?? "",
-          rating: raw.technician.rating ?? null,
-          phone: raw.technician.phone ?? "",
+          name: raw.technician.name,
+          rating: raw.technician.rating,
+          phone: raw.technician.phone,
         }
       : null,
   };
@@ -72,6 +65,11 @@ export default function CustomerDashboard() {
   const [tab, setTab] = useState("upcoming");
   const [ratingDraft, setRatingDraft] = useState({});
   const [cancellingId, setCancellingId] = useState(null);
+
+  // Profile Fetch
+  const { data: profileData, loading: profileLoading } = fetchHook(
+    guidId ? `https://localhost:7011/api/User/UserSpecificAccountInfo/${guidId}` : null
+  );
 
   const { data: rawStages, loading: stagesLoading } = fetchHook(
     "https://localhost:7011/api/Booking/getBookingStatus"
@@ -93,25 +91,26 @@ export default function CustomerDashboard() {
     () =>
       (rawStages || [])
         .map(normalizeStage)
-        .filter((s) => s.toLowerCase() !== "cancelled"),
+        .filter((s) => s && s.toLowerCase() !== "cancelled"),
     [rawStages]
   );
 
   const pendingBookings = useMemo(
-    () => (rawPending || []).map(normalizeBooking).filter((b) => b.status.toLowerCase() !== "cancelled"),
+    () =>
+      (rawPending || [])
+        .map(normalizeBooking)
+        .filter((b) => b && b.status?.toLowerCase() !== "cancelled"),
     [rawPending]
   );
 
   const historyBookings = useMemo(() => {
-    const completed = (rawHistory || []).map(normalizeBooking);
-    const cancelled = (rawCancelled || []).map(normalizeBooking);
+    const completed = (rawHistory || []).map(normalizeBooking).filter(Boolean);
+    const cancelled = (rawCancelled || []).map(normalizeBooking).filter(Boolean);
     return [...completed, ...cancelled].sort(
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
     );
   }, [rawHistory, rawCancelled]);
 
-  // Soonest pending booking stands in as the "active job" card — never
-  // cancelled, since pendingBookings above already filters those out.
   const activeJob = useMemo(() => {
     if (pendingBookings.length === 0) return null;
     return [...pendingBookings].sort(
@@ -119,30 +118,37 @@ export default function CustomerDashboard() {
     )[0];
   }, [pendingBookings]);
 
-  // Where the active job's status actually sits along the tracker — e.g.
-  // "Pending" lights up just the first dot, "Completed" fills the whole
-  // bar. Falls back to 0 (start of the bar) if the status string doesn't
-  // match any known stage, rather than crashing or showing nothing lit.
   const activeStageIndex = useMemo(() => {
-    if (!activeJob) return 0;
+    if (!activeJob || !activeJob.status) return 0;
     const idx = stages.findIndex((s) => s.toLowerCase() === activeJob.status.toLowerCase());
     return idx === -1 ? 0 : idx;
   }, [activeJob, stages]);
 
   const stats = useMemo(() => {
     const completedThisYear = historyBookings.filter((b) => {
-      if (b.status.toLowerCase() !== "completed") return false;
+      if (b.status?.toLowerCase() !== "completed") return false;
+      if (!b.date) return false;
       return new Date(b.date).getFullYear() === new Date().getFullYear();
     });
     const spent = completedThisYear.reduce((sum, b) => sum + Number(b.price || 0), 0);
 
     return [
       { label: "Upcoming", value: pendingBookings.length },
-      { label: "Completed jobs", value: historyBookings.filter((b) => b.status.toLowerCase() === "completed").length },
+      { label: "Completed jobs", value: historyBookings.filter((b) => b.status?.toLowerCase() === "completed").length },
       { label: "This year, spent", value: formatRs(spent) },
-      { label: "Saved addresses", value: MOCK_ADDRESSES.length },
     ];
   }, [pendingBookings, historyBookings]);
+
+  const userProfile = useMemo(() => {
+    if (!profileData) return null;
+    return {
+      name: profileData.name || profileData.fullName,
+      email: profileData.emailAddress,
+      memberSince: profileData.dateCreated
+        ? new Date(profileData.dateCreated).toLocaleDateString(undefined, { year: 'numeric', month: 'short' })
+        : null
+    };
+  }, [profileData]);
 
   const isLoadingUpcoming = pendingLoading || stagesLoading;
   const isLoadingHistory = historyLoading || cancelledLoading;
@@ -180,7 +186,7 @@ export default function CustomerDashboard() {
           <div className="wsw-dashboard__greeting">
             <span className="wsw-dashboard__eyebrow">Your account</span>
             <h1 className="wsw-dashboard__title">
-              Welcome back, {MOCK_PROFILE.name.split(" ")[0]}
+              Welcome back{userProfile?.name ? `, ${userProfile.name.split(" ")[0]}` : ""}
             </h1>
             <p className="wsw-dashboard__subtitle">Here's what's happening with your services.</p>
           </div>
@@ -218,12 +224,14 @@ export default function CustomerDashboard() {
                     <div className="wsw-dashboard__active-job-info">
                       <h3 className="wsw-dashboard__active-job-service">{activeJob.service}</h3>
                       <p className="wsw-dashboard__active-job-meta">
-                        {activeJob.category} · {activeJob.date}, {activeJob.slot}
+                        {activeJob.category && `${activeJob.category} · `}
+                        {activeJob.date && `${activeJob.date}`}
+                        {activeJob.slot && `, ${activeJob.slot}`}
                       </p>
                       <p className="wsw-dashboard__active-job-address">{activeJob.address}</p>
                     </div>
 
-                    {activeJob.technician && (
+                    {activeJob.technician && activeJob.technician.name && (
                       <div className="wsw-dashboard__technician">
                         <span className="wsw-dashboard__technician-avatar">
                           {initials(activeJob.technician.name)}
@@ -302,7 +310,9 @@ export default function CustomerDashboard() {
                         <div className="wsw-dashboard__booking-main">
                           <span className="wsw-dashboard__booking-service">{b.service}</span>
                           <span className="wsw-dashboard__booking-meta">
-                            {b.category} · {b.date}, {b.slot}
+                            {b.category && `${b.category} · `}
+                            {b.date && `${b.date}`}
+                            {b.slot && `, ${b.slot}`}
                           </span>
                           <span className="wsw-dashboard__booking-address">{b.address}</span>
                         </div>
@@ -337,7 +347,9 @@ export default function CustomerDashboard() {
                       <div className="wsw-dashboard__booking-main">
                         <span className="wsw-dashboard__booking-service">{b.service}</span>
                         <span className="wsw-dashboard__booking-meta">
-                          {b.category} · {b.date} · {formatRs(b.price)}
+                          {b.category && `${b.category} · `}
+                          {b.date && `${b.date} · `}
+                          {b.price && formatRs(b.price)}
                         </span>
                         <span className="wsw-dashboard__booking-code">{b.code}</span>
                       </div>
@@ -345,13 +357,13 @@ export default function CustomerDashboard() {
                         <span className={"wsw-dashboard__status wsw-dashboard__status--" + statusClass(b.status)}>
                           {b.status}
                         </span>
-                        {b.status.toLowerCase() === "completed" && b.rated === null && !ratingDraft[b.code] && (
+                        {b.status?.toLowerCase() === "completed" && b.rated === null && !ratingDraft[b.code] && (
                           <RatingPicker value={0} onRate={(rating) => submitRating(b, rating)} />
                         )}
-                        {b.status.toLowerCase() === "completed" && (b.rated !== null || ratingDraft[b.code]) && (
+                        {b.status?.toLowerCase() === "completed" && (b.rated !== null || ratingDraft[b.code]) && (
                           <span className="wsw-dashboard__rated">★ {b.rated ?? ratingDraft[b.code]} rated</span>
                         )}
-                        {b.status.toLowerCase() === "completed" && (
+                        {b.status?.toLowerCase() === "completed" && (
                           <button type="button" className="wsw-dashboard__link-btn">
                             Rebook
                           </button>
@@ -369,51 +381,38 @@ export default function CustomerDashboard() {
           <aside className="wsw-dashboard__side">
             <section className="wsw-dashboard__panel wsw-dashboard__panel--compact" aria-label="Account details">
               <h2 className="wsw-dashboard__panel-title">Account</h2>
-              <div className="wsw-dashboard__profile">
-                <span className="wsw-dashboard__profile-avatar">{initials(MOCK_PROFILE.name)}</span>
-                <div>
-                  <p className="wsw-dashboard__profile-name">{MOCK_PROFILE.name}</p>
-                  <p className="wsw-dashboard__profile-since">Customer since {MOCK_PROFILE.memberSince}</p>
-                </div>
-              </div>
-              <dl className="wsw-dashboard__detail-list">
-                <div className="wsw-dashboard__detail-item">
-                  <dt>Phone</dt>
-                  <dd>{MOCK_PROFILE.phone}</dd>
-                </div>
-                <div className="wsw-dashboard__detail-item">
-                  <dt>Email</dt>
-                  <dd>{MOCK_PROFILE.email}</dd>
-                </div>
-              </dl>
-              <button type="button" className="wsw-dashboard__link-btn">
-                Edit profile
-              </button>
-            </section>
-
-            <section className="wsw-dashboard__panel wsw-dashboard__panel--compact" aria-label="Saved addresses">
-              <div className="wsw-dashboard__panel-head">
-                <h2 className="wsw-dashboard__panel-title">Addresses</h2>
-                <button type="button" className="wsw-dashboard__link-btn">
-                  + Add
-                </button>
-              </div>
-              <ul className="wsw-dashboard__address-list">
-                {MOCK_ADDRESSES.map((a) => (
-                  <li className="wsw-dashboard__address-row" key={a.id}>
+              {profileLoading ? (
+                <p className="wsw-dashboard__loading-note">Loading profile...</p>
+              ) : userProfile ? (
+                <>
+                  <div className="wsw-dashboard__profile">
+                    <span className="wsw-dashboard__profile-avatar">{initials(userProfile.name)}</span>
                     <div>
-                      <p className="wsw-dashboard__address-label">
-                        {a.label}
-                        {a.primary && <span className="wsw-dashboard__address-primary">Primary</span>}
-                      </p>
-                      <p className="wsw-dashboard__address-text">{a.address}</p>
+                      {userProfile.name && <p className="wsw-dashboard__profile-name">{userProfile.name}</p>}
+                      {userProfile.memberSince && (
+                        <p className="wsw-dashboard__profile-since">Customer since {userProfile.memberSince}</p>
+                      )}
                     </div>
-                    <button type="button" className="wsw-dashboard__link-btn">
-                      Edit
-                    </button>
-                  </li>
-                ))}
-              </ul>
+                  </div>
+                  <dl className="wsw-dashboard__detail-list">
+                    {userProfile.phone && (
+                      <div className="wsw-dashboard__detail-item">
+                        <dt>Phone</dt>
+                        <dd>{userProfile.phone}</dd>
+                      </div>
+                    )}
+                    {userProfile.email && (
+                      <div className="wsw-dashboard__detail-item">
+                        <dt>Email</dt>
+                        <dd>{userProfile.email}</dd>
+                      </div>
+                    )}
+                  </dl>
+                  <button type="button" className="wsw-dashboard__link-btn">
+                    Edit profile
+                  </button>
+                </>
+              ) : null}
             </section>
 
             <section className="wsw-dashboard__panel wsw-dashboard__panel--compact wsw-dashboard__panel--dark" aria-label="Support">

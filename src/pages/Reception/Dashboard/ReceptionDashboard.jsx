@@ -79,7 +79,7 @@ export default function ReceptionistPage() {
   const [dismissingId, setDismissingId] = useState(null);
 
   const { data: rawBookings, loading: bookingsLoading } = fetchHook(
-    "https://localhost:7011/api/Booking/getBookings"
+    "https://localhost:7011/api/Booking/getAllPendingBookings"
   );
   const { data: rawEmployees, loading: staffLoading } = fetchHook(
     "https://localhost:7011/api/Employee/getEmployeesDetail"
@@ -91,14 +91,12 @@ export default function ReceptionistPage() {
   const bookings = useMemo(() => (rawBookings || []).map(normalizeBooking), [rawBookings]);
   const industries = useMemo(() => (rawIndustries || []).map(normalizeIndustry), [rawIndustries]);
 
-  // Pending bookings need a technician assigned — this is the queue.
   const queue = useMemo(
     () => bookings.filter((b) => b.status === "Pending" && !b.technicianId),
     [bookings]
   );
 
-  // Today's schedule only shows jobs actually in motion or wrapped up today —
-  // not pending ones, which already live in the queue above.
+
   const todaysSchedule = useMemo(
     () =>
       bookings.filter(
@@ -107,8 +105,7 @@ export default function ReceptionistPage() {
     [bookings]
   );
 
-  // A technician counts as "on a job" if they have an in-progress booking
-  // right now, "off duty" if HR marked them that way, otherwise available.
+
   const technicians = useMemo(() => {
     const employees = (rawEmployees || []).map(normalizeEmployee);
     return employees.map((emp) => {

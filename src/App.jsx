@@ -7,8 +7,8 @@ import Services from './pages/Services/Services';
 import About from './pages/About/About';
 import PrivacyPolicy from './pages/TermsAndConditions/WowPrivacy';
 import TermsAndConditions from './pages/TermsAndConditions/TermsAndConditions';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
+import Login from './pages/AuthPages/Login';
+import Signup from './pages/AuthPages/Signup';
 import Staffs from './pages/Staffs/Staffs';
 import Users from './pages/Users/Users';
 import ProtectedRoute from './routes/ProtectedRoute';
@@ -29,6 +29,7 @@ import { AuthProvider } from './context/AuthContext';
 import ReceptionBookings from './pages/Reception/Bookings/ReceptionBooking';
 import CustomerHistory from './pages/Customer/CustomerHistory/CustomerHistory';
 import ReceivablePayablePage from './pages/Receivable/Receivablepayable';
+import ExpenseTracker from './pages/Reception/ExpenseTracker/ExpenseTracker';
 
 const App = () => {
 
@@ -76,6 +77,7 @@ const App = () => {
                   <Route path="/settings" element={<CustomerSettings />} />
                   <Route path="/reception/dashboard" element={<ReceptionDashboard/>} />
                   <Route path="/reception/bookings" element={<ReceptionBookings/>} />
+                  <Route path="/reception/expense" element={<ExpenseTracker/>} />
 
                 </Route>
               </Route>

@@ -16,9 +16,6 @@
   --wsw-sidebar-width-collapsed: 4.5rem;
   width: var(--wsw-sidebar-width);
   flex-shrink: 0;
-  /* Same deep green as every page header band — this is what ties the
-     sidebar back into the rest of the product instead of reading as a
-     separate dark-mode panel bolted onto a light app. */
   background: var(--wsw-green);
   background-image: repeating-linear-gradient(135deg, rgba(209, 254, 23, 0.035) 0px, rgba(209, 254, 23, 0.035) 1px, transparent 1px, transparent 14px);
   color: var(--wsw-cream);
@@ -47,6 +44,28 @@
   display: none;
 }
 .wsw-sidebar {
+  /* ---------- Collapse handle — floats on the sidebar's right edge ---------- */
+}
+.wsw-sidebar__collapse-handle {
+  position: absolute;
+  top: 5.5rem;
+  right: -0.7rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: var(--wsw-lime);
+  color: var(--wsw-ink);
+  border: 2px solid var(--wsw-cream);
+  display: grid;
+  place-items: center;
+  z-index: 2;
+  box-shadow: 0 4px 10px rgba(1, 10, 8, 0.35);
+  transition: transform 0.15s ease;
+}
+.wsw-sidebar__collapse-handle:hover {
+  transform: scale(1.1);
+}
+.wsw-sidebar {
   /* ---------- Brand ---------- */
 }
 .wsw-sidebar__brand {
@@ -55,19 +74,17 @@
   gap: 0.7rem;
   padding: 1.35rem 1.1rem;
   border-bottom: 1px solid rgba(248, 250, 234, 0.12);
-  min-height: 4rem;
+  min-height: 4.5rem;
+  position: relative;
 }
-.wsw-sidebar__brand-mark {
-  display: grid;
-  place-items: center;
-  width: 2.1rem;
-  height: 2.1rem;
+.wsw-sidebar__logo {
+  width: 2.3rem;
+  height: 2.3rem;
+  -o-object-fit: contain;
+     object-fit: contain;
   border-radius: 8px;
-  background: var(--wsw-lime);
-  color: var(--wsw-ink);
-  font-family: var(--wsw-font-mono);
-  font-weight: 700;
-  font-size: 0.8rem;
+  background: var(--wsw-cream);
+  padding: 0.25rem;
   flex-shrink: 0;
 }
 .wsw-sidebar__brand-text {
@@ -104,14 +121,19 @@
   padding: 0.85rem 0.65rem;
   display: flex;
   flex-direction: column;
-  gap: 1.1rem;
+  gap: 0.35rem;
   overflow-y: auto;
   overflow-x: hidden;
 }
 .wsw-sidebar__group {
   display: flex;
   flex-direction: column;
-  gap: 0.1rem;
+  gap: 0.15rem;
+}
+.wsw-sidebar__group-divider {
+  height: 1px;
+  background: rgba(248, 250, 234, 0.1);
+  margin: 0.6rem 0.5rem 0.75rem;
 }
 .wsw-sidebar__group-label {
   font-family: var(--wsw-font-mono);
@@ -126,9 +148,9 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.6rem 0.7rem;
-  border-radius: 8px;
+  gap: 0.7rem;
+  padding: 0.45rem 0.6rem;
+  border-radius: 10px;
   color: rgba(248, 250, 234, 0.72);
   text-decoration: none;
   font-size: 0.87rem;
@@ -140,55 +162,37 @@
   background: rgba(248, 250, 234, 0.08);
   color: var(--wsw-cream);
 }
-.wsw-sidebar__link--active {
-  color: var(--wsw-ink);
-  font-weight: 600;
-  /* Solid lime fill, same accent used for primary buttons and badges
-     on every other page — reads as "this product's accent," not a
-     one-off dark-theme highlight. */
-  background: var(--wsw-lime);
+.wsw-sidebar__link:hover .wsw-sidebar__link-icon-chip {
+  background: rgba(248, 250, 234, 0.12);
 }
-.wsw-sidebar__link--active .wsw-sidebar__link-bar {
-  opacity: 0;
+.wsw-sidebar__link--active {
+  color: var(--wsw-cream);
+  font-weight: 600;
+  background: rgba(248, 250, 234, 0.06);
+}
+.wsw-sidebar__link--active .wsw-sidebar__link-icon-chip {
+  background: var(--wsw-lime);
 }
 .wsw-sidebar__link--active .wsw-sidebar__link-icon {
   color: var(--wsw-ink);
 }
-.wsw-sidebar__link-bar {
-  position: absolute;
-  left: -0.65rem;
-  top: 0.35rem;
-  bottom: 0.35rem;
-  width: 3px;
-  border-radius: 999px;
-  background: var(--wsw-lime);
-  opacity: 0;
-  transition: opacity 0.15s ease;
+.wsw-sidebar__link-icon-chip {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 8px;
+  background: rgba(248, 250, 234, 0.05);
+  flex-shrink: 0;
+  transition: background 0.15s ease;
 }
 .wsw-sidebar__link-icon {
   flex-shrink: 0;
-  opacity: 0.95;
+  color: inherit;
 }
 .wsw-sidebar__link-label {
   overflow: hidden;
   text-overflow: ellipsis;
-}
-.wsw-sidebar {
-  /* ---------- Collapse toggle ---------- */
-}
-.wsw-sidebar__collapse-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  background: none;
-  border: none;
-  border-top: 1px solid rgba(248, 250, 234, 0.12);
-  color: rgba(248, 250, 234, 0.6);
-  padding: 0.6rem;
-}
-.wsw-sidebar__collapse-toggle:hover {
-  color: var(--wsw-lime);
 }
 .wsw-sidebar {
   /* ---------- User card ---------- */
@@ -266,7 +270,7 @@
   .wsw-sidebar__close {
     display: inline-flex;
   }
-  .wsw-sidebar__collapse-toggle {
+  .wsw-sidebar__collapse-handle {
     display: none;
   }
   .wsw-sidebar__scrim {

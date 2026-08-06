@@ -113,7 +113,7 @@ export default function ReceptionBookings() {
 
   function closeEdit() {
     setEditingBooking(null);
-    setDraft(null);
+    setDraft(null); 
     setErrors({});
   }
 
