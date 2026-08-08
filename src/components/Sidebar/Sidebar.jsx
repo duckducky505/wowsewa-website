@@ -1,4 +1,3 @@
-// components/Sidebar/Sidebar.jsx
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { MdClose, MdChevronLeft, MdChevronRight, MdLogout } from "react-icons/md";
@@ -95,6 +94,8 @@ export default function Sidebar({ role, user, isOpen, onClose, onLogout }) {
             )}
           </div>
         )}
+
+        {!collapsed && <div className="wsw-sidebar__foot">console v2.4 · secure</div>}
       </aside>
     </>
   );

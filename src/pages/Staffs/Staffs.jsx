@@ -150,7 +150,7 @@ export default function Staffs() {
     };
 
     const editPayload = [
-      { op: "replace", path: "/name", value: payload.name },
+      { op: "replace", path: "/name", value: payload.fullNamename },
       { op: "replace", path: "/phoneNumber", value: payload.phoneNumber },
       { op: "replace", path: "/industryId", value: payload.industryId },
       { op: "replace", path: "/joinedDate", value: payload.joinedDate },
@@ -274,9 +274,9 @@ export default function Staffs() {
                     <tr className="wsw-staff__row" key={person.id}>
                       <td>
                         <div className="wsw-staff__person">
-                          <span className="wsw-staff__avatar">{initials(person.name)}</span>
+                          <span className="wsw-staff__avatar">{initials(person.fullName)}</span>
                           <div>
-                            <p className="wsw-staff__person-name">{person.name}</p>
+                            <p className="wsw-staff__person-name">{person.fullName}</p>
                             {person.joinedDate && (
                               <p className="wsw-staff__person-meta">Joined {person.joinedDate}</p>
                             )}

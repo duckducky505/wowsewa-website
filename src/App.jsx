@@ -30,6 +30,7 @@ import ReceptionBookings from './pages/Reception/Bookings/ReceptionBooking';
 import CustomerHistory from './pages/Customer/CustomerHistory/CustomerHistory';
 import ReceivablePayablePage from './pages/Receivable/Receivablepayable';
 import ExpenseTracker from './pages/Reception/ExpenseTracker/ExpenseTracker';
+import InventoryManagement from './pages/Inventory/InventoryManagement';
 
 const App = () => {
 
@@ -76,6 +77,7 @@ const App = () => {
                   <Route path="/customer/history" element={<CustomerHistory />} />
                   <Route path="/settings" element={<CustomerSettings />} />
                   <Route path="/reception/dashboard" element={<ReceptionDashboard/>} />
+                  <Route path="/reception/inventory" element={<InventoryManagement/>} />
                   <Route path="/reception/bookings" element={<ReceptionBookings/>} />
                   <Route path="/reception/expense" element={<ExpenseTracker/>} />
 
