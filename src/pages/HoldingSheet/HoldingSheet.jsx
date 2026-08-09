@@ -65,6 +65,7 @@ const HoldingSheet = () => {
   const [selected, setSelected] = useState(null);
   const [form, setForm] = useState(blankForm);
   const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState('');
 
   const { data: rawEntries, loading: entriesLoading } = fetchHook('https://localhost:7011/api/HoldingSheet/get/holding-sheet-data');
   const { data: rawHolders, loading: holdersLoading } = fetchHook('https://localhost:7011/api/Holder/get/holders-data');
@@ -106,6 +107,7 @@ const HoldingSheet = () => {
 
   const openAdd = () => {
     setForm(blankForm);
+    setFormError('');
     setMode('add');
   };
 
@@ -122,6 +124,7 @@ const HoldingSheet = () => {
       status: entry.status || statusValues?.[0] || '',
       note: entry.note || '',
     });
+    setFormError('');
     setMode('edit');
   };
 
@@ -140,11 +143,29 @@ const HoldingSheet = () => {
     setSelected(null);
     setForm(blankForm);
     setSubmitting(false);
+    setFormError('');
   };
+
+  function validateForm() {
+    if (!form.createdDate) return 'Please pick a date.';
+    if (!form.fromHolderId) return 'Please choose a "from" holder.';
+    if (!form.toHolderId) return 'Please choose a "to" holder.';
+    if (form.fromHolderId === form.toHolderId) return '"From" and "To" holders must be different.';
+    if (!form.amount || Number(form.amount) <= 0) return 'Enter a valid amount greater than zero.';
+    return '';
+  }
 
   const handleAdd = async (e) => {
     e.preventDefault();
+
+    const validationError = validateForm();
+    if (validationError) {
+      setFormError(validationError);
+      return;
+    }
+
     setSubmitting(true);
+    setFormError('');
 
     const payload = {
       createdDate: form.createdDate,
@@ -158,7 +179,8 @@ const HoldingSheet = () => {
       note: form.note,
     };
 
-    const addRes = await fetchAPI('https://localhost:7011/api/HoldingSheet/addEntry', 'POST', payload);
+    // Matches HoldingSheetController: [HttpPost("add/holder-sheet-data")]
+    const addRes = await fetchAPI('https://localhost:7011/api/HoldingSheet/add/holder-sheet-data', 'POST', payload);
     setSubmitting(false);
 
     if (addRes) {
@@ -172,7 +194,15 @@ const HoldingSheet = () => {
   const handleEdit = async (e) => {
     e.preventDefault();
     if (!selected) return;
+
+    const validationError = validateForm();
+    if (validationError) {
+      setFormError(validationError);
+      return;
+    }
+
     setSubmitting(true);
+    setFormError('');
 
     const patchPayload = [
       { op: 'replace', path: '/CreatedDate', value: form.createdDate },
@@ -401,7 +431,7 @@ const HoldingSheet = () => {
                 <MdClose size={20} />
               </button>
             </div>
-            
+
             <form className="wsw-holding__form" onSubmit={mode === 'add' ? handleAdd : handleEdit}>
               <div className="wsw-holding__field">
                 <label className="wsw-holding__label" htmlFor="hs-date">Date</label>
@@ -480,6 +510,8 @@ const HoldingSheet = () => {
                 <label className="wsw-holding__label" htmlFor="hs-note">Note</label>
                 <textarea id="hs-note" name="note" className="wsw-holding__textarea" rows="3" placeholder="Optional note" value={form.note} onChange={onField} />
               </div>
+
+              {formError && <p className="wsw-holding__form-error">{formError}</p>}
 
               <div className="wsw-holding__modal-actions">
                 <button type="submit" className="wsw-holding__primary-btn" disabled={submitting}>

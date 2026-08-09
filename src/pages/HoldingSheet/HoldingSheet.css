@@ -465,6 +465,14 @@
   font-size: 0.74rem;
   color: var(--wsw-amber);
 }
+.wsw-holding__form-error {
+  font-size: 0.85rem;
+  color: var(--wsw-red);
+  background: var(--wsw-red-bg);
+  border-radius: 8px;
+  padding: 0.6rem 0.85rem;
+  margin: 0;
+}
 .wsw-holding__input, .wsw-holding__select, .wsw-holding__textarea {
   font-family: inherit;
   font-size: 0.95rem;

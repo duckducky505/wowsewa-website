@@ -19,12 +19,14 @@ function initials(name) {
 
 function normalizeEmployee(raw) {
   return {
-    id: raw.guidId,
-    name: raw.name,
-    phone: raw.phoneNumber,
-    industryId: raw.industryId,
-    industryName: raw.industry?.industryName ?? raw.IndustryName ?? raw.industry?.industryName ?? "Unassigned",
-    joinedDate: raw.joinedDate,
+    id: raw.guidId ?? raw.GuidId,
+    fullName: raw.fullName ?? raw.FullName ?? raw.name ?? raw.Name ?? "",
+    phone: raw.phoneNumber ?? raw.PhoneNumber ?? "",
+    industryId: raw.industryId ?? raw.IndustryId,
+    industryName:
+      raw.industry?.industryName ?? raw.Industry?.IndustryName ?? raw.IndustryName ?? "Unassigned",
+    joinedDate: raw.joinedDate ?? raw.JoinedDate,
+    isActive: raw.isActive ?? raw.IsActive ?? true,
   };
 }
 
@@ -35,8 +37,12 @@ function normalizeIndustry(raw) {
   };
 }
 
+function statusLabel(isActive) {
+  return isActive ? "Active" : "Inactive";
+}
+
 function emptyDraft() {
-  return { name: "", phone: "", industryId: "", joinedDate: "" };
+  return { name: "", phone: "", industryId: "", joinedDate: "", isActive: true };
 }
 
 // ---- Component --------------------------------------------------------------
@@ -51,6 +57,7 @@ export default function Staffs() {
 
   const [activeIndustryId, setActiveIndustryId] = useState("All");
   const [search, setSearch] = useState("");
+  const [showAll, setShowAll] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [draft, setDraft] = useState(emptyDraft());
@@ -72,30 +79,36 @@ export default function Staffs() {
 
   const filteredStaff = useMemo(() => {
     return staff.filter((s) => {
+      const matchesActive = showAll || s.isActive;
       const matchesCategory = activeIndustryId === "All" || s.industryId === activeIndustryId;
       const q = search.trim().toLowerCase();
       const matchesSearch =
         !q ||
-        s.name.toLowerCase().includes(q) ||
+        s.fullName.toLowerCase().includes(q) ||
         s.phone.toLowerCase().includes(q);
-      return matchesCategory && matchesSearch;
+      return matchesActive && matchesCategory && matchesSearch;
     });
-  }, [staff, activeIndustryId, search]);
+  }, [staff, activeIndustryId, search, showAll]);
 
   const categoryCounts = useMemo(() => {
-    const counts = { All: staff.length };
+    const visibleStaff = showAll ? staff : staff.filter((s) => s.isActive);
+    const counts = { All: visibleStaff.length };
     industries.forEach((ind) => {
-      counts[ind.id] = staff.filter((s) => s.industryId === ind.id).length;
+      counts[ind.id] = visibleStaff.filter((s) => s.industryId === ind.id).length;
     });
     return counts;
-  }, [staff, industries]);
+  }, [staff, industries, showAll]);
 
   const stats = useMemo(() => {
+    const visibleStaff = showAll ? staff : staff.filter((s) => s.isActive);
     return [
-      { label: "Total staff", value: staff.length },
-      { label: "Categories covered", value: new Set(staff.map((s) => s.industryId).filter(Boolean)).size },
+      { label: "Total staff", value: visibleStaff.length },
+      {
+        label: "Categories covered",
+        value: new Set(visibleStaff.map((s) => s.industryId).filter(Boolean)).size,
+      },
     ];
-  }, [staff]);
+  }, [staff, showAll]);
 
   function openAddForm() {
     setEditingId(null);
@@ -107,10 +120,11 @@ export default function Staffs() {
   function openEditForm(person) {
     setEditingId(person.id);
     setDraft({
-      name: person.name,
+      name: person.fullName,
       phone: person.phone,
       industryId: person.industryId ?? "",
       joinedDate: person.joinedDate,
+      isActive: person.isActive,
     });
     setErrors({});
     setShowForm(true);
@@ -145,15 +159,17 @@ export default function Staffs() {
     const payload = {
       name: draft.name.trim(),
       phoneNumber: draft.phone.trim(),
-      industryId: parseInt(draft.industryId, 10), 
+      industryId: parseInt(draft.industryId, 10),
       joinedDate: draft.joinedDate || new Date().toISOString().split("T")[0],
+      isActive: draft.isActive,
     };
 
     const editPayload = [
-      { op: "replace", path: "/name", value: payload.fullNamename },
+      { op: "replace", path: "/fullName", value: payload.name },
       { op: "replace", path: "/phoneNumber", value: payload.phoneNumber },
       { op: "replace", path: "/industryId", value: payload.industryId },
       { op: "replace", path: "/joinedDate", value: payload.joinedDate },
+      { op: "replace", path: "/isActive", value: payload.isActive },
     ];
 
     const res = editingId
@@ -193,6 +209,13 @@ export default function Staffs() {
             <p className="wsw-staff__sub">Manage technicians and staff, by category.</p>
           </div>
           <div className="wsw-staff__header-actions">
+            <button
+              type="button"
+              className="wsw-staff__icon-btn"
+              onClick={() => setShowAll((prev) => !prev)}
+            >
+              {showAll ? "Show active only" : "Show all staff"}
+            </button>
             <button type="button" className="wsw-staff__icon-btn">
               <MdFileDownload size={18} /> Export
             </button>
@@ -265,6 +288,7 @@ export default function Staffs() {
                   <tr>
                     <th>Staff</th>
                     <th>Category</th>
+                    <th>Status</th>
                     <th>Phone</th>
                     <th aria-label="Actions" />
                   </tr>
@@ -285,6 +309,18 @@ export default function Staffs() {
                       </td>
                       <td>
                         <span className="wsw-staff__category-tag">{person.industryName}</span>
+                      </td>
+                      <td>
+                        <span
+                          className={
+                            "wsw-staff__status-pill " +
+                            (person.isActive
+                              ? "wsw-staff__status-pill--active"
+                              : "wsw-staff__status-pill--off-duty")
+                          }
+                        >
+                          {statusLabel(person.isActive)}
+                        </span>
                       </td>
                       <td className="wsw-staff__cell-muted">{person.phone || "—"}</td>
                       <td>
@@ -413,6 +449,23 @@ export default function Staffs() {
                   onChange={(e) => updateDraft("joinedDate", e.target.value)}
                 />
               </div>
+
+              {editingId && (
+                <div className="wsw-staff__field">
+                  <label className="wsw-staff__label" htmlFor="staff-status">
+                    Status
+                  </label>
+                  <select
+                    id="staff-status"
+                    className="wsw-staff__select"
+                    value={draft.isActive ? "active" : "inactive"}
+                    onChange={(e) => updateDraft("isActive", e.target.value === "active")}
+                  >
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                </div>
+              )}
 
               <div className="wsw-staff__modal-actions">
                 <button type="submit" className="wsw-staff__primary-btn" disabled={submitting}>

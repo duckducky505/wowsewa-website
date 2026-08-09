@@ -67,9 +67,7 @@ const AdminDashboard = () => {
   const { data: cashFlowData } = fetchHook('https://localhost:7011/api/CashFlow/get/allCashFlowData');
   const { data: holdingData } = fetchHook('https://localhost:7011/api/HoldingSheet/get/holding-sheet-data');
 
-  // Every month of the selected year, zero-filled where the API has no
-  // entry — the bar chart always shows all 12 bars, with the selected
-  // month visually emphasized rather than the chart being replaced.
+
   const barChartData = useMemo(() => {
     return MONTH_NAMES.slice(1).map((monthStr, index) => {
       const monthNum = index + 1;

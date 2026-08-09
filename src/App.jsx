@@ -31,6 +31,7 @@ import CustomerHistory from './pages/Customer/CustomerHistory/CustomerHistory';
 import ReceivablePayablePage from './pages/Receivable/Receivablepayable';
 import ExpenseTracker from './pages/Reception/ExpenseTracker/ExpenseTracker';
 import InventoryManagement from './pages/Inventory/InventoryManagement';
+import HoldersPage from './pages/Holders/Holders';
 
 const App = () => {
 
@@ -66,6 +67,7 @@ const App = () => {
                   <Route path="/admin/Category" element={<JobsCategory />} />
                   <Route path="/admin/staff" element={<Staffs />} />
                   <Route path="/admin/cashflow" element={<CashFlowPage />} />
+                  <Route path="/admin/holders" element={<HoldersPage />} />
                   <Route path="/admin/holding-sheet" element={<HoldingSheet />} />
                   <Route path="/admin/receivable-payable" element={<ReceivablePayablePage />} />
                 </Route>

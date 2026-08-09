@@ -376,6 +376,14 @@
   &__field { display: flex; flex-direction: column; gap: 0.4rem; }
   &__label { font-size: 0.82rem; font-weight: 600; }
   &__field-hint { font-size: 0.74rem; color: var(--wsw-amber); }
+  &__form-error {
+  font-size: 0.85rem;
+  color: var(--wsw-red);
+  background: var(--wsw-red-bg);
+  border-radius: 8px;
+  padding: 0.6rem 0.85rem;
+  margin: 0;
+}
 
   &__input, &__select, &__textarea {
     font-family: inherit;

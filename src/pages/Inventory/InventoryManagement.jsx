@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useAuth } from "../../context/AuthContext";
-import {fetchHook} from "../../hooks/fetchHook";
+import { fetchHook } from "../../hooks/fetchHook";
 import "./InventoryManagement.css";
 
 const emptyProductForm = {
