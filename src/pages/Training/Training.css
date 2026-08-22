@@ -1,19 +1,10 @@
-/* ==========================================================================
-   Training & Academy — scoped styles
-   Builds on app.css WITHOUT modifying it: reuses .container, .bg-main /
-   .bg-light / .bg-dark, .btn / .btn-primary and .accent-text-main, plus the
-   app.css color variables and the UniNeue font families. Because each
-   @font-face is font-weight:normal / font-style:normal, weight & italic are
-   selected via the family NAME (UniNeue / UniNeue-Bold / UniNeue-Heavy /
-   UniNeue-Italic). Every rule is scoped under .academy — no style leakage.
-   ========================================================================== */
 .academy {
   --lime:       var(--primary-color);     /* #D1FE17 */
   --green:      var(--background-color);   /* #074C3A */
   --cream:      var(--light-color);        /* #F8FAEA */
   --dark:       var(--dark-color);         /* #010a08 */
   --green-deep: #053a2c;
-  --green-card: #0a5341;                   /* card sitting on the green page  */
+  --green-card: #0a5341;                  
   font-family: "UniNeue", "Poppins", sans-serif;
 }
 
@@ -31,7 +22,6 @@
 }
 .academy .ac-eyebrow .ln { width: 34px; height: 2px; background: currentColor; display: inline-block; }
 
-/* keep accent words lime even inside the heavy section titles */
 .academy .accent-text-main { font-family: "UniNeue-Italic", serif; color: var(--primary-color); }
 
 /* ==========================================================================
@@ -93,9 +83,13 @@
 .academy .ac-hero-media { position: relative; }
 .academy .ac-hero-img {
   position: relative; overflow: hidden;
-  min-height: 430px; height: 100%;
+  min-height: 300px; height: 100%;
+  width: 100%;
   border-radius: 22px;
   background: #06382a;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
   border: 1px solid rgba(248, 250, 234, 0.1);
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 8px; cursor: pointer;

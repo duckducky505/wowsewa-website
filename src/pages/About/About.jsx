@@ -60,10 +60,26 @@ const VALUES = [
 ];
 
 const JOURNEY = [
-  { year: '2023', h: 'WowSewa is born',          p: 'Launched in Bengaluru with 20 plumbers and electricians and a single promise: show up on time, price it fairly.' },
-  { year: '2024', h: 'Four trades, one app',     p: 'Added appliances and IT & devices, crossed 10,000 jobs and introduced the 90-day repair warranty.' },
-  { year: '2025', h: 'Seven cities',             p: 'Expanded to Mumbai, Pune, Hyderabad, Chennai, Delhi NCR and Gurgaon with a 24×7 emergency desk.' },
-  { year: '2026', h: '38,000 homes & counting',  p: '482 vetted pros, a 4.92-star average and the Home Plus annual plan trusted by thousands of families.' },
+  { 
+    year: '2023', 
+    h: 'WowSewa is born',          
+    p: 'Launched in Kathmandu with 20 local plumbers and electricians and a single promise: show up on time, price it fairly.' 
+  },
+  { 
+    year: '2024', 
+    h: 'Four trades, one app',     
+    p: 'Launched our official mobile platform, added appliances and IT & devices to the lineup, and introduced our signature 90-day repair warranty.' 
+  },
+  { 
+    year: '2025', 
+    h: 'Full Valley expansion',    
+    p: 'Expanded operations seamlessly across Kathmandu backing up residents with our 24×7 emergency desk.' 
+  },
+  { 
+    year: '2026', 
+    h: '38,000 homes & counting', 
+    p: 'Over 480 vetted local pros, a 4.92-star average, and the launch of annual maintenance packages trusted by families across the capital.' 
+  },
 ];
 
 // ── Sections ─────────────────────────────────────────────────────────────────
@@ -210,7 +226,7 @@ function Journey() {
     <section className="about-journey bg-light">
       <div className="container">
         <div className="about-eyebrow on-light"><span className="about-eyebrow-line" />The journey</div>
-        <h2>From one van<br />to seven cities.</h2>
+        <h2>From one technician<br />to the capital’s trusted choice.</h2>
 
         <div className="about-journey-grid">
           {JOURNEY.map((j) => (

@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import './Training.css';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Footer/Footer';
+import  training from '../../assets/images/training.jpeg'
 
 /* Drop a real workshop photo here later (import a file and set this). */
-const TRAINING_HERO_IMAGE = '';
+const TRAINING_HERO_IMAGE = training;
 
 // ── Icons ───────────────────────────────────────────────────────────────────
 const Arrow = ({ s = 16 }) => (

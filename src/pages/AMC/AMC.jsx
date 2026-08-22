@@ -1,308 +1,397 @@
-import React, { useState } from 'react';
-import { 
-  MdCheckCircle, 
-  MdNetworkCheck, 
-  MdAcUnit, 
-  MdSolarPower, 
-  MdKitchen, 
-  MdPhone, 
-  MdLocationOn, 
-  MdStar, 
-  MdShield 
+import React, { useEffect, useState } from 'react';
+import {
+  MdCheckCircle, MdNetworkCheck, MdAcUnit, MdSolarPower, MdKitchen,
+  MdPhone, MdLocationOn, MdStar, MdShield, MdStore, MdLocalCafe,
+  MdLocalHospital, MdSchool, MdRestaurant, MdBusiness, MdApartment,
+  MdLocationCity, MdWifi, MdDevices, MdViewModule, MdCable, MdWifiTethering,
+  MdCleaningServices, MdSpeed, MdFilterAlt, MdWaterDrop, MdElectricBolt,
+  MdWbSunny, MdBatteryFull, MdMemory, MdSettings,
+  MdEco, MdCurrencyRupee, MdShoppingCart, MdAccessTime, MdHeadsetMic,
+  MdVerifiedUser, MdEngineering, MdArrowForward, MdLanguage, MdTimeline
 } from 'react-icons/md';
-import './AMC.css';
-import Footer from '../../components/Footer/Footer';
 import Navbar from '../../components/Navbar/Navbar';
+import Footer from '../../components/Footer/Footer';
+import './AMC.css';
 
-// Image Imports
+// ── Image Imports ─────────────────────────────────────────────
 import starterImg from '../../assets/images/starter.jpg';
 import businessImg from '../../assets/images/business.jpg';
 import corporateImg from '../../assets/images/corporate.jpg';
+import acImg from '../../assets/images/AC AMC.jpg';
+import solarImg from '../../assets/images/SolarAMC.jpg';
+import refrigeratorImg from '../../assets/images/RefrigeratorAMC.jpg';
+
 
 const AMC_PLANS = [
   {
-    name: "Starter Plan",
-    price: "Rs. 8,000",
+    name: 'Starter Plan',
+    price: '8,000',
     image: starterImg,
-    suitableFor: ["Shops", "Cafes", "Clinics"],
-    includes: ["1 scheduled visit", "Phone support", "Priority service", "AMC discount 10%"],
-    tagline: "Reliable Care. Every Month.",
-    featured: false
+    tagline: 'Reliable Care. Every Month.',
+    featured: false,
+    suitableFor: [
+      { icon: <MdStore />, label: 'Shops' },
+      { icon: <MdLocalCafe />, label: 'Cafes' },
+      { icon: <MdLocalHospital />, label: 'Clinics' }
+    ],
+    includes: ['1 scheduled visit', 'Phone support', 'Priority service', 'AMC discount 10%']
   },
   {
-    name: "Business Plan",
-    price: "Rs. 15,000",
+    name: 'Business Plan',
+    price: '15,000',
     image: businessImg,
-    suitableFor: ["Schools", "Restaurants", "Medium offices"],
-    includes: ["2 visits/month", "Emergency support", "AMC discount 12%", "Preventive maintenance"],
-    tagline: "Peace of Mind. Every Day.",
-    featured: true
+    tagline: 'Peace of Mind. Every Day.',
+    featured: true,
+    suitableFor: [
+      { icon: <MdSchool />, label: 'Schools' },
+      { icon: <MdRestaurant />, label: 'Restaurants' },
+      { icon: <MdBusiness />, label: 'Medium offices' }
+    ],
+    includes: ['2 visits/month', 'Emergency support', 'AMC discount 12%', 'Preventive maintenance']
   },
   {
-    name: "Corporate Plan",
-    price: "Rs. 25,000",
+    name: 'Corporate Plan',
+    price: '25,000',
     image: corporateImg,
-    suitableFor: ["Hotels", "Corporate offices", "Large facilities"],
-    includes: ["Weekly visits", "Emergency response", "AMC discount 15%", "Dedicated technician support", "Monthly reports"],
-    tagline: "Expert Care. Maximum Uptime.",
-    featured: false
+    tagline: 'Expert Care. Maximum Uptime.',
+    featured: false,
+    suitableFor: [
+      { icon: <MdApartment />, label: 'Hotels' },
+      { icon: <MdBusiness />, label: 'Corporate offices' },
+      { icon: <MdLocationCity />, label: 'Large facilities' }
+    ],
+    includes: ['Weekly visits', 'Emergency response', 'AMC discount 15%', 'Dedicated technician support', 'Monthly reports']
   }
 ];
 
 const AMC_SERVICES = [
   {
-    id: "networking",
-    title: "Networking AMC",
-    tagline: "Strong Network. Seamless Connection.",
+    id: 'networking',
+    title: 'Networking AMC',
+    tagline: 'Strong Network. Seamless Connection.',
     icon: <MdNetworkCheck />,
-    badge: "EXPERT CARE FOR STABLE NETWORKS",
+    badge: 'Expert care for stable networks',
+    image: null,
     services: [
-      { name: "Router Maintenance", desc: "Regular checkup, updates, and performance optimization for smooth internet access." },
-      { name: "Switch Maintenance", desc: "Port check, updates, and configuration to ensure stable network performance." },
-      { name: "Rack Organization", desc: "Neat and professional rack setup for better airflow and easy access." },
-      { name: "Cable Management", desc: "Proper cable labeling, bundling, and routing for a clean and reliable network." },
-      { name: "WiFi Troubleshooting", desc: "Resolve WiFi issues, optimize signal strength, and ensure uninterrupted wireless connectivity." }
+      { icon: <MdWifi />, name: 'Router Maintenance', desc: 'Regular checkup, updates, and performance optimization for smooth internet access.' },
+      { icon: <MdDevices />, name: 'Switch Maintenance', desc: 'Port check, updates, and configuration to ensure stable network performance.' },
+      { icon: <MdViewModule />, name: 'Rack Organization', desc: 'Neat and professional rack setup for better airflow and easy access.' },
+      { icon: <MdCable />, name: 'Cable Management', desc: 'Proper cable labeling, bundling, and routing for a clean and reliable network.' },
+      { icon: <MdWifiTethering />, name: 'WiFi Troubleshooting', desc: 'Resolve WiFi issues, optimize signal strength, and ensure uninterrupted wireless connectivity.' }
     ],
-    benefits: ["Stable Internet", "Less Downtime", "Improved Performance", "Enhanced Security", "Cost Savings", "Expert Support"]
+    benefits: ['Stable Internet', 'Less Downtime', 'Improved Performance', 'Enhanced Security', 'Cost Savings', 'Expert Support']
   },
   {
-    id: "ac",
-    title: "AC AMC",
-    tagline: "Cooler Spaces. Happier Places.",
+    id: 'ac',
+    title: 'AC AMC',
+    tagline: 'Cooler Spaces. Happier Places.',
     icon: <MdAcUnit />,
-    badge: "EXPERT CARE FOR YOUR COMFORT",
+    badge: 'Expert care for your comfort',
+    image: acImg,
     services: [
-      { name: "AC Cleaning", desc: "Deep cleaning of indoor & outdoor unit for better cooling." },
-      { name: "Gas Pressure Inspection", desc: "Check and adjust gas pressure for optimal performance." },
-      { name: "Filter Cleaning", desc: "Clean filters to ensure clean air and efficient cooling." },
-      { name: "Drain Cleaning", desc: "Clear drain line to prevent water leakage and blockage." },
-      { name: "Electrical Inspection", desc: "Inspect wiring, connections, and electrical components for safe operation." }
+      { icon: <MdCleaningServices />, name: 'AC Cleaning', desc: 'Deep cleaning of indoor & outdoor unit for better cooling.' },
+      { icon: <MdSpeed />, name: 'Gas Pressure Inspection', desc: 'Check and adjust gas pressure for optimal performance.' },
+      { icon: <MdFilterAlt />, name: 'Filter Cleaning', desc: 'Clean filters to ensure clean air and efficient cooling.' },
+      { icon: <MdWaterDrop />, name: 'Drain Cleaning', desc: 'Clear drain line to prevent water leakage and blockage.' },
+      { icon: <MdElectricBolt />, name: 'Electrical Inspection', desc: 'Inspect wiring, connections, and electrical components for safe operation.' }
     ],
-    benefits: ["Lower Electricity Bill", "Better Cooling", "Longer AC Lifespan", "Cleaner Air", "Fewer Breakdowns"]
+    benefits: ['Lower Electricity Bill', 'Better Cooling', 'Longer AC Lifespan', 'Cleaner Air', 'Fewer Breakdowns']
   },
   {
-    id: "solar",
-    title: "Solar & Inverter AMC",
-    tagline: "Clean Energy. Reliable Power.",
+    id: 'solar',
+    title: 'Solar & Inverter AMC',
+    tagline: 'Clean Energy. Reliable Power.',
     icon: <MdSolarPower />,
-    badge: "EXPERT CARE FOR YOUR ENERGY",
+    badge: 'Expert care for your energy',
+    image: solarImg,
     services: [
-      { name: "Panel Cleaning", desc: "Remove dust, dirt, and debris to ensure maximum sunlight absorption and efficiency." },
-      { name: "Battery Inspection", desc: "Check battery health, charge level, terminals, and connections for reliable backup." },
-      { name: "Inverter Maintenance", desc: "Inspect and service inverter components for smooth and safe operation." },
-      { name: "Performance Testing", desc: "Test system performance, voltage, current, and output for maximum efficiency." }
+      { icon: <MdWbSunny />, name: 'Panel Cleaning', desc: 'Remove dust, dirt, and debris to ensure maximum sunlight absorption and efficiency.' },
+      { icon: <MdBatteryFull />, name: 'Battery Inspection', desc: 'Check battery health, charge level, terminals, and connections for reliable backup.' },
+      { icon: <MdMemory />, name: 'Inverter Maintenance', desc: 'Inspect and service inverter components for smooth and safe operation.' },
+      { icon: <MdSpeed />, name: 'Performance Testing', desc: 'Test system performance, voltage, current, and output for maximum efficiency.' }
     ],
-    benefits: ["Higher Output", "Longer Battery Life", "System Reliability", "Lower Maintenance Cost", "Eco-Friendly & Efficient"]
+    benefits: ['Higher Output', 'Longer Battery Life', 'System Reliability', 'Lower Maintenance Cost', 'Eco-Friendly & Efficient']
   },
   {
-    id: "refrigerator",
-    title: "Refrigerator AMC",
-    tagline: "Cool Inside. Fresh Always.",
+    id: 'refrigerator',
+    title: 'Refrigerator AMC',
+    tagline: 'Cool Inside. Fresh Always.',
     icon: <MdKitchen />,
-    badge: "EXPERT CARE FOR YOUR APPLIANCES",
+    badge: 'Expert care for your appliances',
+    image: refrigeratorImg,
     services: [
-      { name: "Cooling Inspection", desc: "Check cooling performance to ensure optimum temperature and freshness." },
-      { name: "Compressor Testing", desc: "Test compressor for proper functioning and long life." },
-      { name: "Gas Pressure Check", desc: "Check and adjust gas pressure for efficient cooling." },
-      { name: "Condenser Cleaning", desc: "Clean the condenser coils to remove dust and improve heat exchange." },
-      { name: "Electrical Inspection", desc: "Inspect wiring, connections, and components for safe and reliable operation." }
+      { icon: <MdAcUnit />, name: 'Cooling Inspection', desc: 'Check cooling performance to ensure optimum temperature and freshness.' },
+      { icon: <MdSettings />, name: 'Compressor Testing', desc: 'Test compressor for proper functioning and long life.' },
+      { icon: <MdSettings />, name: 'Gas Pressure Check', desc: 'Check and adjust gas pressure for efficient cooling.' },
+      { icon: <MdFilterAlt />, name: 'Condenser Cleaning', desc: 'Clean the condenser coils to remove dust and improve heat exchange.' },
+      { icon: <MdElectricBolt />, name: 'Electrical Inspection', desc: 'Inspect wiring, connections, and components for safe and reliable operation.' }
     ],
-    benefits: ["Reduced Spoilage", "Improved Efficiency", "Longer Appliance Life", "Cost Savings", "Timely Service"]
+    benefits: ['Reduced Spoilage', 'Improved Efficiency', 'Longer Appliance Life', 'Cost Savings', 'Timely Service']
   }
 ];
 
+const TRUST = [
+  { icon: <MdEngineering />, t: 'Expert Technicians', d: 'Skilled. Reliable. Dedicated.' },
+  { icon: <MdAccessTime />, t: 'Timely Service', d: 'On-time visits, every single time.' },
+  { icon: <MdVerifiedUser />, t: '100% Reliability', d: 'Preventive care, zero surprises.' },
+  { icon: <MdHeadsetMic />, t: 'Phone Support', d: 'One call away — 9762424318.' }
+];
+
+const MARQUEE = ['Plumbing', 'Electrical', 'IT & Devices', 'Appliance Installation', 'AC Service', 'Solar & Inverter', 'Refrigerator Repair', 'Networking', 'Monthly AMC Plans'];
+
+/* ── Scroll-reveal hook ── */
+const useReveal = () => {
+  useEffect(() => {
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => {
+        if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
+      }),
+      { threshold: 0.12 }
+    );
+    document.querySelectorAll('[data-reveal]').forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+};
+
+/* ── Tagline splitter: "A. B." → A. <span>B.</span> ── */
+const Tagline = ({ text, className }) => {
+  const parts = text.split('. ');
+  return (
+    <p className={className}>
+      {parts[0]}. <span>{parts.slice(1).join('. ')}</span>
+    </p>
+  );
+};
+
 export default function AMC() {
   const [activeTab, setActiveTab] = useState('networking');
-  const activeService = AMC_SERVICES.find(s => s.id === activeTab);
+  const activeService = AMC_SERVICES.find((s) => s.id === activeTab);
+  useReveal();
 
   return (
     <>
-      <Navbar/>
+      <Navbar />
       <div className="amc-page">
-        
-        {/* Hero Header Unit */}
-        <section className="bg-main text-center amc-hero">
-          <div className="container hero-content-wrapper">
-            <span className="text-md accent-text-main">
-              Annual & Monthly Maintenance Contracts
-            </span>
-            <h1 className="text-xxl">
-              You Rest, <span className="accent-text-main">We Care</span>
-            </h1>
-            <p className="text-md amc-hero-lead">
-              Ensure seamless operations with our professional service packages. Tailored technical support for corporate spaces, residential complexes, and commercial facilities.
-            </p>
-          </div>
-        </section>
 
-        {/* Subscription Tier List System */}
-        <section className="container amc-plans-section">
-          <div className="text-center plans-header">
-            <h2 className="text-xl">Monthly <span>AMC Plans</span></h2>
-            <p className="text-sm">Choose the ideal tier designed to handle your scale of operations effortlessly.</p>
-          </div>
-
-          <div className="plan-grid">
-            {AMC_PLANS.map((plan, index) => (
-              <div 
-                key={index} 
-                className={`card plan-card ${plan.featured ? 'plan-card--featured' : ''}`}
-              >
-                {plan.featured && (
-                  <div className="featured-badge">
-                    <MdStar /> MOST POPULAR
-                  </div>
-                )}
-                
-                {/* Plan Card Image Layout */}
-                <div className="plan-img-container">
-                  <img src={plan.image} alt={plan.name} className="plan-card-img" />
-                </div>
-                
-                <div className="plan-header-block">
-                  <h3 className="text-lg">{plan.name}</h3>
-                  <p>{plan.tagline}</p>
-                </div>
-                
-                <div className="price-block">
-                  <span className="text-xl">{plan.price}</span>
-                  <span> / Month</span>
-                </div>
-
-                <div className="tags-section">
-                  <strong>Suitable For:</strong>
-                  <div className="tags-wrapper">
-                    {plan.suitableFor.map((item, idx) => (
-                      <span key={idx} className="tag">{item}</span>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="features-section">
-                  <strong>What's Included:</strong>
-                  <ul>
-                    {plan.includes.map((inc, idx) => (
-                      <li key={idx} className="feature-item">
-                        <MdCheckCircle />
-                        <span>{inc}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+        {/* ═════════ HERO ═════════ */}
+        <section className="ws-hero" id="top">
+          <div className="ws-hero__grid">
+            <div className="ws-hero__copy">
+              <p className="ws-eyebrow" data-reveal>Annual &amp; Monthly Maintenance Contracts</p>
+              <h1 className="ws-hero__title" data-reveal>
+                You rest. <span>We care.</span>
+              </h1>
+              <p className="ws-hero__sub" data-reveal>
+                One AMC for your entire space — AC, solar &amp; inverter, refrigeration,
+                networking, plus plumbing, electrical, IT and home-appliance care by
+                WOW SEWA's expert technicians in Kathmandu.
+              </p>
+              <div className="ws-hero__actions" data-reveal>
+                <a className="btn btn--primary" href="#plans">View monthly plans <MdArrowForward /></a>
+                <a className="btn btn--ghost" href="#programs">Explore AMC programs</a>
               </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Dynamic Interactive Filter Selection Modules */}
-        <section className="bg-light amc-verticals-section">
-          <div className="container">
-            <div className="text-center verticals-header">
-              <h2 className="text-xl">Our Specialized <span className="accent-text-bg">AMC </span> Verticals</h2>
-              <p className="text-sm">Select a category below to explore dedicated services and target benefits.</p>
+              <ul className="ws-hero__stats" data-reveal>
+                {['Expert Technicians', 'Timely Service', '100% Reliability', 'Phone Support'].map((s) => (
+                  <li key={s}>{s}</li>
+                ))}
+              </ul>
             </div>
 
-            {/* Interactive Navigation Array */}
-            <div className="tab-container">
-              {AMC_SERVICES.map(service => (
-                <button
-                  key={service.id}
-                  onClick={() => setActiveTab(service.id)}
-                  className={`tab-btn ${activeTab === service.id ? 'active' : ''}`}
+            <div className="ws-hero__art" data-reveal>
+              <img className="ws-hero__img ws-hero__img--a" src={acImg} alt="WOW SEWA AC AMC brochure" />
+              <img className="ws-hero__img ws-hero__img--b" src={starterImg} alt="WOW SEWA Starter plan brochure" />
+              <div className="ws-hero__chip ws-hero__chip--a"><MdVerifiedUser /> 100% Reliability</div>
+              <div className="ws-hero__chip ws-hero__chip--b"><MdAccessTime /> On-time service</div>
+            </div>
+          </div>
+        </section>
+
+        {/* ═════════ MARQUEE ═════════ */}
+        <div className="ws-marquee" aria-hidden="true">
+          <div className="ws-marquee__track">
+            {[...MARQUEE, ...MARQUEE].map((m, i) => (
+              <span className="ws-marquee__item" key={i}>{m}<i>✦</i></span>
+            ))}
+          </div>
+        </div>
+
+        {/* ═════════ PLANS ═════════ */}
+        <section className="ws-plans" id="plans">
+          <div className="ws-plans__inner">
+            <header className="ws-section-head ws-section-head--light" data-reveal>
+              <p className="ws-eyebrow">Monthly AMC Plans</p>
+              <h2 className="ws-section-head__title">Reliable care. <span>Every month.</span></h2>
+              <p className="ws-section-head__sub">Peace of mind. Every day. Choose the tier built for your scale of operations.</p>
+            </header>
+
+            <div className="ws-plans__grid">
+              {AMC_PLANS.map((plan, i) => (
+                <article
+                  key={plan.name}
+                  className={`ws-plan ${plan.featured ? 'is-featured' : ''}`}
+                  data-reveal
+                  style={{ transitionDelay: `${i * 90}ms` }}
                 >
-                  {service.icon}
-                  <span>{service.title}</span>
+                  {plan.featured && <span className="ws-plan__flag"><MdStar /> Most Popular</span>}
+
+                  <div className="ws-plan__media">
+                    <img src={plan.image} alt={`${plan.name} poster`} />
+                  </div>
+
+                  <div className="ws-plan__body">
+                    <h3 className="ws-plan__name">{plan.name}</h3>
+                    <Tagline text={plan.tagline} className="ws-plan__tagline" />
+                    <p className="ws-plan__price"><small>Rs.</small>{plan.price}<span>/ month</span></p>
+
+                    <div className="ws-plan__suit">
+                      <h4>Suitable for</h4>
+                      <div className="ws-chips">
+                        {plan.suitableFor.map((s) => (
+                          <span className="ws-chip" key={s.label}>{s.icon} {s.label}</span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="ws-plan__inc">
+                      <h4>What's included</h4>
+                      <ul>
+                        {plan.includes.map((x) => (
+                          <li key={x}><MdCheckCircle /> {x}</li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <a href="tel:+9779762424318"
+                      className={`btn btn--full ${plan.featured ? 'btn--primary' : 'btn--dark'}`}>
+                      Start this plan
+                    </a>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ═════════ PROGRAMS / VERTICALS ═════════ */}
+        <section className="ws-programs" id="programs">
+          <div className="ws-programs__inner">
+            <header className="ws-section-head" data-reveal>
+              <p className="ws-eyebrow ws-eyebrow--dark">Our Specialized Verticals</p>
+              <h2 className="ws-section-head__title">Pick your <span>peace of mind</span></h2>
+              <p className="ws-section-head__sub">Select a category to explore dedicated services and key benefits.</p>
+            </header>
+
+            <div className="ws-programs__tabs" role="tablist" data-reveal>
+              {AMC_SERVICES.map((s) => (
+                <button
+                  key={s.id}
+                  role="tab"
+                  aria-selected={activeTab === s.id}
+                  className={`ws-tab ${activeTab === s.id ? 'is-active' : ''}`}
+                  onClick={() => setActiveTab(s.id)}
+                >
+                  {s.icon} <span>{s.title}</span>
                 </button>
               ))}
             </div>
 
-            {/* Target Dynamic Content Display Board */}
             {activeService && (
-              <div className="board-wrapper">
-                
-                {/* Scope of Work Panel */}
-                <div className="card scope-card">
-                  <div className="scope-header">
-                    <div>
-                      <h3 className="text-lg">{activeService.title} Scope</h3>
-                      <p className="accent-text">{activeService.tagline}</p>
-                    </div>
-                    <span className="badge">{activeService.badge}</span>
-                  </div>
+              <div className="ws-program" key={activeService.id}>
 
-                  <div className="services-list">
-                    {activeService.services.map((item, idx) => (
-                      <div key={idx} className="service-item-row">
-                        <div className="bullet-index">{idx + 1}</div>
-                        <div>
-                          <h4>{item.name}</h4>
-                          <p>{item.desc}</p>
-                        </div>
-                      </div>
-                    ))}
+                {/* Poster (or designed fallback for Networking) */}
+                {activeService.image ? (
+                  <figure className="ws-program__poster">
+                    <img src={activeService.image} alt={`${activeService.title} brochure`} />
+                    <figcaption>{activeService.badge}</figcaption>
+                  </figure>
+                ) : (
+                  <div className="ws-program__poster ws-program__poster--fallback">
+                    <span className="ws-program__poster-icon">{activeService.icon}</span>
+                    <strong>{activeService.title}</strong>
+                    <Tagline text={activeService.tagline} className="ws-fallback-tag" />
                   </div>
-                </div>
+                )}
 
-                {/* Benefits Core Array Layout */}
-                <div className="side-panel">
-                  <div className="bg-dark benefits-card">
-                    <h3>KEY BENEFITS</h3>
-                    <ul>
-                      {activeService.benefits.map((benefit, idx) => (
-                        <li key={idx}>
-                          <MdCheckCircle />
-                          <span>{benefit}</span>
-                        </li>
+                <div className="ws-program__body">
+                  <p className="ws-badge"><MdShield /> {activeService.badge}</p>
+                  <h3 className="ws-program__title">{activeService.title}</h3>
+                  <Tagline text={activeService.tagline} className="ws-program__tagline" />
+
+                  <div className="ws-program__cols">
+                    {/* Scope of work */}
+                    <div className="ws-list">
+                      <h4>Scope of Work</h4>
+                      {activeService.services.map((item) => (
+                        <article className="ws-list__item" key={item.name}>
+                          <span className="ws-list__icon">{item.icon}</span>
+                          <div>
+                            <strong>{item.name}</strong>
+                            <p>{item.desc}</p>
+                          </div>
+                        </article>
                       ))}
-                    </ul>
-                  </div>
-
-                  {/* Team Quality Stamp Footer Element */}
-                  <div className="technician-stamp">
-                    <div className="text-block">
-                      <span>OUR EXPERT TEAM</span>
-                      <span>SKILLED • RELIABLE • DEDICATED</span>
                     </div>
-                    <MdShield />
+
+                    {/* Benefits + team stamp */}
+                    <div className="ws-side">
+                      <div className="ws-benefits">
+                        <h4>Key Benefits</h4>
+                        <ul>
+                          {activeService.benefits.map((b) => (
+                            <li key={b}><MdCheckCircle /> <span>{b}</span></li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div className="ws-stamp">
+                        <div className="ws-stamp__text">
+                          <span>Our Expert Team</span>
+                          <strong>Skilled • Reliable • Dedicated</strong>
+                        </div>
+                        <MdShield />
+                      </div>
+                    </div>
                   </div>
                 </div>
-
               </div>
             )}
           </div>
         </section>
 
-        {/* Action Footer Call parameters */}
-        <section className="bg-black amc-footer-action">
-          <div className="container footer-grid-layout">
-            <div>
-              <h3 className="text-lg accent-text-main">Ready to Secure Your Operations?</h3>
-              <p className="text-sm">
-                Get in touch with our account managers to arrange a custom site evaluation or set up your monthly subscription protocol setup immediately.
-              </p>
-            </div>
-            
-            <div className="contact-wrapper-block">
-              <div className="contact-item-box">
-                <MdPhone />
-                <div>
-                  <small>CALL SUPPORT</small>
-                  <strong>9762424318</strong>
-                </div>
-              </div>
-              
-              <div className="contact-item-box">
-                <MdLocationOn />
-                <div>
-                  <small>HEADQUARTERS</small>
-                  <strong>Machhapokhari, Kathmandu</strong>
-                </div>
-              </div>
+        {/* ═════════ WHY US ═════════ */}
+        <section className="ws-why" id="why">
+          <div className="ws-why__inner">
+            <header className="ws-section-head ws-section-head--light" data-reveal>
+              <p className="ws-eyebrow">The WOW SEWA promise</p>
+              <h2 className="ws-section-head__title">Skilled. Reliable. <span>Dedicated.</span></h2>
+            </header>
+            <div className="ws-why__grid">
+              {TRUST.map((w, i) => (
+                <article className="ws-why__card" key={w.t} data-reveal style={{ transitionDelay: `${i * 80}ms` }}>
+                  <span className="ws-why__icon">{w.icon}</span>
+                  <strong>{w.t}</strong>
+                  <p>{w.d}</p>
+                </article>
+              ))}
             </div>
           </div>
         </section>
+
+        {/* ═════════ CTA ═════════ */}
+        <section className="ws-cta" id="contact">
+          <div className="ws-cta__inner" data-reveal>
+            <h2>Your comfort. <span>Our priority.</span></h2>
+            <p>Ready to secure your operations? Book a site evaluation or set up your monthly AMC today.</p>
+            <div className="ws-cta__actions">
+              <a className="btn btn--dark" href="tel:+9779762424318"><MdPhone /> 9762424318</a>
+              <a className="btn btn--outline-dark" href="https://www.wowsewa.com" target="_blank" rel="noreferrer">
+                <MdLanguage /> www.wowsewa.com
+              </a>
+            </div>
+            <p className="ws-cta__loc"><MdLocationOn /> Machhapokhari, Kathmandu</p>
+          </div>
+        </section>
       </div>
-      <Footer/>
+      <Footer />
     </>
   );
 }

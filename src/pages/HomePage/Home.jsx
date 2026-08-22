@@ -7,18 +7,20 @@ import Footer from '../..//components/Footer/Footer';
 import Services from '../..//components/Services/Services';
 import Working from '../../components/Working/Working';
 import StatsBar from "../../components/Statsbar/Statsbar";
+import Booking from "../../components/Booking/Booking";
 
 export const Home = () => {
     return(
     <>
         <Navbar/>
         <Hero />
-        <StatsBar/>
         <Services/>
         <Working/>
         <Pricing />
         <Testimonials />
+        <StatsBar/>
         <Faq />
+        <Booking/>
         <Footer />
     </>
     )
