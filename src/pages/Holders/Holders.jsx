@@ -1,13 +1,12 @@
 // pages/Holders/HoldersPage.jsx
 import React, { useMemo, useState } from "react";
-import { MdSearch, MdSync, MdAdd, MdClose } from "react-icons/md";
+import { MdSearch, MdSync, MdAdd, MdClose, MdEdit, MdDelete } from "react-icons/md";
 import { fetchHook } from "../../hooks/fetchHook";
 import { fetchAPI } from "../../utils/fetchAPI";
 import "./Holders.css";
 
 // ---- Constants --------------------------------------------------------------
 
-// Mirrors HolderType enum in Models/Holder.cs
 const HOLDER_TYPES = {
   1: "OfficeCash",
   2: "Staff",
@@ -108,6 +107,16 @@ export default function HoldersPage() {
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
 
+  // ---- Edit state ----
+  const [editingHolder, setEditingHolder] = useState(null);
+  const [editDraft, setEditDraft] = useState(emptyDraft());
+  const [editErrors, setEditErrors] = useState({});
+  const [editSubmitting, setEditSubmitting] = useState(false);
+
+  // ---- Delete state ----
+  const [deletingHolder, setDeletingHolder] = useState(null);
+  const [deleteSubmitting, setDeleteSubmitting] = useState(false);
+
   const holders = useMemo(() => (rawHolders || []).map(normalizeHolder), [rawHolders]);
   const employees = useMemo(
     () => (rawEmployees || []).map(normalizeEmployee).filter((e) => e.isActive),
@@ -158,7 +167,6 @@ export default function HoldersPage() {
     ];
   }, [holders]);
 
-  // ---- Refresh helper (falls back to full reload if fetchHook has no refetch) ----
   function refreshHolders() {
     if (typeof refetch === "function") {
       refetch();
@@ -181,7 +189,7 @@ export default function HoldersPage() {
     }
   }
 
-  // ---- Add holder form ----
+  // ---- Add holder ----
   function openAddForm() {
     setDraft(emptyDraft());
     setErrors({});
@@ -198,23 +206,23 @@ export default function HoldersPage() {
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }));
   }
 
-  function validateDraft() {
+  function validateDraft(d, setErr) {
     const next = {};
-    if (!draft.name.trim()) next.name = "Enter a holder name";
-    if (!draft.type) next.type = "Choose a type";
-    if (draft.currentBalance === "" || isNaN(Number(draft.currentBalance))) {
+    if (!d.name.trim()) next.name = "Enter a holder name";
+    if (!d.type) next.type = "Choose a type";
+    if (d.currentBalance === "" || isNaN(Number(d.currentBalance))) {
       next.currentBalance = "Enter a valid opening balance";
     }
-    if (draft.type === "Staff" && !draft.employeeId) {
+    if (d.type === "Staff" && !d.employeeId) {
       next.employeeId = "Select the linked employee";
     }
-    setErrors(next);
+    setErr(next);
     return Object.keys(next).length === 0;
   }
 
   async function handleAddHolder(e) {
     e.preventDefault();
-    if (!validateDraft()) return;
+    if (!validateDraft(draft, setErrors)) return;
 
     setSubmitting(true);
 
@@ -236,6 +244,92 @@ export default function HoldersPage() {
       refreshHolders();
     } else {
       window.alert("Couldn't add this holder. Please try again.");
+    }
+  }
+
+  // ---- Edit holder ----
+  function openEditForm(holder) {
+    setEditingHolder(holder);
+    setEditDraft({
+      name: holder.name || "",
+      type: holder.type || "OfficeCash",
+      isSystem: Boolean(holder.isSystem),
+      currentBalance: holder.balance ?? "",
+      employeeId: holder.employeeId || "",
+    });
+    setEditErrors({});
+  }
+
+  function closeEditForm() {
+    setEditingHolder(null);
+    setEditDraft(emptyDraft());
+    setEditErrors({});
+  }
+
+  function updateEditDraft(field, value) {
+    setEditDraft((prev) => ({ ...prev, [field]: value }));
+    if (editErrors[field]) setEditErrors((prev) => ({ ...prev, [field]: undefined }));
+  }
+
+  async function handleEditHolder(e) {
+    e.preventDefault();
+    if (!editingHolder) return;
+    if (!validateDraft(editDraft, setEditErrors)) return;
+
+    setEditSubmitting(true);
+
+    const patchPayload = [
+      { op: "replace", path: "/Name", value: editDraft.name.trim() },
+      { op: "replace", path: "/Type", value: HOLDER_TYPE_VALUE[editDraft.type] },
+      { op: "replace", path: "/IsSystem", value: editDraft.isSystem },
+      { op: "replace", path: "/CurrentBalance", value: Number(editDraft.currentBalance) },
+      {
+        op: "replace",
+        path: "/EmployeeId",
+        value: editDraft.type === "Staff" && editDraft.employeeId ? editDraft.employeeId : null,
+      },
+    ];
+
+    const res = await fetchAPI(
+      `https://localhost:7011/api/Holder/update-holder-data/${editingHolder.id}`,
+      "PATCH",
+      patchPayload
+    );
+
+    setEditSubmitting(false);
+
+    if (res) {
+      window.alert("Holder updated successfully.");
+      closeEditForm();
+      refreshHolders();
+    } else {
+      window.alert("Couldn't update this holder. Please try again.");
+    }
+  }
+
+  // ---- Delete holder ----
+  function openDeleteConfirm(holder) {
+    setDeletingHolder(holder);
+  }
+
+  function closeDeleteConfirm() {
+    setDeletingHolder(null);
+  }
+
+  async function handleDeleteHolder() {
+    if (!deletingHolder) return;
+    setDeleteSubmitting(true);
+
+    const res = await fetchAPI(`https://localhost:7011/api/Holder/delete/${deletingHolder.id}`, "DELETE");
+
+    setDeleteSubmitting(false);
+
+    if (res) {
+      window.alert("Holder deleted successfully.");
+      closeDeleteConfirm();
+      refreshHolders();
+    } else {
+      window.alert("Couldn't delete this holder. Please try again.");
     }
   }
 
@@ -356,6 +450,7 @@ export default function HoldersPage() {
                     <th>Type</th>
                     <th>Linked Employee</th>
                     <th className="wsw-holders__num-col">Current Balance</th>
+                    <th aria-label="Actions" />
                   </tr>
                 </thead>
                 <tbody>
@@ -398,6 +493,28 @@ export default function HoldersPage() {
                           {formatCurrency(holder.balance)}
                         </span>
                       </td>
+                      <td>
+                        <div className="wsw-holders__row-actions">
+                          <button
+                            type="button"
+                            className="wsw-holders__icon-action"
+                            onClick={() => openEditForm(holder)}
+                            title="Edit holder"
+                          >
+                            <MdEdit size={16} />
+                          </button>
+                          {!holder.isSystem && (
+                            <button
+                              type="button"
+                              className="wsw-holders__icon-action wsw-holders__icon-action--danger"
+                              onClick={() => openDeleteConfirm(holder)}
+                              title="Delete holder"
+                            >
+                              <MdDelete size={16} />
+                            </button>
+                          )}
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -409,6 +526,7 @@ export default function HoldersPage() {
                     <td className="wsw-holders__num-col wsw-holders__total-value">
                       {formatCurrency(filteredHolders.reduce((sum, h) => sum + h.balance, 0))}
                     </td>
+                    <td></td>
                   </tr>
                 </tfoot>
               </table>
@@ -551,6 +669,183 @@ export default function HoldersPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ===== EDIT HOLDER MODAL ===== */}
+      {editingHolder && (
+        <div
+          className="wsw-holders__modal-backdrop"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Edit holder"
+        >
+          <div className="wsw-holders__modal">
+            <div className="wsw-holders__modal-head">
+              <h2 className="wsw-holders__modal-title">Edit holder</h2>
+              <button
+                type="button"
+                className="wsw-holders__modal-close"
+                onClick={closeEditForm}
+                aria-label="Close"
+              >
+                <MdClose size={20} />
+              </button>
+            </div>
+
+            <form className="wsw-holders__form" onSubmit={handleEditHolder} noValidate>
+              <div className="wsw-holders__field">
+                <label className="wsw-holders__label" htmlFor="edit-holder-name">
+                  Holder name
+                </label>
+                <input
+                  id="edit-holder-name"
+                  className={
+                    "wsw-holders__input" + (editErrors.name ? " wsw-holders__input--error" : "")
+                  }
+                  value={editDraft.name}
+                  onChange={(e) => updateEditDraft("name", e.target.value)}
+                  placeholder="e.g. Nabil Bank - Main"
+                />
+                {editErrors.name && <span className="wsw-holders__error">{editErrors.name}</span>}
+              </div>
+
+              <div className="wsw-holders__field-row">
+                <div className="wsw-holders__field">
+                  <label className="wsw-holders__label" htmlFor="edit-holder-type">
+                    Type
+                  </label>
+                  <select
+                    id="edit-holder-type"
+                    className={
+                      "wsw-holders__select" + (editErrors.type ? " wsw-holders__input--error" : "")
+                    }
+                    value={editDraft.type}
+                    onChange={(e) => updateEditDraft("type", e.target.value)}
+                  >
+                    {Object.values(HOLDER_TYPES).map((typeName) => (
+                      <option key={typeName} value={typeName}>
+                        {HOLDER_TYPE_LABEL[typeName]}
+                      </option>
+                    ))}
+                  </select>
+                  {editErrors.type && <span className="wsw-holders__error">{editErrors.type}</span>}
+                </div>
+
+                <div className="wsw-holders__field">
+                  <label className="wsw-holders__label" htmlFor="edit-holder-balance">
+                    Current Balance (Rs.)
+                  </label>
+                  <input
+                    id="edit-holder-balance"
+                    type="number"
+                    step="0.01"
+                    className={
+                      "wsw-holders__input" +
+                      (editErrors.currentBalance ? " wsw-holders__input--error" : "")
+                    }
+                    value={editDraft.currentBalance}
+                    onChange={(e) => updateEditDraft("currentBalance", e.target.value)}
+                    placeholder="0.00"
+                  />
+                  {editErrors.currentBalance && (
+                    <span className="wsw-holders__error">{editErrors.currentBalance}</span>
+                  )}
+                </div>
+              </div>
+
+              {editDraft.type === "Staff" && (
+                <div className="wsw-holders__field">
+                  <label className="wsw-holders__label" htmlFor="edit-holder-employee">
+                    Linked employee
+                  </label>
+                  <select
+                    id="edit-holder-employee"
+                    className={
+                      "wsw-holders__select" + (editErrors.employeeId ? " wsw-holders__input--error" : "")
+                    }
+                    value={editDraft.employeeId}
+                    onChange={(e) => updateEditDraft("employeeId", e.target.value)}
+                    disabled={employeesLoading}
+                  >
+                    <option value="">
+                      {employeesLoading ? "Loading employees…" : "-- Select employee --"}
+                    </option>
+                    {employees.map((emp) => (
+                      <option key={emp.id} value={emp.id}>
+                        {emp.fullName}
+                      </option>
+                    ))}
+                  </select>
+                  {editErrors.employeeId && (
+                    <span className="wsw-holders__error">{editErrors.employeeId}</span>
+                  )}
+                </div>
+              )}
+
+              <div className="wsw-holders__field wsw-holders__field--checkbox">
+                <label className="wsw-holders__checkbox-label" htmlFor="edit-holder-system">
+                  <input
+                    id="edit-holder-system"
+                    type="checkbox"
+                    checked={editDraft.isSystem}
+                    onChange={(e) => updateEditDraft("isSystem", e.target.checked)}
+                  />
+                  Mark as a system account
+                </label>
+              </div>
+
+              <div className="wsw-holders__modal-actions">
+                <button type="submit" className="wsw-holders__primary-btn" disabled={editSubmitting}>
+                  {editSubmitting ? "Saving…" : "Save changes"}
+                </button>
+                <button type="button" className="wsw-holders__ghost-btn" onClick={closeEditForm}>
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ===== DELETE CONFIRMATION MODAL ===== */}
+      {deletingHolder && (
+        <div
+          className="wsw-holders__modal-backdrop"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Delete holder"
+        >
+          <div className="wsw-holders__modal wsw-holders__modal--narrow">
+            <div className="wsw-holders__modal-head">
+              <h2 className="wsw-holders__modal-title">Delete holder</h2>
+              <button
+                type="button"
+                className="wsw-holders__modal-close"
+                onClick={closeDeleteConfirm}
+                aria-label="Close"
+              >
+                <MdClose size={20} />
+              </button>
+            </div>
+            <p className="wsw-holders__confirm-copy">
+              Are you sure you want to delete <strong>{deletingHolder.name}</strong>? This will
+              permanently remove the holder record. This can't be undone.
+            </p>
+            <div className="wsw-holders__modal-actions">
+              <button
+                type="button"
+                className="wsw-holders__danger-btn"
+                onClick={handleDeleteHolder}
+                disabled={deleteSubmitting}
+              >
+                {deleteSubmitting ? "Deleting…" : "Confirm delete"}
+              </button>
+              <button type="button" className="wsw-holders__ghost-btn" onClick={closeDeleteConfirm}>
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}

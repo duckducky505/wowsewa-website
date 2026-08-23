@@ -28,7 +28,7 @@ function normalizeBooking(raw) {
     slot: raw.preferredTime,
     price: raw.duty.price,
     status: raw.bookingStatus,
-    technicianName: raw.technicianName ?? raw.TechnicianName ?? "",
+    technicianName: raw.employeeName ?? "Unassigned",
     notes: raw.notes ?? raw.Notes ?? "",
     createdAt: raw.createdDate,
   };

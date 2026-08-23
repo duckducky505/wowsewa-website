@@ -59,7 +59,7 @@ export default function JobsPage() {
     "https://localhost:7011/api/industry/getIndustryData"
   );
   const { data: rawDutyData, loading: dutiesLoading } = fetchHook(
-    "https://localhost:7011/getAllDutyData"
+    "https://localhost:7011/api/Duty/getAllDutyData"
   );
   const { data: rawSummaryData, loading: summaryLoading } = fetchHook(
     "https://localhost:7011/api/Duty/detailed-duties-summary"

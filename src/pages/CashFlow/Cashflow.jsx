@@ -53,7 +53,7 @@ const CashFlowForm = ({ onSubmit, submitLabel, form, onField, closeAll, industry
         <select id="cf-employee" name="employeeName" className="wsw-cashflow__select" value={form.employeeName} onChange={onField}>
           <option value="">-- Select employee --</option>
           {employeesData?.map((emp) => (
-            <option key={emp.guidId} value={emp.guidId}>{emp.name}</option>
+            <option key={emp.guidId} value={emp.guidId}>{emp.fullName}</option>
           ))}
         </select>
       </div>
@@ -137,7 +137,7 @@ const CashFlow = () => {
       createdDate: entry.createdDate || '',
       jobCategory: entry.industryId ? entry.industryId.toString() : '',
       clientName: entry.clientName || '',
-      employeeName: entry.employee?.guidId || '',
+      employeeName: entry.employeeId || entry.employee?.guidId || '',
       cashType: entry.cashType || 'Income',
       paymentMethod: entry.paymentMethod || 'Cash',
       cashIn: entry.cashIn ?? '',
@@ -318,7 +318,9 @@ const CashFlow = () => {
                       {industryData?.find((job) => job.industryId === flow.industryId)?.industryName}
                     </td>
                     <td className="wsw-cashflow__cell-strong">{flow.clientName}</td>
-                    <td className="wsw-cashflow__cell-strong">{flow.employee?.name}</td>
+                    <td className="wsw-cashflow__cell-strong">
+                      {flow.employee?.fullName || employeesData?.find((emp) => emp.guidId === flow.employeeId)?.fullName || '—'}
+                    </td>
                     <td>
                       <span
                         className={

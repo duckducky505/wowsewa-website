@@ -27,6 +27,24 @@ function statusClass(status) {
   return status.toLowerCase().replace(/\s+/g, "-");
 }
 
+function fmtDate(d) {
+  if (!d) return "";
+  const dt = new Date(d);
+  if (Number.isNaN(dt.getTime())) return d;
+  return dt.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
+function serviceGlyph(name = "") {
+  const s = name.toLowerCase();
+  if (/plumb|pipe|water|tank|leak|drain/.test(s)) return "💧";
+  if (/electric|wiring|light|fan|power|volt/.test(s)) return "⚡";
+  if (/clean|sanitiz|mop|sweep/.test(s)) return "✦";
+  if (/paint|polish|distemper/.test(s)) return "🖌";
+  if (/carpent|furniture|wood|door/.test(s)) return "🔨";
+  if (/\bac\b|hvac|heat|cool|fridge/.test(s)) return "❄";
+  return "🔧";
+}
+
 function normalizeStage(raw) {
   if (!raw) return "";
   if (typeof raw === "string") return raw;
@@ -66,7 +84,6 @@ export default function CustomerDashboard() {
   const [ratingDraft, setRatingDraft] = useState({});
   const [cancellingId, setCancellingId] = useState(null);
 
-  // Profile Fetch
   const { data: profileData, loading: profileLoading } = fetchHook(
     guidId ? `https://localhost:7011/api/User/UserSpecificAccountInfo/${guidId}` : null
   );
@@ -133,9 +150,13 @@ export default function CustomerDashboard() {
     const spent = completedThisYear.reduce((sum, b) => sum + Number(b.price || 0), 0);
 
     return [
-      { label: "Upcoming", value: pendingBookings.length },
-      { label: "Completed jobs", value: historyBookings.filter((b) => b.status?.toLowerCase() === "completed").length },
-      { label: "This year, spent", value: formatRs(spent) },
+      { icon: "📅", label: "Upcoming", value: pendingBookings.length },
+      {
+        icon: "✓",
+        label: "Completed jobs",
+        value: historyBookings.filter((b) => b.status?.toLowerCase() === "completed").length,
+      },
+      { icon: "₨", label: "Spent this year", value: formatRs(spent) },
     ];
   }, [pendingBookings, historyBookings]);
 
@@ -144,9 +165,13 @@ export default function CustomerDashboard() {
     return {
       name: profileData.name || profileData.fullName,
       email: profileData.emailAddress,
+      phone: profileData.phoneNumber || profileData.phone,
       memberSince: profileData.dateCreated
-        ? new Date(profileData.dateCreated).toLocaleDateString(undefined, { year: 'numeric', month: 'short' })
-        : null
+        ? new Date(profileData.dateCreated).toLocaleDateString(undefined, {
+            year: "numeric",
+            month: "short",
+          })
+        : null,
     };
   }, [profileData]);
 
@@ -182,17 +207,18 @@ export default function CustomerDashboard() {
   return (
     <div className="wsw-dashboard">
       <header className="wsw-dashboard__header">
+        <div className="wsw-dashboard__header-glow" aria-hidden="true" />
         <div className="wsw-dashboard__header-inner">
           <div className="wsw-dashboard__greeting">
-            <span className="wsw-dashboard__eyebrow">Your account</span>
+            <span className="wsw-dashboard__eyebrow">
+              <span className="wsw-dashboard__eyebrow-dot" />
+              Your account
+            </span>
             <h1 className="wsw-dashboard__title">
               Welcome back{userProfile?.name ? `, ${userProfile.name.split(" ")[0]}` : ""}
             </h1>
             <p className="wsw-dashboard__subtitle">Here's what's happening with your services.</p>
           </div>
-          <button type="button" className="wsw-dashboard__new-booking">
-            + New booking
-          </button>
         </div>
       </header>
 
@@ -200,8 +226,11 @@ export default function CustomerDashboard() {
         <section className="wsw-dashboard__stats" aria-label="Account overview">
           {stats.map((s) => (
             <div className="wsw-dashboard__stat-card" key={s.label}>
-              <span className="wsw-dashboard__stat-value">{s.value}</span>
-              <span className="wsw-dashboard__stat-label">{s.label}</span>
+              <span className="wsw-dashboard__stat-icon">{s.icon}</span>
+              <div>
+                <span className="wsw-dashboard__stat-value">{s.value}</span>
+                <span className="wsw-dashboard__stat-label">{s.label}</span>
+              </div>
             </div>
           ))}
         </section>
@@ -214,21 +243,34 @@ export default function CustomerDashboard() {
               </section>
             ) : (
               activeJob && (
-                <section className="wsw-dashboard__panel" aria-label="Active job status">
+                <section className="wsw-dashboard__panel wsw-dashboard__panel--active" aria-label="Active job status">
                   <div className="wsw-dashboard__panel-head">
-                    <h2 className="wsw-dashboard__panel-title">Active job</h2>
+                    <h2 className="wsw-dashboard__panel-title">
+                      <span className="wsw-dashboard__live-pill">
+                        <span className="wsw-dashboard__live-dot" />
+                        Live
+                      </span>
+                      Active job
+                    </h2>
                     <span className="wsw-dashboard__job-code">{activeJob.code}</span>
                   </div>
 
                   <div className="wsw-dashboard__active-job">
                     <div className="wsw-dashboard__active-job-info">
-                      <h3 className="wsw-dashboard__active-job-service">{activeJob.service}</h3>
-                      <p className="wsw-dashboard__active-job-meta">
-                        {activeJob.category && `${activeJob.category} · `}
-                        {activeJob.date && `${activeJob.date}`}
-                        {activeJob.slot && `, ${activeJob.slot}`}
-                      </p>
-                      <p className="wsw-dashboard__active-job-address">{activeJob.address}</p>
+                      <div className="wsw-dashboard__active-job-service-row">
+                        <span className="wsw-dashboard__service-glyph">{serviceGlyph(activeJob.service)}</span>
+                        <div>
+                          <h3 className="wsw-dashboard__active-job-service">{activeJob.service}</h3>
+                          <p className="wsw-dashboard__active-job-meta">
+                            {activeJob.category && `${activeJob.category} · `}
+                            {activeJob.date && `${fmtDate(activeJob.date)}`}
+                            {activeJob.slot && `, ${activeJob.slot}`}
+                          </p>
+                        </div>
+                      </div>
+                      {activeJob.address && (
+                        <p className="wsw-dashboard__active-job-address">📍 {activeJob.address}</p>
+                      )}
                     </div>
 
                     {activeJob.technician && activeJob.technician.name && (
@@ -236,7 +278,8 @@ export default function CustomerDashboard() {
                         <span className="wsw-dashboard__technician-avatar">
                           {initials(activeJob.technician.name)}
                         </span>
-                        <div>
+                        <div className="wsw-dashboard__technician-info">
+                          <p className="wsw-dashboard__technician-role">Technician</p>
                           <p className="wsw-dashboard__technician-name">{activeJob.technician.name}</p>
                           {activeJob.technician.rating && (
                             <p className="wsw-dashboard__technician-rating">★ {activeJob.technician.rating}</p>
@@ -265,7 +308,9 @@ export default function CustomerDashboard() {
                             (i === activeStageIndex ? " wsw-dashboard__stage--current" : "")
                           }
                         >
-                          <span className="wsw-dashboard__stage-dot" />
+                          <span className="wsw-dashboard__stage-dot">
+                            {i < activeStageIndex && "✓"}
+                          </span>
                           <span className="wsw-dashboard__stage-label">{stage}</span>
                         </li>
                       ))}
@@ -287,6 +332,7 @@ export default function CustomerDashboard() {
                     onClick={() => setTab("upcoming")}
                   >
                     Upcoming
+                    <span className="wsw-dashboard__tab-count">{pendingBookings.length}</span>
                   </button>
                   <button
                     type="button"
@@ -296,6 +342,7 @@ export default function CustomerDashboard() {
                     onClick={() => setTab("history")}
                   >
                     History
+                    <span className="wsw-dashboard__tab-count">{historyBookings.length}</span>
                   </button>
                 </div>
               </div>
@@ -307,14 +354,15 @@ export default function CustomerDashboard() {
                   <ul className="wsw-dashboard__booking-list">
                     {pendingBookings.map((b) => (
                       <li className="wsw-dashboard__booking-row" key={b.code}>
+                        <span className="wsw-dashboard__row-glyph">{serviceGlyph(b.service)}</span>
                         <div className="wsw-dashboard__booking-main">
                           <span className="wsw-dashboard__booking-service">{b.service}</span>
                           <span className="wsw-dashboard__booking-meta">
                             {b.category && `${b.category} · `}
-                            {b.date && `${b.date}`}
+                            {b.date && `${fmtDate(b.date)}`}
                             {b.slot && `, ${b.slot}`}
                           </span>
-                          <span className="wsw-dashboard__booking-address">{b.address}</span>
+                          {b.address && <span className="wsw-dashboard__booking-address">📍 {b.address}</span>}
                         </div>
                         <div className="wsw-dashboard__booking-side">
                           <span className={"wsw-dashboard__status wsw-dashboard__status--" + statusClass(b.status)}>
@@ -322,7 +370,7 @@ export default function CustomerDashboard() {
                           </span>
                           <button
                             type="button"
-                            className="wsw-dashboard__link-btn"
+                            className="wsw-dashboard__link-btn wsw-dashboard__link-btn--danger"
                             onClick={() => handleCancelBooking(b)}
                             disabled={cancellingId === b.id}
                           >
@@ -344,11 +392,12 @@ export default function CustomerDashboard() {
                 <ul className="wsw-dashboard__booking-list">
                   {historyBookings.map((b) => (
                     <li className="wsw-dashboard__booking-row" key={b.code}>
+                      <span className="wsw-dashboard__row-glyph">{serviceGlyph(b.service)}</span>
                       <div className="wsw-dashboard__booking-main">
                         <span className="wsw-dashboard__booking-service">{b.service}</span>
                         <span className="wsw-dashboard__booking-meta">
                           {b.category && `${b.category} · `}
-                          {b.date && `${b.date} · `}
+                          {b.date && `${fmtDate(b.date)} · `}
                           {b.price && formatRs(b.price)}
                         </span>
                         <span className="wsw-dashboard__booking-code">{b.code}</span>
@@ -357,11 +406,11 @@ export default function CustomerDashboard() {
                         <span className={"wsw-dashboard__status wsw-dashboard__status--" + statusClass(b.status)}>
                           {b.status}
                         </span>
-                        {b.status?.toLowerCase() === "completed" && b.rated === null && !ratingDraft[b.code] && (
+                        {b.status?.toLowerCase() === "completed" && b.rated == null && !ratingDraft[b.code] && (
                           <RatingPicker value={0} onRate={(rating) => submitRating(b, rating)} />
                         )}
-                        {b.status?.toLowerCase() === "completed" && (b.rated !== null || ratingDraft[b.code]) && (
-                          <span className="wsw-dashboard__rated">★ {b.rated ?? ratingDraft[b.code]} rated</span>
+                        {b.status?.toLowerCase() === "completed" && (b.rated != null || ratingDraft[b.code]) && (
+                          <span className="wsw-dashboard__rated">★ {b.rated ?? ratingDraft[b.code]}/5</span>
                         )}
                         {b.status?.toLowerCase() === "completed" && (
                           <button type="button" className="wsw-dashboard__link-btn">
@@ -408,14 +457,18 @@ export default function CustomerDashboard() {
                       </div>
                     )}
                   </dl>
-                  <button type="button" className="wsw-dashboard__link-btn">
+                  <button type="button" className="wsw-dashboard__link-btn wsw-dashboard__link-btn--block">
                     Edit profile
                   </button>
                 </>
               ) : null}
             </section>
 
-            <section className="wsw-dashboard__panel wsw-dashboard__panel--compact wsw-dashboard__panel--dark" aria-label="Support">
+            <section
+              className="wsw-dashboard__panel wsw-dashboard__panel--compact wsw-dashboard__panel--dark"
+              aria-label="Support"
+            >
+              <span className="wsw-dashboard__support-tag">24/7 support</span>
               <h2 className="wsw-dashboard__panel-title">Need help?</h2>
               <p className="wsw-dashboard__support-copy">
                 Reach our support team for booking changes, billing questions or complaints.
@@ -441,6 +494,7 @@ export default function CustomerDashboard() {
 function EmptyState({ title, body }) {
   return (
     <div className="wsw-dashboard__empty">
+      <span className="wsw-dashboard__empty-glyph">🗂</span>
       <p className="wsw-dashboard__empty-title">{title}</p>
       <p className="wsw-dashboard__empty-body">{body}</p>
     </div>

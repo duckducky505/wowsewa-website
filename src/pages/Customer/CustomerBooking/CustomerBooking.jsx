@@ -1,7 +1,9 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
+import { Navigate } from "react-router-dom";
 import "./CustomerBooking.css";
 import { fetchHook } from "../../../hooks/fetchHook";
 import { fetchAPI } from "../../../utils/fetchAPI";
+
 
 function categoryCode(name) {
   return (name || "").slice(0, 3).toUpperCase();
@@ -17,6 +19,15 @@ function formatDateLabel(value) {
   const d = new Date(`${value}T00:00:00`);
   if (Number.isNaN(d.getTime())) return "—";
   return d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+}
+
+function formatTime(v) {
+  if (!v) return "—";
+  const [h, m] = v.split(":").map(Number);
+  if (Number.isNaN(h)) return v;
+  const ap = h >= 12 ? "PM" : "AM";
+  const hh = h % 12 || 12;
+  return `${hh}:${String(m).padStart(2, "0")} ${ap}`;
 }
 
 function formatRs(value) {
@@ -41,23 +52,60 @@ function normalizeDuty(raw) {
   };
 }
 
+function categoryIconGlyph(name = "") {
+  const s = name.toLowerCase();
+  if (/plumb|pipe|water/.test(s)) return "💧";
+  if (/electric|power|wiring/.test(s)) return "⚡";
+  if (/applian|fridge|wash|ac\b/.test(s)) return "🔌";
+  if (/it\b|device|comput|network|cctv/.test(s)) return "🖥";
+  if (/clean|sanitiz/.test(s)) return "✦";
+  if (/carpent|wood|furniture/.test(s)) return "🔨";
+  return "🔧";
+}
+
+// ---- Barcode (decorative, matches ticket rail styling) ---------------------
+
+const BARCODE = [3, 1, 2, 1, 4, 2, 1, 3, 1, 1, 3, 2, 1, 4, 1, 2, 3, 1, 2, 1, 1, 3, 2, 4, 1, 2];
+
+function Barcode({ label }) {
+  return (
+    <div className="wsw-booking-page__barcode" aria-hidden="true">
+      <div className="wsw-booking-page__barcode-bars">
+        {BARCODE.map((w, i) => (
+          <span
+            key={i}
+            style={{ width: `${w}px` }}
+            className={i % 6 === 4 ? "wsw-booking-page__barcode-bar--lime" : ""}
+          />
+        ))}
+      </div>
+      {label && <span className="wsw-booking-page__barcode-label">{label}</span>}
+    </div>
+  );
+}
+
+// ---- Component --------------------------------------------------------------
 
 export default function BookingPage() {
+  const token = typeof window !== "undefined" ? localStorage.getItem("Token") : null;
 
-    const token = localStorage.getItem("Token");
-
-    if(token == null) return <Navigate to= "/login"/>
-
-    const decodedToken = JSON.parse(atob(token.split(".")[1]));
-    const name = decodedToken["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
-    const guidId = decodedToken["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
-
+  let name = "";
+  let guidId = null;
+  if (token) {
+    try {
+      const decodedToken = JSON.parse(atob(token.split(".")[1]));
+      name = decodedToken["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"] ?? "";
+      guidId = decodedToken["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] ?? null;
+    } catch (e) {
+      // malformed token — treated as unauthenticated below
+    }
+  }
 
   const { data: rawIndustryData, loading: industriesLoading } = fetchHook(
     "https://localhost:7011/api/Industry/getIndustryData"
   );
   const { data: rawDutyData, loading: dutiesLoading } = fetchHook(
-    "https://localhost:7011/getAllDutyData"
+    "https://localhost:7011/api/Duty/getAllDutyData"
   );
 
   const industries = useMemo(() => (rawIndustryData || []).map(normalizeIndustry), [rawIndustryData]);
@@ -80,6 +128,10 @@ export default function BookingPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
 
+  useEffect(() => {
+    if (name) setForm((prev) => ({ ...prev, fullName: prev.fullName || name }));
+  }, [name]);
+
   const category = useMemo(
     () => industries.find((c) => c.id === categoryId) || null,
     [industries, categoryId]
@@ -94,6 +146,14 @@ export default function BookingPage() {
     () => duties.find((s) => s.id === serviceId) || null,
     [duties, serviceId]
   );
+
+  const todayIso = useMemo(() => new Date().toISOString().slice(0, 10), []);
+
+  const ticketStatus = service
+    ? { label: "Ready to confirm", tone: "ready" }
+    : category
+    ? { label: "In progress", tone: "progress" }
+    : { label: "Not started", tone: "idle" };
 
   function handleSelectCategory(id) {
     setCategoryId(id);
@@ -163,32 +223,50 @@ export default function BookingPage() {
     setConfirmedTicket(null);
     setCategoryId(null);
     setServiceId(null);
-    setForm({ fullName: "", phone: "", address: "", date: "", slot: "", notes: "" });
+    setForm({ fullName: name, phone: "", address: "", date: "", slot: "", notes: "" });
     setErrors({});
     setSubmitError("");
     setStep(1);
   }
 
-  const canReviewTicket = Boolean(category);
+  function copyCode(code) {
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(code).catch(() => {});
+    }
+  }
+
+  // Guard is placed after all hooks are called, keeping hook order stable.
+  if (!token) return <Navigate to="/login" replace />;
 
   return (
     <div className="wsw-booking-page">
       <header className="wsw-booking-page__header">
+        <div className="wsw-booking-page__header-deco" aria-hidden="true">
+          <span className="wsw-booking-page__ring" />
+          <span className="wsw-booking-page__ring wsw-booking-page__ring--inner" />
+          <span className="wsw-booking-page__glow" />
+        </div>
         <div className="wsw-booking-page__header-inner">
-          <span className="wsw-booking-page__eyebrow">Book a service</span>
+          <span className="wsw-booking-page__eyebrow">🔧 Book a service</span>
           <h1 className="wsw-booking-page__title">
             Tell us what's broken.
             <br />
-            We'll send someone who can fix it.
+            We'll send someone who can <span className="wsw-booking-page__title-hl">fix it.</span>
           </h1>
           <p className="wsw-booking-page__subtitle">
             Plumbing, electrical, appliances or IT devices — one booking, one visit, one bill.
           </p>
+
+          <ul className="wsw-booking-page__trust">
+            <li className="wsw-booking-page__trust-chip">🛡 Verified technicians</li>
+            <li className="wsw-booking-page__trust-chip">⏱ Slot confirmed in ~30 min</li>
+            <li className="wsw-booking-page__trust-chip">🪙 Pay after the job is done</li>
+          </ul>
         </div>
       </header>
 
       {confirmedTicket ? (
-        <ConfirmationView ticket={confirmedTicket} onNewBooking={handleNewBooking} />
+        <ConfirmationView ticket={confirmedTicket} onNewBooking={handleNewBooking} onCopy={copyCode} />
       ) : (
         <div className="wsw-booking-page__body">
           <div className="wsw-booking-page__main">
@@ -200,9 +278,17 @@ export default function BookingPage() {
 
             {step === 1 && (
               <section className="wsw-booking-page__panel" aria-label="Choose a service category">
-                <h2 className="wsw-booking-page__panel-title">What needs attention?</h2>
+                <div className="wsw-booking-page__panel-head">
+                  <h2 className="wsw-booking-page__panel-title">What needs attention?</h2>
+                  <span className="wsw-booking-page__stepcount">01 / 03</span>
+                </div>
+
                 {isLoadingCatalog ? (
-                  <p className="wsw-booking-page__loading-note">Loading services…</p>
+                  <div className="wsw-booking-page__category-grid" aria-label="Loading">
+                    {[0, 1, 2, 3].map((i) => (
+                      <div key={i} className="wsw-booking-page__skel" style={{ height: 118 }} />
+                    ))}
+                  </div>
                 ) : industries.length > 0 ? (
                   <div className="wsw-booking-page__category-grid">
                     {industries.map((c) => (
@@ -215,7 +301,10 @@ export default function BookingPage() {
                         }
                         onClick={() => handleSelectCategory(c.id)}
                       >
-                        <span className="wsw-booking-page__category-code">{categoryCode(c.name)}</span>
+                        <span className="wsw-booking-page__category-top">
+                          <span className="wsw-booking-page__category-icon">{categoryIconGlyph(c.name)}</span>
+                          <span className="wsw-booking-page__category-code">{categoryCode(c.name)}</span>
+                        </span>
                         <span className="wsw-booking-page__category-label">{c.name}</span>
                         {c.tagline && <span className="wsw-booking-page__category-tagline">{c.tagline}</span>}
                       </button>
@@ -232,9 +321,17 @@ export default function BookingPage() {
                 <button type="button" className="wsw-booking-page__back-link" onClick={() => setStep(1)}>
                   ← {category.name}
                 </button>
-                <h2 className="wsw-booking-page__panel-title">Pick the exact job</h2>
+                <div className="wsw-booking-page__panel-head">
+                  <h2 className="wsw-booking-page__panel-title">Pick the exact job</h2>
+                  <span className="wsw-booking-page__stepcount">02 / 03</span>
+                </div>
+
                 {isLoadingCatalog ? (
-                  <p className="wsw-booking-page__loading-note">Loading jobs…</p>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }} aria-label="Loading">
+                    {[0, 1, 2, 3].map((i) => (
+                      <div key={i} className="wsw-booking-page__skel" style={{ height: 62 }} />
+                    ))}
+                  </div>
                 ) : categoryServices.length > 0 ? (
                   <ul className="wsw-booking-page__service-list">
                     {categoryServices.map((s) => (
@@ -247,10 +344,16 @@ export default function BookingPage() {
                           }
                           onClick={() => handleSelectService(s.id)}
                         >
-                          <span className="wsw-booking-page__service-name">{s.name}</span>
+                          <span className="wsw-booking-page__service-left">
+                            {s.id === serviceId && <span className="wsw-booking-page__service-check">✓</span>}
+                            <span className="wsw-booking-page__service-name">{s.name}</span>
+                          </span>
                           <span className="wsw-booking-page__service-meta">
-                            <span>{s.duration ? `${s.duration} mins` : "—"}</span>
+                            <span className="wsw-booking-page__service-dur">
+                              {s.duration ? `${s.duration}m` : "—"}
+                            </span>
                             <span className="wsw-booking-page__service-price">{formatRs(s.price)}</span>
+                            <span className="wsw-booking-page__service-arrow">→</span>
                           </span>
                         </button>
                       </li>
@@ -267,7 +370,10 @@ export default function BookingPage() {
                 <button type="button" className="wsw-booking-page__back-link" onClick={() => setStep(2)}>
                   ← {service.name}
                 </button>
-                <h2 className="wsw-booking-page__panel-title">Where and when</h2>
+                <div className="wsw-booking-page__panel-head">
+                  <h2 className="wsw-booking-page__panel-title">Where and when</h2>
+                  <span className="wsw-booking-page__stepcount">03 / 03</span>
+                </div>
 
                 <form className="wsw-booking-page__form" onSubmit={handleSubmit} noValidate>
                   <div className="wsw-booking-page__field-row">
@@ -287,6 +393,7 @@ export default function BookingPage() {
                       error={errors.phone}
                       type="tel"
                       autoComplete="tel"
+                      placeholder="+977 98X-XXXXXXX"
                     />
                   </div>
 
@@ -297,6 +404,7 @@ export default function BookingPage() {
                     onChange={(v) => updateField("address", v)}
                     error={errors.address}
                     autoComplete="street-address"
+                    placeholder="Street, area, city"
                   />
 
                   <div className="wsw-booking-page__field-row">
@@ -307,6 +415,7 @@ export default function BookingPage() {
                       onChange={(v) => updateField("date", v)}
                       error={errors.date}
                       type="date"
+                      min={todayIso}
                     />
                     <Field
                       id="slot"
@@ -335,7 +444,14 @@ export default function BookingPage() {
                   {submitError && <p className="wsw-booking-page__error wsw-booking-page__error--form">{submitError}</p>}
 
                   <button type="submit" className="wsw-booking-page__submit" disabled={submitting}>
-                    {submitting ? "Confirming…" : "Confirm booking"}
+                    {submitting ? (
+                      <>
+                        <span className="wsw-booking-page__spin" />
+                        Confirming…
+                      </>
+                    ) : (
+                      <>Confirm booking →</>
+                    )}
                   </button>
                 </form>
               </section>
@@ -346,8 +462,9 @@ export default function BookingPage() {
             <div className="wsw-booking-page__ticket">
               <div className="wsw-booking-page__ticket-top">
                 <span className="wsw-booking-page__ticket-eyebrow">Work order</span>
-                <span className="wsw-booking-page__ticket-status">
-                  {canReviewTicket ? "In progress" : "Not started"}
+                <span className={"wsw-booking-page__ticket-status wsw-booking-page__ticket-status--" + ticketStatus.tone}>
+                  <span className="wsw-booking-page__ticket-status-dot" />
+                  {ticketStatus.label}
                 </span>
               </div>
 
@@ -364,7 +481,7 @@ export default function BookingPage() {
                   <dt>Est. duration</dt>
                   <dd>{service?.duration ? `${service.duration} mins` : "—"}</dd>
                 </div>
-                <div className="wsw-booking-page__ticket-item">
+                <div className="wsw-booking-page__ticket-item wsw-booking-page__ticket-item--hl">
                   <dt>Est. price</dt>
                   <dd>{service ? formatRs(service.price) : "—"}</dd>
                 </div>
@@ -374,15 +491,17 @@ export default function BookingPage() {
                 </div>
                 <div className="wsw-booking-page__ticket-item">
                   <dt>Time</dt>
-                  <dd>{form.slot || "—"}</dd>
+                  <dd>{formatTime(form.slot)}</dd>
                 </div>
                 <div className="wsw-booking-page__ticket-item">
                   <dt>Address</dt>
-                  <dd>{form.address ? `${form.address}` : "—"}</dd>
+                  <dd>{form.address || "—"}</dd>
                 </div>
               </dl>
 
               <div className="wsw-booking-page__ticket-perforation" aria-hidden="true" />
+
+              <Barcode label="PRE-CONFIRMATION" />
 
               <p className="wsw-booking-page__ticket-footnote">
                 A technician confirms your slot within 30 minutes of booking. Final price may vary after inspection.
@@ -391,6 +510,11 @@ export default function BookingPage() {
           </aside>
         </div>
       )}
+
+      <footer className="wsw-booking-page__footer">
+        WOWSEWA <span className="wsw-booking-page__footer-dot" /> ONE VISIT, ONE BILL{" "}
+        <span className="wsw-booking-page__footer-dot" /> KATHMANDU
+      </footer>
     </div>
   );
 }
@@ -399,7 +523,7 @@ export default function BookingPage() {
 
 function StepPill({ index, label, active, done, onClick, disabled }) {
   return (
-    <li>
+    <li className="wsw-booking-page__step-item">
       <button
         type="button"
         className={
@@ -417,8 +541,7 @@ function StepPill({ index, label, active, done, onClick, disabled }) {
   );
 }
 
-// Custom Field manages 'type="time"' using native elements cleanly
-function Field({ id, label, value, onChange, error, type = "text", autoComplete }) {
+function Field({ id, label, value, onChange, error, type = "text", autoComplete, ...rest }) {
   return (
     <div className="wsw-booking-page__field">
       <label className="wsw-booking-page__label" htmlFor={id}>
@@ -431,35 +554,44 @@ function Field({ id, label, value, onChange, error, type = "text", autoComplete 
         value={value}
         onChange={(e) => onChange(e.target.value)}
         autoComplete={autoComplete}
+        {...rest}
       />
-      {error && <span className="wsw-booking-page__error">{error}</span>}
+      {error && <span className="wsw-booking-page__error">⚠ {error}</span>}
     </div>
   );
 }
 
-function ConfirmationView({ ticket, onNewBooking }) {
+function ConfirmationView({ ticket, onNewBooking, onCopy }) {
   const { code, category, service, form } = ticket;
+
   return (
     <div className="wsw-booking-page__confirmation">
       <div className="wsw-booking-page__confirmation-ticket">
+        <span className="wsw-booking-page__confirmation-badge">✓</span>
+
         <span className="wsw-booking-page__ticket-eyebrow">Booking confirmed</span>
-        <h2 className="wsw-booking-page__confirmation-code">{code}</h2>
+        <div className="wsw-booking-page__confirmation-code-row">
+          <h2 className="wsw-booking-page__confirmation-code">{code}</h2>
+          <button type="button" className="wsw-booking-page__copy-btn" onClick={() => onCopy(code)}>
+            Copy
+          </button>
+        </div>
         <p className="wsw-booking-page__confirmation-line">
           {service.name} · {category.name}
         </p>
+
         <div className="wsw-booking-page__ticket-perforation" aria-hidden="true" />
+
         <dl className="wsw-booking-page__ticket-list">
           <div className="wsw-booking-page__ticket-item">
             <dt>Technician arrives</dt>
             <dd>
-              {formatDateLabel(form.date)}, {form.slot}
+              {formatDateLabel(form.date)}, {formatTime(form.slot)}
             </dd>
           </div>
           <div className="wsw-booking-page__ticket-item">
             <dt>Address</dt>
-            <dd>
-              {form.address}, {form.city}
-            </dd>
+            <dd>{form.address}</dd>
           </div>
           <div className="wsw-booking-page__ticket-item">
             <dt>Contact</dt>
@@ -467,14 +599,24 @@ function ConfirmationView({ ticket, onNewBooking }) {
               {form.fullName} · {form.phone}
             </dd>
           </div>
+          <div className="wsw-booking-page__ticket-item wsw-booking-page__ticket-item--hl">
+            <dt>Est. total</dt>
+            <dd>{formatRs(service.price)}</dd>
+          </div>
         </dl>
+
+        <Barcode label={`WOWSEWA • ${code}`} />
+
         <p className="wsw-booking-page__ticket-footnote">
           Save this code. You'll get an SMS confirmation shortly with your technician's name and photo.
         </p>
       </div>
-      <button type="button" className="wsw-booking-page__submit" onClick={onNewBooking}>
-        Book another service
-      </button>
+
+      <div className="wsw-booking-page__confirmation-actions">
+        <button type="button" className="wsw-booking-page__submit" onClick={onNewBooking}>
+          + Book another service
+        </button>
+      </div>
     </div>
   );
 }
