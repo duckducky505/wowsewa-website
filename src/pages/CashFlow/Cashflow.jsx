@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MdArrowBack, MdFileDownload, MdAdd, MdClose } from 'react-icons/md';
 import { FaEdit, FaTrash } from 'react-icons/fa';
-import { fetchHook } from '../../hooks/fetchHook';
 import { fetchAPI } from '../../utils/fetchAPI';
+import { useSignalR } from '../../hooks/signalR';
 import './Cashflow.css';
 
 const blankForm = {
@@ -109,24 +109,72 @@ const CashFlowForm = ({ onSubmit, submitLabel, form, onField, closeAll, industry
   </form>
 );
 
+const CASHFLOW_ENDPOINT = "https://localhost:7011/api/CashFlow/get/allCashFlowData";
+const INDUSTRY_ENDPOINT = "https://localhost:7011/api/industry/getIndustryData";
+const EMPLOYEES_ENDPOINT = "https://localhost:7011/api/Employee/getEmployeesDetail";
+const CASHTYPE_ENDPOINT = "https://localhost:7011/api/Categories/get/Cash-Type-Values";
+const PAYMENT_ENDPOINT = "https://localhost:7011/api/Categories/get/Payment-Method-Values";
+
 const CashFlow = () => {
   const navigate = useNavigate();
 
-  const { data: cashFlowData } = fetchHook("https://localhost:7011/api/CashFlow/get/allCashFlowData");
-  const { data: industryData } = fetchHook("https://localhost:7011/api/industry/getIndustryData");
-  const { data: employeesData } = fetchHook("https://localhost:7011/api/Employee/getEmployeesDetail");
-  const { data: cashType } = fetchHook("https://localhost:7011/api/Categories/get/Cash-Type-Values");
-  const { data: paymentMethod } = fetchHook("https://localhost:7011/api/Categories/get/Payment-Method-Values");
+  const [cashFlowData, setCashFlowData] = useState([]);
+  const [cashFlowLoading, setCashFlowLoading] = useState(true);
+  const [industryData, setIndustryData] = useState([]);
+  const [employeesData, setEmployeesData] = useState([]);
+  const [cashType, setCashType] = useState([]);
+  const [paymentMethod, setPaymentMethod] = useState([]);
 
-  const [mode, setMode] = useState(null); // null | 'add' | 'edit' | 'delete'
+  const { connection, isConnected } = useSignalR() || {};
+
+  const [mode, setMode] = useState(null);
   const [selected, setSelected] = useState(null);
   const [form, setForm] = useState(blankForm);
   const [submitting, setSubmitting] = useState(false);
 
+  const loadCashFlow = useCallback(async () => {
+    setCashFlowLoading(true);
+    const res = await fetchAPI(CASHFLOW_ENDPOINT, "GET");
+    setCashFlowData(Array.isArray(res) ? res : []);
+    setCashFlowLoading(false);
+  }, []);
+
+  const loadStaticLookups = useCallback(async () => {
+    const [ind, emp, ct, pm] = await Promise.all([
+      fetchAPI(INDUSTRY_ENDPOINT, "GET"),
+      fetchAPI(EMPLOYEES_ENDPOINT, "GET"),
+      fetchAPI(CASHTYPE_ENDPOINT, "GET"),
+      fetchAPI(PAYMENT_ENDPOINT, "GET"),
+    ]);
+    setIndustryData(Array.isArray(ind) ? ind : []);
+    setEmployeesData(Array.isArray(emp) ? emp : []);
+    setCashType(Array.isArray(ct) ? ct : []);
+    setPaymentMethod(Array.isArray(pm) ? pm : []);
+  }, []);
+
+  useEffect(() => {
+    loadCashFlow();
+    loadStaticLookups();
+  }, [loadCashFlow, loadStaticLookups]);
+
+  // Live updates: refresh the ledger whenever any client adds/edits/deletes
+  // a cash flow entry, or when a Holding Sheet completion auto-generates one.
+  useEffect(() => {
+    if (!connection || !isConnected) return;
+
+    const handleUpdate = () => loadCashFlow();
+
+    connection.on("CashFlowUpdated", handleUpdate);
+
+    return () => {
+      connection.off("CashFlowUpdated", handleUpdate);
+    };
+  }, [connection, isConnected, loadCashFlow]);
+
   const onField = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
 
   const openAdd = () => {
-    const today = new Date().toISOString().split('T')[0]; // "2026-04-26"
+    const today = new Date().toISOString().split('T')[0];
     setForm({ ...blankForm, createdDate: today });
     setMode('add');
   };
@@ -178,8 +226,8 @@ const CashFlow = () => {
     setSubmitting(false);
 
     if (res) {
-      window.alert("New cash flow entry has been added successfully.");
-      window.location.reload();
+      loadCashFlow();
+      closeAll();
     } else {
       window.alert("Some error occurred. Please try again later.");
     }
@@ -193,8 +241,8 @@ const CashFlow = () => {
     setSubmitting(false);
 
     if (res) {
-      window.alert("Entry deleted successfully.");
-      window.location.reload();
+      loadCashFlow();
+      closeAll();
     } else {
       window.alert("Some error occurred. Please try again.");
     }
@@ -243,11 +291,7 @@ const CashFlow = () => {
       }
 
       if (currentValue !== originalValue) {
-        patchPayload.push({
-          op: "replace",
-          path,
-          value: currentValue,
-        });
+        patchPayload.push({ op: "replace", path, value: currentValue });
       }
     });
 
@@ -262,8 +306,8 @@ const CashFlow = () => {
     setSubmitting(false);
 
     if (res) {
-      window.alert("Entry updated successfully.");
-      window.location.reload();
+      loadCashFlow();
+      closeAll();
     } else {
       window.alert("Some error occurred. Please try again.");
     }
@@ -282,6 +326,7 @@ const CashFlow = () => {
             <p className="wsw-cashflow__sub">Historic balance sheets for platform workflow parameters.</p>
           </div>
           <div className="wsw-cashflow__header-actions">
+            {isConnected && <span className="wsw-cashflow__live-indicator">● Live</span>}
             <button type="button" className="wsw-cashflow__add-btn" onClick={openAdd}>
               <MdAdd size={18} /> Add entry
             </button>
@@ -311,7 +356,13 @@ const CashFlow = () => {
                 </tr>
               </thead>
               <tbody>
-                {cashFlowData?.length > 0 ? cashFlowData.map((flow) => (
+                {cashFlowLoading ? (
+                  <tr>
+                    <td colSpan={10}>
+                      <p className="wsw-cashflow__cell-muted">Loading entries…</p>
+                    </td>
+                  </tr>
+                ) : cashFlowData?.length > 0 ? cashFlowData.map((flow) => (
                   <tr className="wsw-cashflow__row" key={flow.id}>
                     <td>{flow.createdDate}</td>
                     <td className="wsw-cashflow__cell-muted">

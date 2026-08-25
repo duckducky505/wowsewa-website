@@ -43,21 +43,14 @@ export default function AfterLoginLayout() {
   return (
     <div className="wsw-app-layout">
       <Sidebar
-        role={role}
+        role={user?.role}
         user={user}
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
         onLogout={handleLogout}
       />
-
       <div className="wsw-app-layout__main">
-        <Header
-          user={user}
-          role={role}
-          onMenuClick={() => setSidebarOpen(true)}
-          onLogout={handleLogout}
-        />
-
+        <Header user={user} role={user?.role} onMenuClick={() => setSidebarOpen(true)} onLogout={handleLogout} />
         <main className="wsw-app-layout__content">
           <Outlet />
         </main>

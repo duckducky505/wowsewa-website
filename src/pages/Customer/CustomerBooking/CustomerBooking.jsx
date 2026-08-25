@@ -1,26 +1,23 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Navigate } from "react-router-dom";
 import "./CustomerBooking.css";
-import { fetchHook } from "../../../hooks/fetchHook";
 import { fetchAPI } from "../../../utils/fetchAPI";
+import { useSignalR } from "../../../hooks/signalR";
 
-
+// ---- Helpers (unchanged from your version) ----------------------------------
 function categoryCode(name) {
   return (name || "").slice(0, 3).toUpperCase();
 }
-
 function generateTicketCode(categoryName) {
   const rand = Math.floor(1000 + Math.random() * 9000);
   return `WS-${categoryCode(categoryName)}-${rand}`;
 }
-
 function formatDateLabel(value) {
   if (!value) return "—";
   const d = new Date(`${value}T00:00:00`);
   if (Number.isNaN(d.getTime())) return "—";
   return d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
 }
-
 function formatTime(v) {
   if (!v) return "—";
   const [h, m] = v.split(":").map(Number);
@@ -29,11 +26,9 @@ function formatTime(v) {
   const hh = h % 12 || 12;
   return `${hh}:${String(m).padStart(2, "0")} ${ap}`;
 }
-
 function formatRs(value) {
   return value ? `Rs ${Number(value).toLocaleString()}` : "—";
 }
-
 function normalizeIndustry(raw) {
   return {
     id: raw.industryId ?? raw.IndustryId ?? raw.id ?? raw.Id,
@@ -41,7 +36,6 @@ function normalizeIndustry(raw) {
     tagline: raw.tagline ?? raw.Tagline ?? raw.description ?? raw.Description ?? "",
   };
 }
-
 function normalizeDuty(raw) {
   return {
     id: raw.dutyId ?? raw.DutyId ?? raw.id ?? raw.Id,
@@ -51,7 +45,6 @@ function normalizeDuty(raw) {
     price: raw.price ?? raw.Price ?? raw.rate ?? raw.Rate ?? 0,
   };
 }
-
 function categoryIconGlyph(name = "") {
   const s = name.toLowerCase();
   if (/plumb|pipe|water/.test(s)) return "💧";
@@ -63,8 +56,6 @@ function categoryIconGlyph(name = "") {
   return "🔧";
 }
 
-// ---- Barcode (decorative, matches ticket rail styling) ---------------------
-
 const BARCODE = [3, 1, 2, 1, 4, 2, 1, 3, 1, 1, 3, 2, 1, 4, 1, 2, 3, 1, 2, 1, 1, 3, 2, 4, 1, 2];
 
 function Barcode({ label }) {
@@ -72,17 +63,16 @@ function Barcode({ label }) {
     <div className="wsw-booking-page__barcode" aria-hidden="true">
       <div className="wsw-booking-page__barcode-bars">
         {BARCODE.map((w, i) => (
-          <span
-            key={i}
-            style={{ width: `${w}px` }}
-            className={i % 6 === 4 ? "wsw-booking-page__barcode-bar--lime" : ""}
-          />
+          <span key={i} style={{ width: `${w}px` }} className={i % 6 === 4 ? "wsw-booking-page__barcode-bar--lime" : ""} />
         ))}
       </div>
       {label && <span className="wsw-booking-page__barcode-label">{label}</span>}
     </div>
   );
 }
+
+const INDUSTRIES_ENDPOINT = "https://localhost:7011/api/Industry/getIndustryData";
+const DUTIES_ENDPOINT = "https://localhost:7011/api/Duty/getAllDutyData";
 
 // ---- Component --------------------------------------------------------------
 
@@ -101,12 +91,49 @@ export default function BookingPage() {
     }
   }
 
-  const { data: rawIndustryData, loading: industriesLoading } = fetchHook(
-    "https://localhost:7011/api/Industry/getIndustryData"
-  );
-  const { data: rawDutyData, loading: dutiesLoading } = fetchHook(
-    "https://localhost:7011/api/Duty/getAllDutyData"
-  );
+  const [rawIndustryData, setRawIndustryData] = useState([]);
+  const [industriesLoading, setIndustriesLoading] = useState(true);
+  const [rawDutyData, setRawDutyData] = useState([]);
+  const [dutiesLoading, setDutiesLoading] = useState(true);
+
+  const { connection, isConnected } = useSignalR();
+
+  const loadIndustries = useCallback(async () => {
+    setIndustriesLoading(true);
+    const res = await fetchAPI(INDUSTRIES_ENDPOINT, "GET");
+    setRawIndustryData(Array.isArray(res) ? res : []);
+    setIndustriesLoading(false);
+  }, []);
+
+  const loadDuties = useCallback(async () => {
+    setDutiesLoading(true);
+    const res = await fetchAPI(DUTIES_ENDPOINT, "GET");
+    setRawDutyData(Array.isArray(res) ? res : []);
+    setDutiesLoading(false);
+  }, []);
+
+  useEffect(() => {
+    loadIndustries();
+    loadDuties();
+  }, [loadIndustries, loadDuties]);
+
+  // Live updates: if admin changes the service catalog (new duty, price
+  // change, industry added) while a customer has this page open, refresh
+  // the catalog silently — don't disrupt whatever step they're on.
+  useEffect(() => {
+    if (!connection || !isConnected) return;
+
+    const handleIndustryUpdate = () => loadIndustries();
+    const handleDutyUpdate = () => loadDuties();
+
+    connection.on("IndustryUpdated", handleIndustryUpdate);
+    connection.on("DutyUpdated", handleDutyUpdate);
+
+    return () => {
+      connection.off("IndustryUpdated", handleIndustryUpdate);
+      connection.off("DutyUpdated", handleDutyUpdate);
+    };
+  }, [connection, isConnected, loadIndustries, loadDuties]);
 
   const industries = useMemo(() => (rawIndustryData || []).map(normalizeIndustry), [rawIndustryData]);
   const duties = useMemo(() => (rawDutyData || []).map(normalizeDuty), [rawDutyData]);
@@ -132,20 +159,9 @@ export default function BookingPage() {
     if (name) setForm((prev) => ({ ...prev, fullName: prev.fullName || name }));
   }, [name]);
 
-  const category = useMemo(
-    () => industries.find((c) => c.id === categoryId) || null,
-    [industries, categoryId]
-  );
-
-  const categoryServices = useMemo(
-    () => duties.filter((d) => d.industryId === categoryId),
-    [duties, categoryId]
-  );
-
-  const service = useMemo(
-    () => duties.find((s) => s.id === serviceId) || null,
-    [duties, serviceId]
-  );
+  const category = useMemo(() => industries.find((c) => c.id === categoryId) || null, [industries, categoryId]);
+  const categoryServices = useMemo(() => duties.filter((d) => d.industryId === categoryId), [duties, categoryId]);
+  const service = useMemo(() => duties.find((s) => s.id === serviceId) || null, [duties, serviceId]);
 
   const todayIso = useMemo(() => new Date().toISOString().slice(0, 10), []);
 
@@ -235,7 +251,6 @@ export default function BookingPage() {
     }
   }
 
-  // Guard is placed after all hooks are called, keeping hook order stable.
   if (!token) return <Navigate to="/login" replace />;
 
   return (

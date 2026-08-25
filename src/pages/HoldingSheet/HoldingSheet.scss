@@ -438,3 +438,14 @@
     &:disabled { opacity: 0.55; cursor: not-allowed; }
   }
 }
+
+&__live-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+}

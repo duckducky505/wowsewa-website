@@ -15,7 +15,9 @@ const ProtectedRoute = ({ allowedRoles }) => {
     }
 
     if (allowedRoles && allowedRoles.length > 0) {
-        const userRole = user?.role?.toLowerCase();
+        const rawRole = user?.role || user?.["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+        const userRole = rawRole?.toLowerCase();
+
         const hasRequiredRole = allowedRoles.some(
             (role) => role.toLowerCase() === userRole
         );

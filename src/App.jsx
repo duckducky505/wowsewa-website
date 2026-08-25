@@ -1,5 +1,4 @@
-import './App.css';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import MainLayout from './layouts/MainLayout';
 import Home from './pages/Home';
 import AMC from './pages/AMC/AMC';
@@ -32,6 +31,11 @@ import ReceivablePayablePage from './pages/Receivable/Receivablepayable';
 import ExpenseTracker from './pages/Reception/ExpenseTracker/ExpenseTracker';
 import InventoryManagement from './pages/Inventory/InventoryManagement';
 import HoldersPage from './pages/Holders/Holders';
+import Unauthorized from './pages/Unauthorized/Unauthorized';
+
+//React Toastify Notification 
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const App = () => {
 
@@ -40,10 +44,17 @@ const App = () => {
     <BrowserRouter>
       <ScrollToTop />
       <WhatsAppFloat />
+      <ToastContainer 
+          position="top-right" 
+          autoClose={3000} 
+          hideProgressBar={false} 
+          theme="colored" 
+        />
         <Routes>
           {/* Public routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/unauthorized" element={<Unauthorized />} />
 
           {/* Marketing/General layouts */}
           <Route element={<MainLayout />}>
@@ -61,7 +72,7 @@ const App = () => {
               <Route element={<AfterLoginLayout />}>
 
                 {/* Admin-only pages */}
-                <Route element={<ProtectedRoute allow={["admin"]} />}>
+                <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
                   <Route path="/admin/dashboard" element={<AdminDashboard />} />
                   <Route path="/admin/jobs" element={<JobsPage />} />
                   <Route path="/admin/Category" element={<JobsCategory />} />
@@ -72,8 +83,19 @@ const App = () => {
                   <Route path="/admin/receivable-payable" element={<ReceivablePayablePage />} />
                 </Route>
 
+                {/* Reception-only */}
+                <Route element={<ProtectedRoute allowedRoles={["reception"]} />}>
+                    <Route element={<AfterLoginLayout />}>
+                      <Route path="/reception/dashboard" element={<ReceptionDashboard />} />
+                      <Route path="/reception/dashboard" element={<ReceptionDashboard/>} />
+                      <Route path="/reception/inventory" element={<InventoryManagement/>} />
+                      <Route path="/reception/bookings" element={<ReceptionBookings/>} />
+                      <Route path="/reception/expense" element={<ExpenseTracker/>} />
+                    </Route>
+                </Route>
+
                 {/* Customer protected routes */} 
-                <Route element={<ProtectedRoute allow={["customer"]} />}>
+                <Route element={<ProtectedRoute allowedRoles={["customer"]} />}>
                   <Route path="/customer/dashboard" element={<CustomerDashboard />} />
                   <Route path="customer/booking" element={<CustomerBooking />} />
                   <Route path="/customer/history" element={<CustomerHistory />} />

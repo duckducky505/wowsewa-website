@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FaArrowLeft } from 'react-icons/fa';
 import './AuthStyles.css';
 import { useAuth } from '../../context/AuthContext';
+import { decodeToken } from '../../utils/jwt';
 
 const Login = () => {
     const [email, setEmail] = useState("");
@@ -38,37 +39,10 @@ const Login = () => {
             }
 
             const data = await response.json();
+            login(data.token);
 
-            const decodedToken = JSON.parse(atob(data.token.split(".")[1]));
-
-            const name =
-                decodedToken.name ||
-                decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/name"];
-
-            const userEmail =
-                decodedToken.email ||
-                decodedToken["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"];
-
-            const rawRole =
-                decodedToken.role ||
-                decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
-
-            const guidId =
-                decodedToken.guidId ||
-                decodedToken["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
-
-            const role = (rawRole || "").toLowerCase();
-
-            console.log(name);
-            console.log(userEmail);
-            console.log(rawRole);
-            console.log(guidId);
-
-
-            const user = { guidId, name, email: userEmail };
-
-            login(user, data.token);
-            navigate(`/${role}/dashboard`, { replace: true });
+            const decoded = decodeToken(data.token);
+            navigate(`/${decoded.role}/dashboard`, { replace: true });
         } catch (err) {
             setError("Couldn't reach the server. Please try again.");
             console.error(err);

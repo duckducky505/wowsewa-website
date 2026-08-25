@@ -1,10 +1,11 @@
 // pages/AdminDashboard/HoldingSheetPage.jsx
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MdArrowBack, MdFileDownload, MdAdd, MdClose } from 'react-icons/md';
 import { FaEdit, FaTrash, FaBan } from 'react-icons/fa';
 import { fetchHook } from '../../hooks/fetchHook';
 import { fetchAPI } from '../../utils/fetchAPI';
+import { useSignalR } from '../../hooks/signalR';
 import './HoldingSheet.css';
 
 const blankForm = {
@@ -58,6 +59,9 @@ function formatRs(value) {
   return `Rs. ${Number(value || 0).toLocaleString()}`;
 }
 
+const HOLDING_SHEET_ENDPOINT = 'https://localhost:7011/api/HoldingSheet/get/holding-sheet-data';
+const HOLDERS_ENDPOINT = 'https://localhost:7011/api/Holder/get/holders-data';
+
 const HoldingSheet = () => {
   const navigate = useNavigate();
 
@@ -67,11 +71,60 @@ const HoldingSheet = () => {
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
 
-  const { data: rawEntries, loading: entriesLoading } = fetchHook('https://localhost:7011/api/HoldingSheet/get/holding-sheet-data');
-  const { data: rawHolders, loading: holdersLoading } = fetchHook('https://localhost:7011/api/Holder/get/holders-data');
+  // Entries & holders are now local state (not fetchHook) so we can refresh
+  // them on demand — after a mutation, or when SignalR tells us something changed —
+  // without a full page reload.
+  const [rawEntries, setRawEntries] = useState([]);
+  const [entriesLoading, setEntriesLoading] = useState(true);
+  const [rawHolders, setRawHolders] = useState([]);
+  const [holdersLoading, setHoldersLoading] = useState(true);
+
   const { data: statusValues } = fetchHook('https://localhost:7011/api/Categories/get/Status');
   const { data: paymentType } = fetchHook('https://localhost:7011/api/Categories/get/Payment-Method-Values');
   const { data: entryType } = fetchHook('https://localhost:7011/api/Categories/get/Entry-Types');
+
+  const { connection, isConnected } = useSignalR() || {};
+
+  const loadEntries = useCallback(async () => {
+    setEntriesLoading(true);
+    const res = await fetchAPI(HOLDING_SHEET_ENDPOINT, 'GET');
+    setRawEntries(Array.isArray(res) ? res : []);
+    setEntriesLoading(false);
+  }, []);
+
+  const loadHolders = useCallback(async () => {
+    setHoldersLoading(true);
+    const res = await fetchAPI(HOLDERS_ENDPOINT, 'GET');
+    setRawHolders(Array.isArray(res) ? res : []);
+    setHoldersLoading(false);
+  }, []);
+
+  const refreshData = useCallback(() => {
+    loadEntries();
+    loadHolders();
+  }, [loadEntries, loadHolders]);
+
+  // Initial load
+  useEffect(() => {
+    refreshData();
+  }, [refreshData]);
+
+  // SignalR: whenever the backend broadcasts "HoldingSheetUpdated" (fire this
+  // from the HoldingSheetController after Add/Update/Delete succeeds server-side),
+  // silently refetch instead of forcing every open tab to hard-reload.
+  useEffect(() => {
+    if (!connection || !isConnected) return;
+
+    const handleUpdate = () => {
+      refreshData();
+    };
+
+    connection.on('HoldingSheetUpdated', handleUpdate);
+
+    return () => {
+      connection.off('HoldingSheetUpdated', handleUpdate);
+    };
+  }, [connection, isConnected, refreshData]);
 
   const entries = useMemo(() => (rawEntries || []).map(normalizeEntry), [rawEntries]);
   const holders = useMemo(() => (rawHolders || []).map(normalizeHolder), [rawHolders]);
@@ -184,10 +237,12 @@ const HoldingSheet = () => {
     setSubmitting(false);
 
     if (addRes) {
-      window.alert('New holding sheet entry added successfully.');
-      window.location.reload();
+      // No SignalR broadcast needed to fall back on — refresh locally too,
+      // in case this client itself doesn't receive its own broadcast.
+      refreshData();
+      closeAll();
     } else {
-      window.alert('Error adding the entry. Please try again later.');
+      setFormError('Error adding the entry. Please try again later.');
     }
   };
 
@@ -224,10 +279,10 @@ const HoldingSheet = () => {
     setSubmitting(false);
 
     if (editRes) {
-      window.alert('Entry updated successfully.');
-      window.location.reload();
+      refreshData();
+      closeAll();
     } else {
-      window.alert('Some error occurred. Please try again.');
+      setFormError('Some error occurred. Please try again.');
     }
   };
 
@@ -242,8 +297,8 @@ const HoldingSheet = () => {
     setSubmitting(false);
 
     if (res) {
-      window.alert('Entry marked as cancelled. (Balance reversal must be verified on the backend — see code comment.)');
-      window.location.reload();
+      refreshData();
+      closeAll();
     } else {
       window.alert('Some error occurred. Please try again.');
     }
@@ -256,8 +311,8 @@ const HoldingSheet = () => {
     setSubmitting(false);
 
     if (delRes) {
-      window.alert('Entry deleted successfully.');
-      window.location.reload();
+      refreshData();
+      closeAll();
     } else {
       window.alert('Some error occurred. Please try again.');
     }
@@ -276,6 +331,11 @@ const HoldingSheet = () => {
             <p className="wsw-holding__sub">Track who's holding company money and where it moved.</p>
           </div>
           <div className="wsw-holding__header-actions">
+            {isConnected && (
+              <span className="wsw-holding__live-indicator" title="Live updates connected">
+                ● Live
+              </span>
+            )}
             <button type="button" className="wsw-holding__add-btn" onClick={openAdd}>
               <MdAdd size={18} /> Add entry
             </button>

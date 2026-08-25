@@ -1,65 +1,48 @@
+// AuthContext.tsx
 import React, { createContext, ReactNode, useContext, useEffect, useState } from "react";
-
-export interface User {
-    guidId: string;
-    name: string;
-    email: string;
-}
+import { decodeToken, isTokenExpired, DecodedToken } from "../utils/jwt";
 
 interface AuthContextType {
-    user: User | null;
+    user: DecodedToken | null;
     isAuthenticated: boolean;
     isLoading: boolean;
-    login: (userData: User, token: string) => void;
+    login: (token: string) => void;
     logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [user, setUser] = useState<User | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [user, setUser] = useState<DecodedToken | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const initializeAuth = () => {
-            try {
-                const storedToken = localStorage.getItem('Token');
-                const storedUser = localStorage.getItem("User");
-
-                if (storedToken && storedUser) {
-                    setUser(JSON.parse(storedUser));
-                }
-            } catch (error) {
-                console.error("Failed to restore auth state:", error);
-            } finally {
-                setIsLoading(false);
+        const storedToken = localStorage.getItem("Token");
+        if (storedToken) {
+            const decoded = decodeToken(storedToken);
+            if (decoded && !isTokenExpired(decoded)) {
+                setUser(decoded);
+            } else {
+                localStorage.removeItem("Token"); // stale/expired/tampered
             }
-        };
-        initializeAuth();
+        }
+        setIsLoading(false);
     }, []);
 
-    const login = (userData: User, token: string) => {
-        setUser(userData);
-        localStorage.setItem('Token', token);
-        localStorage.setItem("User", JSON.stringify(userData));
+    const login = (token: string) => {
+        const decoded = decodeToken(token);
+        if (!decoded) throw new Error("Invalid token received from server");
+        localStorage.setItem("Token", token);
+        setUser(decoded);
     };
 
     const logout = () => {
         setUser(null);
-        localStorage.removeItem('Token');
-        localStorage.removeItem("User");
+        localStorage.removeItem("Token");
     };
 
     return (
-        <AuthContext.Provider
-            value={{
-                user,
-                isAuthenticated: !!user,
-                isLoading,
-                login,
-                logout,
-            }}
-        >
+        <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, logout }}>
             {children}
         </AuthContext.Provider>
     );
@@ -67,8 +50,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
 export const useAuth = (): AuthContextType => {
     const context = useContext(AuthContext);
-    if (!context) {
-        throw new Error('useAuth must be used within an AuthProvider');
-    }
+    if (!context) throw new Error("useAuth must be used within an AuthProvider");
     return context;
 };

@@ -1,39 +1,29 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import "./CustomerDashboard.css";
-import { fetchHook } from "../../../hooks/fetchHook";
 import { fetchAPI } from "../../../utils/fetchAPI";
 import { useAuth } from "../../../context/AuthContext";
+import { useSignalR } from "../../../hooks/signalR";
 
-// ---- Helpers --------------------------------------------------------------
+// ---- Helpers (unchanged) ---------------------------------------------------
 
 function initials(name) {
   if (!name) return "";
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .map((n) => n[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
+  return name.split(" ").filter(Boolean).map((n) => n[0]).join("").slice(0, 2).toUpperCase();
 }
-
 function formatRs(value) {
   if (value === null || value === undefined) return "";
   return `Rs ${Number(value).toLocaleString()}`;
 }
-
 function statusClass(status) {
   if (!status) return "";
   return status.toLowerCase().replace(/\s+/g, "-");
 }
-
 function fmtDate(d) {
   if (!d) return "";
   const dt = new Date(d);
   if (Number.isNaN(dt.getTime())) return d;
   return dt.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
-
 function serviceGlyph(name = "") {
   const s = name.toLowerCase();
   if (/plumb|pipe|water|tank|leak|drain/.test(s)) return "💧";
@@ -44,13 +34,11 @@ function serviceGlyph(name = "") {
   if (/\bac\b|hvac|heat|cool|fridge/.test(s)) return "❄";
   return "🔧";
 }
-
 function normalizeStage(raw) {
   if (!raw) return "";
   if (typeof raw === "string") return raw;
   return raw.stageName ?? raw.StageName ?? raw.name ?? raw.Name;
 }
-
 function normalizeBooking(raw) {
   if (!raw) return null;
   return {
@@ -65,11 +53,7 @@ function normalizeBooking(raw) {
     status: raw.bookingStatus ?? raw.status,
     rated: raw.rating ?? raw.Rating,
     technician: raw.technician
-      ? {
-          name: raw.technician.name,
-          rating: raw.technician.rating,
-          phone: raw.technician.phone,
-        }
+      ? { name: raw.technician.name, rating: raw.technician.rating, phone: raw.technician.phone }
       : null,
   };
 }
@@ -84,55 +68,104 @@ export default function CustomerDashboard() {
   const [ratingDraft, setRatingDraft] = useState({});
   const [cancellingId, setCancellingId] = useState(null);
 
-  const { data: profileData, loading: profileLoading } = fetchHook(
-    guidId ? `https://localhost:7011/api/User/UserSpecificAccountInfo/${guidId}` : null
-  );
+  const [profileData, setProfileData] = useState(null);
+  const [profileLoading, setProfileLoading] = useState(true);
+  const [rawStages, setRawStages] = useState([]);
+  const [stagesLoading, setStagesLoading] = useState(true);
+  const [rawPending, setRawPending] = useState([]);
+  const [pendingLoading, setPendingLoading] = useState(true);
+  const [rawHistory, setRawHistory] = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(true);
+  const [rawCancelled, setRawCancelled] = useState([]);
+  const [cancelledLoading, setCancelledLoading] = useState(true);
 
-  const { data: rawStages, loading: stagesLoading } = fetchHook(
-    "https://localhost:7011/api/Booking/getBookingStatus"
-  );
+  const { connection, isConnected } = useSignalR() || {};
 
-  const { data: rawPending, loading: pendingLoading } = fetchHook(
-    guidId ? `https://localhost:7011/api/Booking/upcoming/getUserSpecificBooking/${guidId}` : null
-  );
+  const loadProfile = useCallback(async () => {
+    if (!guidId) return;
+    setProfileLoading(true);
+    const res = await fetchAPI(`https://localhost:7011/api/User/UserSpecificAccountInfo/${guidId}`, "GET");
+    setProfileData(res || null);
+    setProfileLoading(false);
+  }, [guidId]);
 
-  const { data: rawHistory, loading: historyLoading } = fetchHook(
-    guidId ? `https://localhost:7011/api/Booking/history/getUserSpecificBooking/${guidId}` : null
-  );
+  const loadStages = useCallback(async () => {
+    setStagesLoading(true);
+    const res = await fetchAPI("https://localhost:7011/api/Booking/getBookingStatus", "GET");
+    setRawStages(Array.isArray(res) ? res : []);
+    setStagesLoading(false);
+  }, []);
 
-  const { data: rawCancelled, loading: cancelledLoading } = fetchHook(
-    guidId ? `https://localhost:7011/api/Booking/cancelled/getUserSpecificBooking/${guidId}` : null
-  );
+  const loadPending = useCallback(async () => {
+    if (!guidId) return;
+    setPendingLoading(true);
+    const res = await fetchAPI(`https://localhost:7011/api/Booking/upcoming/getUserSpecificBooking/${guidId}`, "GET");
+    setRawPending(Array.isArray(res) ? res : []);
+    setPendingLoading(false);
+  }, [guidId]);
+
+  const loadHistory = useCallback(async () => {
+    if (!guidId) return;
+    setHistoryLoading(true);
+    const res = await fetchAPI(`https://localhost:7011/api/Booking/history/getUserSpecificBooking/${guidId}`, "GET");
+    setRawHistory(Array.isArray(res) ? res : []);
+    setHistoryLoading(false);
+  }, [guidId]);
+
+  const loadCancelled = useCallback(async () => {
+    if (!guidId) return;
+    setCancelledLoading(true);
+    const res = await fetchAPI(`https://localhost:7011/api/Booking/cancelled/getUserSpecificBooking/${guidId}`, "GET");
+    setRawCancelled(Array.isArray(res) ? res : []);
+    setCancelledLoading(false);
+  }, [guidId]);
+
+  const refreshBookings = useCallback(() => {
+    loadPending();
+    loadHistory();
+    loadCancelled();
+  }, [loadPending, loadHistory, loadCancelled]);
+
+  useEffect(() => {
+    loadProfile();
+    loadStages();
+    refreshBookings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [guidId]);
+
+  // Live updates: technician assignment, status changes, or cancellations
+  // made from the receptionist/admin side reflect here immediately.
+  useEffect(() => {
+    if (!connection || !isConnected || !guidId) return;
+
+    const handleBookingUpdate = () => refreshBookings();
+
+    connection.on("BookingUpdated", handleBookingUpdate);
+
+    return () => {
+      connection.off("BookingUpdated", handleBookingUpdate);
+    };
+  }, [connection, isConnected, guidId, refreshBookings]);
 
   const stages = useMemo(
-    () =>
-      (rawStages || [])
-        .map(normalizeStage)
-        .filter((s) => s && s.toLowerCase() !== "cancelled"),
+    () => (rawStages || []).map(normalizeStage).filter((s) => s && s.toLowerCase() !== "cancelled"),
     [rawStages]
   );
 
   const pendingBookings = useMemo(
-    () =>
-      (rawPending || [])
-        .map(normalizeBooking)
-        .filter((b) => b && b.status?.toLowerCase() !== "cancelled"),
+    () => (rawPending || []).map(normalizeBooking).filter((b) => b && b.status?.toLowerCase() !== "cancelled"),
     [rawPending]
   );
 
   const historyBookings = useMemo(() => {
     const completed = (rawHistory || []).map(normalizeBooking).filter(Boolean);
     const cancelled = (rawCancelled || []).map(normalizeBooking).filter(Boolean);
-    return [...completed, ...cancelled].sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-    );
+    return [...completed, ...cancelled].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }, [rawHistory, rawCancelled]);
 
   const activeJob = useMemo(() => {
     if (pendingBookings.length === 0) return null;
-    return [...pendingBookings].sort(
-      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-    )[0];
+    return [...pendingBookings].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
   }, [pendingBookings]);
 
   const activeStageIndex = useMemo(() => {
@@ -151,11 +184,7 @@ export default function CustomerDashboard() {
 
     return [
       { icon: "📅", label: "Upcoming", value: pendingBookings.length },
-      {
-        icon: "✓",
-        label: "Completed jobs",
-        value: historyBookings.filter((b) => b.status?.toLowerCase() === "completed").length,
-      },
+      { icon: "✓", label: "Completed jobs", value: historyBookings.filter((b) => b.status?.toLowerCase() === "completed").length },
       { icon: "₨", label: "Spent this year", value: formatRs(spent) },
     ];
   }, [pendingBookings, historyBookings]);
@@ -167,10 +196,7 @@ export default function CustomerDashboard() {
       email: profileData.emailAddress,
       phone: profileData.phoneNumber || profileData.phone,
       memberSince: profileData.dateCreated
-        ? new Date(profileData.dateCreated).toLocaleDateString(undefined, {
-            year: "numeric",
-            month: "short",
-          })
+        ? new Date(profileData.dateCreated).toLocaleDateString(undefined, { year: "numeric", month: "short" })
         : null,
     };
   }, [profileData]);
@@ -198,7 +224,7 @@ export default function CustomerDashboard() {
     setCancellingId(null);
 
     if (res) {
-      window.location.reload();
+      refreshBookings();
     } else {
       window.alert("Couldn't cancel this booking. Please try again.");
     }
@@ -213,6 +239,7 @@ export default function CustomerDashboard() {
             <span className="wsw-dashboard__eyebrow">
               <span className="wsw-dashboard__eyebrow-dot" />
               Your account
+              {isConnected && <span className="wsw-dashboard__live-tag">Live</span>}
             </span>
             <h1 className="wsw-dashboard__title">
               Welcome back{userProfile?.name ? `, ${userProfile.name.split(" ")[0]}` : ""}

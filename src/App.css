@@ -21,7 +21,7 @@
 }
 
 :root{
-    --font-main:'Poppins','UniNeue', system-ui, -apple-system, sans-serif;
+    --font-main:'UniNeue','Poppins', system-ui, -apple-system, sans-serif;
     --primary-color:#D1FE17;
     --bg-color:#074C3A;
     --lime-dark: #A6C400;
