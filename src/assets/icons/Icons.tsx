@@ -9,8 +9,17 @@ const S = (props: React.SVGProps<SVGSVGElement>) => ({
   strokeWidth: 1.8,
   strokeLinecap: "round" as const,
   strokeLinejoin: "round" as const,
+  "aria-hidden": true,
   ...props,
 });
+
+/* compact factory for the stroke-only page icons below */
+const mk = (children: React.ReactNode, sw = 1.7) => {
+  const C = ({ className = "h-5 w-5" }: P) => (
+    <svg {...S({ className, strokeWidth: sw })}>{children}</svg>
+  );
+  return C;
+};
 
 /* ============ BRAND ============ */
 export function LogoMark({ className = "h-10 w-10" }: P) {
@@ -178,6 +187,13 @@ export const IconUser = ({ className = "h-5 w-5" }: P) => (
   </svg>
 );
 
+export const IconGlobe = ({ className = "h-5 w-5" }: P) => (
+  <svg {...S({ className })}>
+    <circle cx="12" cy="12" r="8.5" />
+    <path d="M3.5 12h17M12 3.5c2.8 3.2 2.8 13.8 0 17M12 3.5c-2.8 3.2-2.8 13.8 0 17" strokeWidth="1.5" />
+  </svg>
+);
+
 /* ============ SOCIAL ============ */
 export const IconFacebook = ({ className = "h-5 w-5" }: P) => (
   <svg {...S({ className })}>
@@ -205,6 +221,37 @@ export const IconTiktok = ({ className = "h-5 w-5" }: P) => (
     <path d="M14.5 3.5c.4 2.4 2 4 4.5 4.3v3a7.6 7.6 0 0 1-4.5-1.4v5.8a5.8 5.8 0 1 1-5.8-5.8c.3 0 .7 0 1 .1v3.1a2.8 2.8 0 1 0 1.8 2.7V3.5h3z" />
   </svg>
 );
+
+/* ============ PAGE / VERTICAL ICONS (AMC · Training · About · Trust) ============ */
+export const IconStore = mk(<><path d="M4 10 5.2 4h13.6L20 10" /><path d="M4 10a2.6 2.6 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0A2.6 2.6 0 0 0 20 10" /><path d="M5.5 12.5V20h13v-7.5" /><path d="M9.5 20v-5h5v5" /></>);
+export const IconCafe = mk(<><path d="M4 9h12v5a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V9z" /><path d="M16 10h2a2.5 2.5 0 0 1 0 5h-2" /><path d="M7 3.5c0 1.2 1 1.3 1 2.5M11 3.5c0 1.2 1 1.3 1 2.5" /></>);
+export const IconClinic = mk(<><rect x="4" y="4" width="16" height="16" rx="2" /><path d="M12 8.5v7M8.5 12h7" /></>);
+export const IconSchool = mk(<><path d="m12 3 10 5-10 5L2 8l10-5z" /><path d="M6.5 10.5V16c0 1.6 2.5 3 5.5 3s5.5-1.4 5.5-3v-5.5" /><path d="M22 8v5" /></>);
+export const IconRestaurant = mk(<><path d="M6 3v6M4 3v6a2 2 0 0 0 4 0V3M6 11v10" /><path d="M17 3c-2 1.5-3 4-3 6.5 0 1.8 1.2 3 3 3v8.5" /></>);
+export const IconBriefcase = mk(<><rect x="3" y="7" width="18" height="13" rx="2" /><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 12.5h18" /></>);
+export const IconHotel = mk(<><rect x="5" y="3" width="14" height="18" rx="1" /><path d="M9 7h2M13 7h2M9 11h2M13 11h2M10 21v-3.5h4V21" /></>);
+export const IconCity = mk(<><path d="M3 21h18M5 21V8l5-3.5V21M14 21v-9.5l5 2V21" /><path d="M7.5 9.5v.01M7.5 13v.01M7.5 16.5v.01M16.5 15.5v.01M16.5 18v.01" /></>);
+export const IconNetwork = mk(<><circle cx="12" cy="5" r="2.2" /><circle cx="5" cy="19" r="2.2" /><circle cx="19" cy="19" r="2.2" /><path d="M12 7.2V13m0 0-5.2 4M12 13l5.2 4" /></>);
+export const IconSun = mk(<><circle cx="12" cy="12" r="4" /><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" /></>);
+export const IconFridge = mk(<><rect x="6" y="2.5" width="12" height="19" rx="2" /><path d="M6 9.5h12M9 5.5V7M9 12.5V16" /></>);
+export const IconRouter = mk(<><rect x="3" y="13" width="18" height="7" rx="2" /><path d="M7 16.5h.01M10.5 16.5h.01" /><path d="M16.5 13V9.5a3.5 3.5 0 0 0-3.5-3.5" /><path d="M13.5 9a4.5 4.5 0 0 1 4.5 4.5" /></>);
+export const IconSwitch = mk(<><rect x="3" y="9" width="18" height="6" rx="1.5" /><path d="M7 12h.01M11 12h.01M15 12h.01M19 12h.01" /></>);
+export const IconRack = mk(<><rect x="6" y="3" width="12" height="18" rx="1.5" /><path d="M6 9h12M6 15h12M9.5 6h.01M9.5 12h.01M9.5 18h.01" /></>);
+export const IconCable = mk(<><path d="M9 7V3M15 7V3" /><path d="M7 7h10v3a5 5 0 0 1-10 0V7z" /><path d="M12 15v6" /></>);
+export const IconWaves = mk(<><path d="M4.5 12.5a10.5 10.5 0 0 1 15 0" /><path d="M8 16a5.5 5.5 0 0 1 8 0" /><circle cx="12" cy="19.2" r="1" fill="currentColor" stroke="none" /></>);
+export const IconGauge = mk(<><path d="M5 19a9 9 0 1 1 14 0" /><path d="m12 14 4-4" /><circle cx="12" cy="14" r="1.4" /></>);
+export const IconFilter = mk(<path d="M4 5h16l-6 7v5.5l-4 2V12L4 5z" />);
+export const IconDrop = mk(<path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z" />);
+export const IconBattery = mk(<><rect x="3" y="8" width="16" height="9" rx="2" /><path d="M21 11v3M6.5 11v3M10 11v3M13.5 11v3" /></>);
+export const IconGear = mk(<><circle cx="12" cy="12" r="3.2" /><path d="M12 2.5v2.8M12 18.7v2.8M2.5 12h2.8M18.7 12h2.8M5.2 5.2l2 2M16.8 16.8l2 2M5.2 18.8l2-2M16.8 7.2l2-2" /></>);
+export const IconCheckCircle = mk(<><circle cx="12" cy="12" r="9" /><path d="m8.5 12.5 2.5 2.5 4.5-5" /></>);
+export const IconHardHat = mk(<><path d="M4 16.5a8 8 0 0 1 16 0" /><path d="M2.5 16.5h19M10 8.7V5.5h4v3.2" /></>);
+export const IconVerified = mk(<><circle cx="12" cy="8" r="4" /><path d="m10.5 8 1.2 1.2L14 6.9" /><path d="M5 21a7 7 0 0 1 14 0" /></>);
+export const IconHeadset = mk(<><path d="M4 13.5a8 8 0 0 1 16 0" /><rect x="3" y="13.5" width="4" height="6" rx="1.5" /><rect x="17" y="13.5" width="4" height="6" rx="1.5" /><path d="M19 19.5v.5a2.5 2.5 0 0 1-2.5 2.5H13.5" /></>);
+export const IconSparkle = mk(<path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M5.6 18.4l2.8-2.8M15.6 8.4l2.8-2.8" />);
+export const IconLevels = mk(<path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />);
+export const IconPipe = mk(<><path d="M7 3v6a3 3 0 0 0 3 3h4a3 3 0 0 1 3 3v6" /><rect x="4" y="2" width="6" height="3" rx="1" /><rect x="14" y="19" width="6" height="3" rx="1" /></>);
+export const IconSearch = mk(<><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></>);
 
 /* ============ MISC ============ */
 export function StarRow({ n = 5, className = "h-3.5 w-3.5" }: { n?: number; className?: string }) {

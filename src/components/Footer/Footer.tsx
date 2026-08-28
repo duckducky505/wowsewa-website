@@ -4,6 +4,7 @@ import {
   PHONE_TEL, PHONE_DISPLAY,
   EMAIL, ADDRESS, SOCIALS,
 } from "../../data/data";
+import logo from "../../assets/images/wowLogo2.png";
 
 function BigRow() {
   return (
@@ -89,9 +90,8 @@ export default function Footer() {
           <Reveal>
             <div>
               <a href="#top" className="inline-flex items-center gap-3">
-                <LogoMark className="h-11 w-11" />
                 <span className="font-display text-2xl font-extrabold leading-none text-cream">
-                  Wow<span className="text-lime">Sewa</span>
+                  <img src={logo}/>
                 </span>
               </a>
               <p className="mt-5 max-w-[38ch] text-[14.5px] leading-relaxed text-cream/60">
