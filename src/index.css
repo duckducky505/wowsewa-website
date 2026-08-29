@@ -2,18 +2,18 @@
 
 
 @font-face {
-  font-family: "Uni Neue";
+  font-family: "UniNeue";
   font-style: normal;
   font-weight: 100 500;
   font-display: swap;
-  src: url("../src/assets/fonts/UniNeueRegular.ttf") format("ttf");
+  src: url("../src/assets/fonts/UniNeueRegular.ttf") format("truetype");
 }
 @font-face {
-  font-family: "Uni Neue";
+  font-family: "UniNeue-Italic";
   font-style: normal;
   font-weight: 600 1000;
   font-display: swap;
-  src: url("../src/assets/fonts/UniNeueBlack-Italic.ttf") format("ttf");
+  src: url("../src/assets/fonts/UniNeueBlack-Italic.ttf") format("truetype");
 }
 
 @theme {
@@ -28,8 +28,8 @@
   --color-mist: #e9efd6;
   --color-fog: #b9c7ab;
 
-  --font-display: "Uni Neue", "Bricolage Grotesque", "Segoe UI", sans-serif;
-  --font-body: "Uni Neue", "Instrument Sans", "Segoe UI", sans-serif;
+  --font-display: "UniNeue", "Bricolage Grotesque", "Segoe UI", sans-serif;
+  --font-body: "UniNeue", "Instrument Sans", "Segoe UI", sans-serif;
   --font-mono: "JetBrains Mono", "Courier New", monospace;
 
   --shadow-hard-lime: 8px 8px 0 0 #d1fe17;

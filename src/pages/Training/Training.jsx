@@ -80,7 +80,7 @@ export default function Training() {
                 <h1 className="mt-6 font-display font-extrabold leading-[0.98] tracking-tight">
                   <Reveal delay={140}><span className="block text-[clamp(2.5rem,5.6vw,4.4rem)]">Learn a trade.</span></Reveal>
                   <Reveal delay={230}><span className="text-outline-cream block text-[clamp(2.5rem,5.6vw,4.4rem)]">Earn a badge.</span></Reveal>
-                  <Reveal delay={320}><span className="block text-[clamp(2.5rem,5.6vw,4.4rem)] text-lime">Join the network.</span></Reveal>
+                  <Reveal delay={320}><span className="block text-[clamp(2.5rem,5.6vw,4.4rem)] text-lime italic">Join the network.</span></Reveal>
                 </h1>
                 <Reveal delay={400}>
                   <p className="mt-6 max-w-xl text-[16px] leading-relaxed text-cream/75">

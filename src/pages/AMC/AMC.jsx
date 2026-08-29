@@ -76,7 +76,7 @@ export default function AMC() {
               </p>
               <h1 className="mt-5 font-display font-extrabold leading-[0.98] tracking-tight">
                 <span className="block text-[clamp(2.6rem,5.8vw,4.6rem)]">You rest.</span>
-                <span className="block text-[clamp(2.6rem,5.8vw,4.6rem)] text-lime">We care.</span>
+                <span className="block text-[clamp(2.6rem,5.8vw,4.6rem)] text-lime italic">We care.</span>
               </h1>
               <p className="mt-6 max-w-xl text-[16px] leading-relaxed text-cream/75">
                 One AMC for your entire space — AC, solar &amp; inverter, refrigeration,

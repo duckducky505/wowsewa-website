@@ -42,19 +42,7 @@ import {
   IconCalendar,
 } from "../assets/icons/Icons";
 
-/* ---------------- images (employees & work) ---------------- */
-export const IMG = {
-  team: "https://image.qwenlm.ai/generated-images/ccedcf31-a2a7-4d44-b1bb-e46cfb56cb3f/_result.png",
-  plumber: "https://image.qwenlm.ai/generated-images/f97ec1a6-0218-48e9-86d5-0165166f9107/_result.png",
-  electrician: "https://image.qwenlm.ai/generated-images/3c06cf75-06d8-4069-9d8e-f2ffbe9bfe93/_result.png",
-  appliance: "https://image.qwenlm.ai/generated-images/405249b2-e457-4f5f-b4be-1df5a0478df2/_result.png",
-  it: "https://image.qwenlm.ai/generated-images/aa2fc5d6-e109-4d22-bde1-58fd9001f2e1/_result.png",
-  ac: "https://image.qwenlm.ai/generated-images/66b89f36-38f5-47e7-a924-72ffcdd762ff/_result.png",
-  painter: "https://image.qwenlm.ai/generated-images/ebfb78fb-d903-41cc-b86d-490c2f357d09/_result.png",
-  working: "https://image.qwenlm.ai/generated-images/20487d2b-d553-4f64-a194-0ee1493cb159/_result.png",
-  founder: "https://image.qwenlm.ai/generated-images/7a28877f-5de2-4cf8-9fd9-a7f50388905d/_result.png",
-  training: "https://image.qwenlm.ai/generated-images/53ecee50-3beb-4ad1-8565-66c14b1144ef/_result.png",
-};
+
 
 /* ---------------- services ---------------- */
 export type Service = {
@@ -155,14 +143,6 @@ export type Tech = {
   tags: string[];
 };
 
-export const TECHS: Tech[] = [
-  { name: "Ramesh Shrestha", role: "Master Plumber", img: IMG.plumber, rating: 4.9, jobs: 1240, years: 9, tags: ["Geyser", "Leak detection", "Bathroom fittings"] },
-  { name: "Bikash Gurung", role: "Licensed Electrician", img: IMG.electrician, rating: 4.8, jobs: 1560, years: 11, tags: ["Rewiring", "Inverter", "Emergency"] },
-  { name: "Sunita Tamang", role: "Appliance Specialist", img: IMG.appliance, rating: 4.9, jobs: 980, years: 6, tags: ["Washer", "RO purifier", "TV mounts"] },
-  { name: "Anisha Karki", role: "IT & Device Technician", img: IMG.it, rating: 5.0, jobs: 720, years: 5, tags: ["Laptops", "Screens", "Wi-Fi mesh"] },
-  { name: "Deepak Maharjan", role: "AC & Heating Expert", img: IMG.ac, rating: 4.8, jobs: 890, years: 8, tags: ["Gas refill", "Split AC", "Heaters"] },
-  { name: "Prakash Thapa", role: "Painting Contractor", img: IMG.painter, rating: 4.7, jobs: 460, years: 12, tags: ["Interior", "Damp-proof", "Texture"] },
-];
 
 /* ---------------- process ---------------- */
 export const STEPS = [

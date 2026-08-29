@@ -375,7 +375,7 @@ export default function Hero() {
               <span className="text-outline-cream block text-[clamp(2.6rem,6vw,4.6rem)]">TO DEAD PIXELS,</span>
             </Reveal>
             <Reveal delay={280}>
-              <span className="block text-[clamp(2.6rem,6vw,4.6rem)] text-lime">
+              <span className="block text-[clamp(2.6rem,6vw,4.6rem)] text-lime italic">
                 <Scramble text="WE FIX HOME." delay={500} />
               </span>
             </Reveal>

@@ -47,7 +47,7 @@ export default function About() {
                 <h1 className="font-display font-extrabold leading-[0.97] tracking-tight">
                   <Reveal delay={80}><span className="block text-[clamp(2.7rem,6.4vw,5rem)] text-cream">ONE NUMBER.</span></Reveal>
                   <Reveal delay={180}><span className="text-outline-cream block text-[clamp(2.7rem,6.4vw,5rem)]">SIX TRADES.</span></Reveal>
-                  <Reveal delay={280}><span className="block text-[clamp(2.7rem,6.4vw,5rem)] text-lime">ZERO NO-SHOWS.</span></Reveal>
+                  <Reveal delay={280}><span className="block text-[clamp(2.7rem,6.4vw,5rem)] text-lime italic">ZERO NO-SHOWS.</span></Reveal>
                 </h1>
                 <Reveal delay={380}>
                   <p className="mt-7 max-w-xl text-[16.5px] leading-relaxed text-cream/75">

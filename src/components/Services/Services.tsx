@@ -105,7 +105,7 @@ export default function Services() {
               <h2 className="font-display text-[clamp(2.2rem,5vw,3.9rem)] font-extrabold leading-[1.02] tracking-tight text-pine">
                 One crew for the
                 <br />
-                <span className="relative inline-block">
+                <span className="relative inline-block text-lime-deep italic">
                   whole house.
                   <svg viewBox="0 0 300 12" className="absolute -bottom-2 left-0 w-full" aria-hidden="true">
                     <path d="M3 9c60-6 180-6 294-3" stroke="#D1FE17" strokeWidth="6" fill="none" strokeLinecap="round" />
