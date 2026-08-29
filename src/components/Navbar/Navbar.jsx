@@ -8,6 +8,7 @@ const navLinks = [
   { to: '/about-us', label: 'About Us' },
   { to: '/amc', label: 'AMC' },
   { to: '/services', label: 'Our Services' },
+  {to: '/training-wowsewa', label:'Training'},
 ];
 
 const Navbar = () => {
