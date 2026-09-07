@@ -1,4 +1,3 @@
-// utils/jwt.ts
 export interface DecodedToken {
     guidId: string;
     name: string;

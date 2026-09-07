@@ -1,8 +1,11 @@
-import React, { useMemo, useState } from "react";
-import { MdClose } from "react-icons/md";
-import "./ReceptionBooking.css";
+import React, { useEffect, useMemo, useState } from "react";
+import * as signalR from "@microsoft/signalr";
 import { fetchHook } from "../../../hooks/fetchHook";
 import { fetchAPI } from "../../../utils/fetchAPI";
+import {
+  PageHead, Card, Pill, Field, Modal, GhostButton, LimeButton, inputCls,
+  useToast, ToastHost, StatTile, EditIc, ClockIc, WalletIc,
+} from "../../../ui/ui";
 
 // ---- Helpers --------------------------------------------------------------
 
@@ -15,28 +18,25 @@ function normalizeIndustry(raw) {
 
 function normalizeBooking(raw) {
   return {
-    id: raw.bookingId,
-    code: raw.bookingCode,
-    customer: raw.customerName,
-    phone: raw.phoneNumber,
-    industryId: raw.industryId,
-    category: raw.industry?.industryName ?? "",
-    service: raw.duty?.dutyName ?? "",
+    id: raw.bookingId ?? raw.BookingId,
+    code: raw.bookingCode ?? raw.BookingCode,
+    customer: raw.customerName ?? raw.CustomerName,
+    phone: raw.phoneNumber ?? raw.PhoneNumber,
+    industryId: raw.industryId ?? raw.IndustryId,
+    category: raw.industry?.industryName ?? raw.Industry?.IndustryName ?? "",
+    service: raw.duty?.dutyName ?? raw.Duty?.DutyName ?? "",
     description: raw.description ?? raw.Description ?? raw.duty?.description ?? raw.duty?.Description ?? "",
-    address: raw.address,
-    date: raw.preferredDate,
-    slot: raw.preferredTime,
-    price: raw.duty.price,
-    status: raw.bookingStatus,
-    technicianName: raw.employeeName ?? "Unassigned",
+    address: raw.address ?? raw.Address,
+    date: raw.preferredDate ?? raw.PreferredDate,
+    slot: raw.preferredTime ?? raw.PreferredTime,
+    price: raw.duty?.price ?? raw.Duty?.Price ?? raw.price ?? 0,
+    status: raw.bookingStatus ?? raw.BookingStatus,
+    technicianName: raw.employee?.fullName ?? raw.Employee?.FullName ?? "Unassigned",
     notes: raw.notes ?? raw.Notes ?? "",
-    createdAt: raw.createdDate,
+    createdAt: raw.createdDate ?? raw.CreatedDate,
   };
 }
 
-// Status list comes straight from the API — this just handles either a
-// plain string array or a list of {statusName} objects, and never leaves
-// it undefined so .map/.forEach elsewhere can't crash on first render.
 function normalizeStatus(raw, i) {
   if (typeof raw === "string") return raw;
   return raw.statusName ?? raw.StatusName ?? raw.name ?? raw.Name ?? `Status ${i + 1}`;
@@ -55,16 +55,37 @@ function formatRs(value) {
   return `Rs ${Number(value || 0).toLocaleString()}`;
 }
 
+function statusTone(status) {
+  const s = (status || "").toLowerCase();
+  if (s === "completed") return "lime";
+  if (s === "cancelled") return "red";
+  if (s === "inprocess" || s === "in progress") return "amber";
+  return "muted";
+}
+
+const HUB_URL = "https://localhost:7011/hub/notification"; // must match Program.cs MapHub route
+
 // ---- Component --------------------------------------------------------------
 
 export default function ReceptionBookings() {
+  const { toasts, push } = useToast();
+
   const { data: rawBookings, loading: bookingsLoading } = fetchHook(
     "https://localhost:7011/api/Booking/getBookings"
   );
   const { data: rawIndustries } = fetchHook("https://localhost:7011/api/industry/getIndustryData");
   const { data: rawStatuses } = fetchHook("https://localhost:7011/api/Booking/getBookingStatus");
 
-  const bookings = useMemo(() => (rawBookings || []).map(normalizeBooking), [rawBookings]);
+  // Live updates (assignment, status changes, cancellations from other
+  // screens) are layered over the fetched list as overrides keyed by id,
+  // rather than reloading the whole page — same pattern as the booking
+  // queue dashboard.
+  const [overrides, setOverrides] = useState({});
+
+  const bookings = useMemo(() => {
+    return (rawBookings || []).map(normalizeBooking).map((b) => (overrides[b.id] ? { ...b, ...overrides[b.id] } : b));
+  }, [rawBookings, overrides]);
+
   const industries = useMemo(() => (rawIndustries || []).map(normalizeIndustry), [rawIndustries]);
   const statusOptions = useMemo(() => (rawStatuses || []).map(normalizeStatus), [rawStatuses]);
 
@@ -75,6 +96,54 @@ export default function ReceptionBookings() {
   const [draft, setDraft] = useState(null);
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
+
+  // ---- SignalR live sync ------------------------------------------------
+  useEffect(() => {
+    // Must attach the auth token the same way every other authenticated
+    // page's connection does — SignalR sends it as ?access_token=... on the
+    // handshake since it can't set an Authorization header on a WebSocket
+    // connection. Without this the hub rejects the connection with a 401
+    // before any event can arrive.
+    const connection = new signalR.HubConnectionBuilder()
+      .withUrl(HUB_URL, {
+        accessTokenFactory: () => localStorage.getItem("Token"),
+      })
+      .withAutomaticReconnect()
+      .build();
+
+    // Generic broadcast every BroadcastToRoles(...) call emits on the
+    // backend — { entityType, action, message, data }. Only Booking events
+    // are relevant here. VERIFY the actual event name/shape against a real
+    // connected session — this is written against NotificationService's
+    // call signature but hasn't been confirmed live.
+    const handleEntityUpdate = (payload) => {
+      const { entityType, action, message, data } = payload || {};
+      if (entityType !== "Booking") return;
+
+      if (action === "Deleted") {
+        const id = data?.bookingId ?? data?.BookingId ?? data;
+        setOverrides((prev) => {
+          const next = { ...prev };
+          delete next[id];
+          return next;
+        });
+      } else {
+        const updated = normalizeBooking(data);
+        setOverrides((prev) => ({ ...prev, [updated.id]: updated }));
+      }
+      if (message) push(message);
+    };
+
+    connection.on("EntityUpdated", handleEntityUpdate);
+
+    connection.start().catch((err) => {
+      console.error("SignalR connection failed:", err);
+    });
+
+    return () => {
+      connection.stop();
+    };
+  }, [push]);
 
   const filteredBookings = useMemo(() => {
     return bookings.filter((b) => {
@@ -97,24 +166,28 @@ export default function ReceptionBookings() {
     return counts;
   }, [bookings, statusOptions]);
 
-  function openView(booking) {
-    setViewingBooking(booking);
-  }
+  const totalToday = useMemo(
+    () => bookings.filter((b) => b.date === new Date().toISOString().split("T")[0]).length,
+    [bookings]
+  );
+  const totalRevenue = useMemo(
+    () => bookings.filter((b) => b.status === "Completed").reduce((s, b) => s + (Number(b.price) || 0), 0),
+    [bookings]
+  );
 
-  function closeView() {
-    setViewingBooking(null);
-  }
+  function openView(booking) { setViewingBooking(booking); }
+  function closeView() { setViewingBooking(null); }
 
   function openEdit(booking) {
     setEditingBooking(booking);
     setDraft(emptyDraftFromBooking(booking));
     setErrors({});
   }
-
   function closeEdit() {
     setEditingBooking(null);
-    setDraft(null); 
+    setDraft(null);
     setErrors({});
+    setSubmitting(false);
   }
 
   function updateDraft(field, value) {
@@ -134,17 +207,30 @@ export default function ReceptionBookings() {
     return Object.keys(next).length === 0;
   }
 
+  // A booking can't be marked Completed until a technician is assigned —
+  // the backend posts a holding-sheet entry to that technician when a
+  // booking completes, and rejects the transition if there's nobody to
+  // post it to. Blocking it here avoids a round-trip that's guaranteed to
+  // fail with an opaque error.
+  const canMarkCompleted = Boolean(
+    editingBooking?.technicianName && editingBooking.technicianName !== "Unassigned"
+  );
+
   async function handleSaveEdit(e) {
     e.preventDefault();
     if (!validateDraft()) return;
 
+    if (draft.status === "Completed" && !canMarkCompleted) {
+      setErrors((prev) => ({ ...prev, status: "Assign a technician before marking this booking Completed" }));
+      return;
+    }
+
     setSubmitting(true);
 
-    // Match C# Booking model property names exactly (PascalCase)
     const patchPayload = [
       { op: "replace", path: "/PreferredDate", value: draft.date },
       { op: "replace", path: "/PreferredTime", value: draft.slot.trim() },
-      { op: "replace", path: "/BookingStatus", value: draft.status.toLocaleString() },
+      { op: "replace", path: "/BookingStatus", value: draft.status },
     ];
 
     const res = await fetchAPI(
@@ -155,326 +241,159 @@ export default function ReceptionBookings() {
     setSubmitting(false);
 
     if (res) {
-      window.alert("Booking updated successfully.");
-      window.location.reload();
+      // Apply locally too, don't rely solely on the SignalR round-trip —
+      // and no full-page reload needed now that state updates in place.
+      const updated = typeof res === "object" ? normalizeBooking(res) : { ...editingBooking, ...draft };
+      setOverrides((prev) => ({ ...prev, [editingBooking.id]: updated }));
+      push("Booking updated");
+      closeEdit();
     } else {
-      window.alert("Couldn't update this booking. Please try again.");
+      push("Couldn't update this booking. Please try again.", "red");
     }
   }
 
   return (
-    <div className="wsw-reception-bookings">
-      <header className="wsw-reception-bookings__header">
-        <div className="wsw-reception-bookings__header-inner">
-          <div>
-            <span className="wsw-reception-bookings__eyebrow">Front desk</span>
-            <h1 className="wsw-reception-bookings__title">All bookings</h1>
-            <p className="wsw-reception-bookings__sub">Every booking on the platform, including cancelled ones.</p>
-          </div>
-        </div>
-      </header>
+    <div>
+      <PageHead
+        eyebrow="Front desk · Bookings"
+        title="All bookings"
+        sub="Every booking on the platform, including cancelled ones."
+      />
 
-      <div className="wsw-reception-bookings__body">
-        <div className="wsw-reception-bookings__toolbar">
-          <div className="wsw-reception-bookings__status-tabs" role="tablist" aria-label="Filter by status">
-            <button
-              type="button"
-              role="tab"
-              aria-selected={statusFilter === "All"}
-              className={
-                "wsw-reception-bookings__status-tab" +
-                (statusFilter === "All" ? " wsw-reception-bookings__status-tab--active" : "")
-              }
-              onClick={() => setStatusFilter("All")}
-            >
-              All <span className="wsw-reception-bookings__tab-count">{statusCounts.All ?? 0}</span>
-            </button>
-            {statusOptions.map((s) => (
-              <button
-                type="button"
-                role="tab"
-                key={s}
-                aria-selected={statusFilter === s}
-                className={
-                  "wsw-reception-bookings__status-tab" +
-                  (statusFilter === s ? " wsw-reception-bookings__status-tab--active" : "")
-                }
-                onClick={() => setStatusFilter(s)}
-              >
-                {s} <span className="wsw-reception-bookings__tab-count">{statusCounts[s] ?? 0}</span>
-              </button>
-            ))}
-          </div>
-
-          <input
-            type="search"
-            className="wsw-reception-bookings__search"
-            placeholder="Search customer, phone or job code"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            aria-label="Search bookings"
-          />
-        </div>
-
-        <section className="wsw-reception-bookings__panel" aria-label="Bookings">
-          {bookingsLoading ? (
-            <p className="wsw-reception-bookings__loading-note">Loading bookings…</p>
-          ) : filteredBookings.length > 0 ? (
-            <div className="wsw-reception-bookings__table-wrap">
-              <table className="wsw-reception-bookings__table">
-                <thead>
-                  <tr>
-                    <th>Customer</th>
-                    <th>Service</th>
-                    <th>Category</th>
-                    <th>Date / Time</th>
-                    <th>Technician</th>
-                    <th>Status</th>
-                    <th aria-label="Actions" />
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredBookings.map((b) => (
-                    <tr className="wsw-reception-bookings__row" key={b.id}>
-                      <td>
-                        <p className="wsw-reception-bookings__cell-strong">{b.customer}</p>
-                        <p className="wsw-reception-bookings__cell-muted">{b.phone}</p>
-                      </td>
-                      <td>
-                        <p className="wsw-reception-bookings__cell-strong">{b.service}</p>
-                        <p className="wsw-reception-bookings__cell-muted">{b.code}</p>
-                      </td>
-                      <td className="wsw-reception-bookings__cell-muted">{b.category}</td>
-                      <td className="wsw-reception-bookings__cell-muted">
-                        {b.date} · {b.slot}
-                      </td>
-                      <td className="wsw-reception-bookings__cell-muted">{b.technicianName || "Unassigned"}</td>
-                      <td>
-                        <span
-                          className={
-                            "wsw-reception-bookings__status-pill wsw-reception-bookings__status-pill--" +
-                            (b.status || "").toLowerCase().replace(/\s+/g, "-")
-                          }
-                        >
-                          {b.status}
-                        </span>
-                      </td>
-                      <td>
-                        <div className="wsw-reception-bookings__row-actions">
-                          <button type="button" className="wsw-reception-bookings__icon-action" onClick={() => openView(b)}>
-                            View
-                          </button>
-                          <button type="button" className="wsw-reception-bookings__icon-action" onClick={() => openEdit(b)}>
-                            Edit
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <div className="wsw-reception-bookings__empty">
-              <p className="wsw-reception-bookings__empty-title">No bookings found</p>
-              <p className="wsw-reception-bookings__empty-body">Try a different status or search term.</p>
-            </div>
-          )}
-        </section>
+      <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
+        <StatTile label="Total bookings" value={bookings.length} icon={ClockIc} tone="pine" />
+        <StatTile label="Today" value={totalToday} icon={ClockIc} tone="lime" />
+        <StatTile label="Completed revenue" value={totalRevenue} prefix="Rs. " icon={WalletIc} tone="pine" />
       </div>
 
-      {viewingBooking && <TicketView booking={viewingBooking} onClose={closeView} />}
+      <Card className="mb-4 flex flex-col gap-3 !p-4 sm:flex-row sm:items-center sm:justify-between">
+        <input
+          type="search"
+          className={`${inputCls} sm:max-w-xs`}
+          placeholder="Search customer, phone or job code"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          aria-label="Search bookings"
+        />
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setStatusFilter("All")}
+            className={`rounded-full px-3.5 py-1.5 text-[12px] font-bold transition-colors ${
+              statusFilter === "All" ? "bg-[#074C3A] text-[#D1FE17]" : "bg-[#074C3A]/5 text-[#5C6B60] hover:bg-[#074C3A]/10"
+            }`}
+          >
+            All ({statusCounts.All ?? 0})
+          </button>
+          {statusOptions.map((s) => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => setStatusFilter(s)}
+              className={`rounded-full px-3.5 py-1.5 text-[12px] font-bold transition-colors ${
+                statusFilter === s ? "bg-[#074C3A] text-[#D1FE17]" : "bg-[#074C3A]/5 text-[#5C6B60] hover:bg-[#074C3A]/10"
+              }`}
+            >
+              {s} ({statusCounts[s] ?? 0})
+            </button>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[900px] text-left">
+            <thead>
+              <tr className="border-b border-[#E3E5D6] font-mono text-[10.5px] font-bold uppercase tracking-[0.14em] text-[#5C6B60]">
+                <th className="px-5 py-3">Customer</th>
+                <th className="px-5 py-3">Service</th>
+                <th className="px-5 py-3">Category</th>
+                <th className="px-5 py-3">Date / Time</th>
+                <th className="px-5 py-3">Technician</th>
+                <th className="px-5 py-3">Status</th>
+                <th className="px-5 py-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {bookingsLoading ? (
+                <tr><td colSpan={7} className="px-5 py-10 text-center text-sm text-[#5C6B60]">Loading bookings…</td></tr>
+              ) : filteredBookings.length > 0 ? (
+                filteredBookings.map((b) => (
+                  <tr key={b.id} className="border-b border-[#E3E5D6] transition-colors duration-150 last:border-0 hover:bg-[#F8FAEA]">
+                    <td className="px-5 py-3.5">
+                      <p className="text-sm font-bold text-[#010A08]">{b.customer}</p>
+                      <p className="text-xs text-[#5C6B60]">{b.phone}</p>
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <p className="text-sm font-semibold text-[#010A08]">{b.service}</p>
+                      <p className="text-xs text-[#5C6B60]">{b.code}</p>
+                    </td>
+                    <td className="px-5 py-3.5 text-sm text-[#5C6B60]">{b.category}</td>
+                    <td className="px-5 py-3.5 text-sm text-[#5C6B60]">{b.date} · {b.slot}</td>
+                    <td className="px-5 py-3.5 text-sm text-[#5C6B60]">{b.technicianName || "Unassigned"}</td>
+                    <td className="px-5 py-3.5"><Pill tone={statusTone(b.status)}>{b.status}</Pill></td>
+                    <td className="px-5 py-3.5">
+                      <div className="flex items-center justify-end gap-2">
+                        <GhostButton onClick={() => openView(b)} className="px-3 py-1.5">View</GhostButton>
+                        <GhostButton onClick={() => openEdit(b)} className="px-3 py-1.5"><EditIc className="h-3.5 w-3.5" /> Edit</GhostButton>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr><td colSpan={7} className="px-5 py-10 text-center text-sm text-[#5C6B60]">No bookings found. Try a different status or search term.</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+
+      {viewingBooking && (
+        <Modal title={`Booking · ${viewingBooking.code}`} onClose={closeView} narrow>
+          <div className="mb-3 flex items-center justify-between">
+            <span className="font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-[#5C6B60]">Work order</span>
+            <Pill tone={statusTone(viewingBooking.status)}>{viewingBooking.status}</Pill>
+          </div>
+          <dl className="space-y-2 text-sm">
+            <div className="flex justify-between border-b border-dashed border-[#E3E5D6] py-1.5"><dt className="text-[#5C6B60]">Customer</dt><dd className="font-semibold text-[#010A08]">{viewingBooking.customer || "—"}</dd></div>
+            <div className="flex justify-between border-b border-dashed border-[#E3E5D6] py-1.5"><dt className="text-[#5C6B60]">Phone</dt><dd className="font-semibold text-[#010A08]">{viewingBooking.phone || "—"}</dd></div>
+            <div className="flex justify-between border-b border-dashed border-[#E3E5D6] py-1.5"><dt className="text-[#5C6B60]">Address</dt><dd className="font-semibold text-[#010A08]">{viewingBooking.address || "—"}</dd></div>
+            <div className="flex justify-between border-b border-dashed border-[#E3E5D6] py-1.5"><dt className="text-[#5C6B60]">Description</dt><dd className="font-semibold text-[#010A08]">{viewingBooking.description || "—"}</dd></div>
+            <div className="flex justify-between border-b border-dashed border-[#E3E5D6] py-1.5"><dt className="text-[#5C6B60]">Technician</dt><dd className="font-semibold text-[#010A08]">{viewingBooking.technicianName || "Unassigned"}</dd></div>
+            <div className="flex justify-between py-1.5"><dt className="text-[#5C6B60]">Price</dt><dd className="font-mono font-bold text-[#074C3A]">{formatRs(viewingBooking.price)}</dd></div>
+          </dl>
+        </Modal>
+      )}
 
       {editingBooking && draft && (
-        <div className="wsw-reception-bookings__modal-backdrop" role="dialog" aria-modal="true" aria-label="Edit booking">
-          <div className="wsw-reception-bookings__modal">
-            <div className="wsw-reception-bookings__modal-head">
-              <h2 className="wsw-reception-bookings__modal-title">Edit booking · {editingBooking.code}</h2>
-              <button type="button" className="wsw-reception-bookings__modal-close" onClick={closeEdit} aria-label="Close">
-                <MdClose size={20} />
-              </button>
+        <Modal title={`Edit booking · ${editingBooking.code}`} onClose={closeEdit}>
+          <form className="space-y-4" onSubmit={handleSaveEdit}>
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="Date" error={errors.date}>
+                <input type="date" className={inputCls} value={draft.date} onChange={(e) => updateDraft("date", e.target.value)} />
+              </Field>
+              <Field label="Time slot" error={errors.slot}>
+                <input className={inputCls} value={draft.slot} onChange={(e) => updateDraft("slot", e.target.value)} placeholder="e.g. 4:00 PM – 6:00 PM" />
+              </Field>
             </div>
-
-            <dl className="wsw-reception-bookings__readonly-list">
-              <div className="wsw-reception-bookings__readonly-item">
-                <dt>Customer</dt>
-                <dd>{editingBooking.customer || "—"}</dd>
-              </div>
-              <div className="wsw-reception-bookings__readonly-item">
-                <dt>Phone</dt>
-                <dd>{editingBooking.phone || "—"}</dd>
-              </div>
-              <div className="wsw-reception-bookings__readonly-item">
-                <dt>Category</dt>
-                <dd>{editingBooking.category || "—"}</dd>
-              </div>
-              <div className="wsw-reception-bookings__readonly-item">
-                <dt>Service</dt>
-                <dd>{editingBooking.service || "—"}</dd>
-              </div>
-              <div className="wsw-reception-bookings__readonly-item">
-                <dt>Address</dt>
-                <dd>{editingBooking.address || "—"}</dd>
-              </div>
-              <div className="wsw-reception-bookings__readonly-item">
-                <dt>Description</dt>
-                <dd>{editingBooking.description || "—"}</dd>
-              </div>
-            </dl>
-
-            <form className="wsw-reception-bookings__form" onSubmit={handleSaveEdit} noValidate>
-              <div className="wsw-reception-bookings__field-row">
-                <Field
-                  id="edit-date"
-                  label="Date"
-                  value={draft.date}
-                  onChange={(v) => updateDraft("date", v)}
-                  error={errors.date}
-                  type="date"
-                />
-                <Field
-                  id="edit-slot"
-                  label="Time slot"
-                  value={draft.slot}
-                  onChange={(v) => updateDraft("slot", v)}
-                  error={errors.slot}
-                  placeholder="e.g. 4:00 PM – 6:00 PM"
-                />
-              </div>
-
-              <div className="wsw-reception-bookings__field-row">
-                <div className="wsw-reception-bookings__field">
-                  <label className="wsw-reception-bookings__label" htmlFor="edit-status">
-                    Status
-                  </label>
-                  <select
-                    id="edit-status"
-                    className="wsw-reception-bookings__select"
-                    value={draft.status}
-                    onChange={(e) => updateDraft("status", e.target.value)}
-                  >
-                    {statusOptions.map((s) => (
-                      <option key={s} value={s}>
-                        {s}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="wsw-reception-bookings__modal-actions">
-                <button type="submit" className="wsw-reception-bookings__primary-btn" disabled={submitting}>
-                  {submitting ? "Saving…" : "Save changes"}
-                </button>
-                <button type="button" className="wsw-reception-bookings__ghost-btn" onClick={closeEdit}>
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+            <Field label="Status" error={errors.status}>
+              <select className={inputCls} value={draft.status} onChange={(e) => updateDraft("status", e.target.value)}>
+                {statusOptions.map((s) => (
+                  <option key={s} value={s} disabled={s === "Completed" && !canMarkCompleted}>
+                    {s}{s === "Completed" && !canMarkCompleted ? " (assign a technician first)" : ""}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <div className="flex items-center gap-2.5 pt-1">
+              <LimeButton type="submit" disabled={submitting}>{submitting ? "Saving…" : "Save changes"}</LimeButton>
+              <GhostButton onClick={closeEdit}>Cancel</GhostButton>
+            </div>
+          </form>
+        </Modal>
       )}
-    </div>
-  );
-}
 
-// ---- Ticket view --------------------------------------------------------------
-
-function TicketView({ booking, onClose }) {
-  return (
-    <div className="wsw-reception-bookings__modal-backdrop" role="dialog" aria-modal="true" aria-label="Booking details">
-      <div className="wsw-reception-bookings__ticket-shell">
-        <button type="button" className="wsw-reception-bookings__ticket-close" onClick={onClose} aria-label="Close">
-          <MdClose size={20} />
-        </button>
-
-        <div className="wsw-reception-bookings__ticket">
-          <div className="wsw-reception-bookings__ticket-top">
-            <span className="wsw-reception-bookings__ticket-eyebrow">Work order</span>
-            <span
-              className={
-                "wsw-reception-bookings__status-pill wsw-reception-bookings__status-pill--" +
-                (booking.status || "").toLowerCase().replace(/\s+/g, "-")
-              }
-            >
-              {booking.status}
-            </span>
-          </div>
-
-          <h2 className="wsw-reception-bookings__ticket-code">{booking.code}</h2>
-          <p className="wsw-reception-bookings__ticket-line">
-            {booking.service} · {booking.category}
-          </p>
-
-          <div className="wsw-reception-bookings__ticket-perforation" aria-hidden="true" />
-
-          <dl className="wsw-reception-bookings__ticket-list">
-            <div className="wsw-reception-bookings__ticket-item">
-              <dt>Customer</dt>
-              <dd>{booking.customer || "—"}</dd>
-            </div>
-            <div className="wsw-reception-bookings__ticket-item">
-              <dt>Phone</dt>
-              <dd>{booking.phone || "—"}</dd>
-            </div>
-            <div className="wsw-reception-bookings__ticket-item">
-              <dt>Address</dt>
-              <dd>{booking.address || "—"}</dd>
-            </div>
-            <div className="wsw-reception-bookings__ticket-item">
-              <dt>Description</dt>
-              <dd>{booking.description || "—"}</dd>
-            </div>
-            <div className="wsw-reception-bookings__ticket-item">
-              <dt>Date</dt>
-              <dd>{booking.date || "—"}</dd>
-            </div>
-            <div className="wsw-reception-bookings__ticket-item">
-              <dt>Time</dt>
-              <dd>{booking.slot || "—"}</dd>
-            </div>
-            <div className="wsw-reception-bookings__ticket-item">
-              <dt>Technician</dt>
-              <dd>{booking.technicianName || "Unassigned"}</dd>
-            </div>
-            <div className="wsw-reception-bookings__ticket-item">
-              <dt>Price</dt>
-              <dd>{formatRs(booking.price)}</dd>
-            </div>
-            {booking.notes && (
-              <div className="wsw-reception-bookings__ticket-item">
-                <dt>Notes</dt>
-                <dd>{booking.notes}</dd>
-              </div>
-            )}
-          </dl>
-
-          <div className="wsw-reception-bookings__ticket-perforation" aria-hidden="true" />
-
-          <p className="wsw-reception-bookings__ticket-footnote">
-            {booking.createdAt ? `Booked ${booking.createdAt}` : "Full booking record"} · ID {booking.id}
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Field({ id, label, value, onChange, error, type = "text", placeholder }) {
-  return (
-    <div className="wsw-reception-bookings__field">
-      <label className="wsw-reception-bookings__label" htmlFor={id}>
-        {label}
-      </label>
-      <input
-        id={id}
-        type={type}
-        className={"wsw-reception-bookings__input" + (error ? " wsw-reception-bookings__input--error" : "")}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-      />
-      {error && <span className="wsw-reception-bookings__error">{error}</span>}
+      <ToastHost toasts={toasts} />
     </div>
   );
 }

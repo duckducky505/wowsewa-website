@@ -32,6 +32,8 @@ import ExpenseTracker from './pages/Reception/ExpenseTracker/ExpenseTracker';
 import InventoryManagement from './pages/Inventory/InventoryManagement';
 import HoldersPage from './pages/Holders/Holders';
 import Unauthorized from './pages/Unauthorized/Unauthorized';
+import SalaryRecordsPage from './pages/SalarySheet/SalarySheet';
+
 
 //React Toastify Notification 
 import { ToastContainer, toast } from 'react-toastify';
@@ -45,7 +47,7 @@ const App = () => {
       <ScrollToTop />
       <WhatsAppFloat />
       <ToastContainer 
-          position="top-right" 
+          position="bottom-right" 
           autoClose={3000} 
           hideProgressBar={false} 
           theme="colored" 
@@ -70,13 +72,13 @@ const App = () => {
             {/* Core Protected Routes Wrapper */}
             <Route element={<ProtectedRoute />}>
               <Route element={<AfterLoginLayout />}>
-
                 {/* Admin-only pages */}
                 <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
                   <Route path="/admin/dashboard" element={<AdminDashboard />} />
                   <Route path="/admin/jobs" element={<JobsPage />} />
                   <Route path="/admin/Category" element={<JobsCategory />} />
                   <Route path="/admin/staff" element={<Staffs />} />
+                  <Route path="/admin/salary-sheet" element={<SalaryRecordsPage />} />
                   <Route path="/admin/cashflow" element={<CashFlowPage />} />
                   <Route path="/admin/holders" element={<HoldersPage />} />
                   <Route path="/admin/holding-sheet" element={<HoldingSheet />} />
@@ -84,14 +86,12 @@ const App = () => {
                 </Route>
 
                 {/* Reception-only */}
-                <Route element={<ProtectedRoute allowedRoles={["reception"]} />}>
-                    <Route element={<AfterLoginLayout />}>
+                <Route element={<ProtectedRoute allowedRoles={["frontdesk"]} />}>
                       <Route path="/reception/dashboard" element={<ReceptionDashboard />} />
                       <Route path="/reception/dashboard" element={<ReceptionDashboard/>} />
                       <Route path="/reception/inventory" element={<InventoryManagement/>} />
                       <Route path="/reception/bookings" element={<ReceptionBookings/>} />
                       <Route path="/reception/expense" element={<ExpenseTracker/>} />
-                    </Route>
                 </Route>
 
                 {/* Customer protected routes */} 

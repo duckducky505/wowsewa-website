@@ -1,22 +1,30 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import "./CustomerDashboard.css";
+import {
+  PageHead, Card, StatTile, Pill, Avatar, SectionLabel,
+  LimeButton, GhostButton, useToast, ToastHost,
+} from "../../../ui/ui";
 import { fetchAPI } from "../../../utils/fetchAPI";
 import { useAuth } from "../../../context/AuthContext";
 import { useSignalR } from "../../../hooks/signalR";
 
-// ---- Helpers (unchanged) ---------------------------------------------------
+/* ---- icons (same family as the rest of the console) -------------------- */
+const Ic = (d) => (p) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...p}>
+    {d}
+  </svg>
+);
+const CalIc = Ic(<><rect x="3" y="4" width="18" height="17" rx="2" /><path d="M16 2v4M8 2v4M3 9.5h18" /></>);
+const CheckIc = Ic(<path d="m4 12.5 5 5L20 6.5" />);
+const CoinIc = Ic(<><circle cx="12" cy="12" r="9" /><path d="M9 8.5h6M9 12h6M10 8.5c2.8 0 4 1.4 4 3.5s-1.2 3.5-4 3.5l4 3" /></>);
+const StarIc = Ic(<path d="m12 3 2.7 5.6 6.3.8-4.6 4.3 1.2 6.1L12 16.9 6.4 19.8l1.2-6.1L3 9.4l6.3-.8L12 3z" />);
+const PhoneIc = Ic(<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.13.96.36 1.9.7 2.8a2 2 0 0 1-.45 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.45c.9.34 1.84.57 2.8.7A2 2 0 0 1 22 16.9z" />);
+const PinIc = Ic(<><path d="M12 21s-7-6.1-7-11a7 7 0 1 1 14 0c0 4.9-7 11-7 11z" /><circle cx="12" cy="10" r="2.5" /></>);
+const HeadsetIc = Ic(<><path d="M4 13a8 8 0 0 1 16 0" /><rect x="3" y="13" width="4" height="6" rx="1.5" /><rect x="17" y="13" width="4" height="6" rx="1.5" /><path d="M19 19v.5a2.5 2.5 0 0 1-2.5 2.5H13" /></>);
+const MailIc = Ic(<><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m4 6.5 8 6 8-6" /></>);
 
-function initials(name) {
-  if (!name) return "";
-  return name.split(" ").filter(Boolean).map((n) => n[0]).join("").slice(0, 2).toUpperCase();
-}
+/* ---- helpers ------------------------------------------------------------ */
 function formatRs(value) {
-  if (value === null || value === undefined) return "";
-  return `Rs ${Number(value).toLocaleString()}`;
-}
-function statusClass(status) {
-  if (!status) return "";
-  return status.toLowerCase().replace(/\s+/g, "-");
+  return `Rs. ${Number(value || 0).toLocaleString()}`;
 }
 function fmtDate(d) {
   if (!d) return "";
@@ -24,15 +32,11 @@ function fmtDate(d) {
   if (Number.isNaN(dt.getTime())) return d;
   return dt.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
-function serviceGlyph(name = "") {
-  const s = name.toLowerCase();
-  if (/plumb|pipe|water|tank|leak|drain/.test(s)) return "💧";
-  if (/electric|wiring|light|fan|power|volt/.test(s)) return "⚡";
-  if (/clean|sanitiz|mop|sweep/.test(s)) return "✦";
-  if (/paint|polish|distemper/.test(s)) return "🖌";
-  if (/carpent|furniture|wood|door/.test(s)) return "🔨";
-  if (/\bac\b|hvac|heat|cool|fridge/.test(s)) return "❄";
-  return "🔧";
+function serviceTone(status) {
+  const s = (status || "").toLowerCase();
+  if (s === "completed") return "lime";
+  if (s === "cancelled") return "red";
+  return "amber";
 }
 function normalizeStage(raw) {
   if (!raw) return "";
@@ -58,15 +62,14 @@ function normalizeBooking(raw) {
   };
 }
 
-// ---- Component --------------------------------------------------------------
-
+/* ================================================================== */
+/*  CUSTOMER DASHBOARD                                                 */
+/* ================================================================== */
 export default function CustomerDashboard() {
   const { user } = useAuth();
   const guidId = user?.guidId ?? null;
-
-  const [tab, setTab] = useState("upcoming");
-  const [ratingDraft, setRatingDraft] = useState({});
-  const [cancellingId, setCancellingId] = useState(null);
+  const { toasts, push } = useToast();
+  const { connection, isConnected } = useSignalR() || {};
 
   const [profileData, setProfileData] = useState(null);
   const [profileLoading, setProfileLoading] = useState(true);
@@ -78,8 +81,8 @@ export default function CustomerDashboard() {
   const [historyLoading, setHistoryLoading] = useState(true);
   const [rawCancelled, setRawCancelled] = useState([]);
   const [cancelledLoading, setCancelledLoading] = useState(true);
-
-  const { connection, isConnected } = useSignalR() || {};
+  const [cancellingId, setCancellingId] = useState(null);
+  const [ratingDraft, setRatingDraft] = useState({});
 
   const loadProfile = useCallback(async () => {
     if (!guidId) return;
@@ -133,30 +136,27 @@ export default function CustomerDashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [guidId]);
 
-  // Live updates: technician assignment, status changes, or cancellations
-  // made from the receptionist/admin side reflect here immediately.
-  useEffect(() => {
-    if (!connection || !isConnected || !guidId) return;
+  // Live updates from the receptionist/admin side (assignment, status, cancellation).
+useEffect(() => {
+  if (!connection || !isConnected || !guidId) return;
+  const handleEntityUpdate = (payload) => {
+    if (payload?.entityType !== "Booking") return;
+    refreshBookings();
+  };
+  connection.on("EntityUpdated", handleEntityUpdate);
+  return () => connection.off("EntityUpdated", handleEntityUpdate);
+}, [connection, isConnected, guidId, refreshBookings]);
 
-    const handleBookingUpdate = () => refreshBookings();
 
-    connection.on("BookingUpdated", handleBookingUpdate);
-
-    return () => {
-      connection.off("BookingUpdated", handleBookingUpdate);
-    };
-  }, [connection, isConnected, guidId, refreshBookings]);
 
   const stages = useMemo(
     () => (rawStages || []).map(normalizeStage).filter((s) => s && s.toLowerCase() !== "cancelled"),
     [rawStages]
   );
-
   const pendingBookings = useMemo(
     () => (rawPending || []).map(normalizeBooking).filter((b) => b && b.status?.toLowerCase() !== "cancelled"),
     [rawPending]
   );
-
   const historyBookings = useMemo(() => {
     const completed = (rawHistory || []).map(normalizeBooking).filter(Boolean);
     const cancelled = (rawCancelled || []).map(normalizeBooking).filter(Boolean);
@@ -173,36 +173,21 @@ export default function CustomerDashboard() {
     const idx = stages.findIndex((s) => s.toLowerCase() === activeJob.status.toLowerCase());
     return idx === -1 ? 0 : idx;
   }, [activeJob, stages]);
+  const progressPct = stages.length > 1 ? Math.min(100, Math.round((activeStageIndex / (stages.length - 1)) * 100)) : 0;
 
-  const stats = useMemo(() => {
-    const completedThisYear = historyBookings.filter((b) => {
-      if (b.status?.toLowerCase() !== "completed") return false;
-      if (!b.date) return false;
-      return new Date(b.date).getFullYear() === new Date().getFullYear();
-    });
-    const spent = completedThisYear.reduce((sum, b) => sum + Number(b.price || 0), 0);
+  const completedCount = historyBookings.filter((b) => b.status?.toLowerCase() === "completed").length;
+  const spentThisYear = useMemo(() => {
+    return historyBookings
+      .filter((b) => b.status?.toLowerCase() === "completed" && b.date && new Date(b.date).getFullYear() === new Date().getFullYear())
+      .reduce((sum, b) => sum + Number(b.price || 0), 0);
+  }, [historyBookings]);
+  const avgRating = useMemo(() => {
+    const rated = historyBookings.filter((b) => b.rated != null && b.rated > 0);
+    if (rated.length === 0) return null;
+    return (rated.reduce((s, b) => s + Number(b.rated), 0) / rated.length).toFixed(1);
+  }, [historyBookings]);
 
-    return [
-      { icon: "📅", label: "Upcoming", value: pendingBookings.length },
-      { icon: "✓", label: "Completed jobs", value: historyBookings.filter((b) => b.status?.toLowerCase() === "completed").length },
-      { icon: "₨", label: "Spent this year", value: formatRs(spent) },
-    ];
-  }, [pendingBookings, historyBookings]);
-
-  const userProfile = useMemo(() => {
-    if (!profileData) return null;
-    return {
-      name: profileData.name || profileData.fullName,
-      email: profileData.emailAddress,
-      phone: profileData.phoneNumber || profileData.phone,
-      memberSince: profileData.dateCreated
-        ? new Date(profileData.dateCreated).toLocaleDateString(undefined, { year: "numeric", month: "short" })
-        : null,
-    };
-  }, [profileData]);
-
-  const isLoadingUpcoming = pendingLoading || stagesLoading;
-  const isLoadingHistory = historyLoading || cancelledLoading;
+  const first = (profileData?.name || profileData?.fullName || user?.name || "neighbour").split(" ")[0];
 
   async function submitRating(booking, rating) {
     setRatingDraft((prev) => ({ ...prev, [booking.code]: rating }));
@@ -211,8 +196,10 @@ export default function CustomerDashboard() {
       "PATCH",
       [{ op: "replace", path: "/rating", value: rating }]
     );
-    if (!res) {
-      window.alert("Couldn't save your rating. Please try again.");
+    if (res) {
+      push(`Thanks! You rated ${booking.code} ${rating}★`);
+    } else {
+      push("Couldn't save your rating — try again", "red");
       setRatingDraft((prev) => ({ ...prev, [booking.code]: 0 }));
     }
   }
@@ -222,327 +209,233 @@ export default function CustomerDashboard() {
     setCancellingId(booking.id);
     const res = await fetchAPI(`https://localhost:7011/api/Booking/deleteBooking/${booking.id}`, "DELETE");
     setCancellingId(null);
-
     if (res) {
+      push(`Booking ${booking.code} cancelled`);
       refreshBookings();
     } else {
-      window.alert("Couldn't cancel this booking. Please try again.");
+      push("Couldn't cancel this booking — try again", "red");
     }
   }
 
   return (
-    <div className="wsw-dashboard">
-      <header className="wsw-dashboard__header">
-        <div className="wsw-dashboard__header-glow" aria-hidden="true" />
-        <div className="wsw-dashboard__header-inner">
-          <div className="wsw-dashboard__greeting">
-            <span className="wsw-dashboard__eyebrow">
-              <span className="wsw-dashboard__eyebrow-dot" />
-              Your account
-              {isConnected && <span className="wsw-dashboard__live-tag">Live</span>}
-            </span>
-            <h1 className="wsw-dashboard__title">
-              Welcome back{userProfile?.name ? `, ${userProfile.name.split(" ")[0]}` : ""}
-            </h1>
-            <p className="wsw-dashboard__subtitle">Here's what's happening with your services.</p>
-          </div>
-        </div>
-      </header>
+    <div className="mx-auto w-full max-w-[72rem] px-4 py-6 sm:px-6 lg:px-8">
+      <PageHead
+        eyebrow={`Workspace · ${new Date().toLocaleDateString([], { weekday: "long", day: "numeric", month: "long" })}${isConnected ? " · Live" : ""}`}
+        title={`Namaste, ${first} 👋`}
+        sub="Your home, handled. Here's what's coming up and what WowSewa has done for you lately."
+      >
+        <LimeButton onClick={() => { window.location.hash = "#/console/customer/booking"; }}>
+          <CalIc className="h-4 w-4" /> Book a service
+        </LimeButton>
+      </PageHead>
 
-      <div className="wsw-dashboard__body">
-        <section className="wsw-dashboard__stats" aria-label="Account overview">
-          {stats.map((s) => (
-            <div className="wsw-dashboard__stat-card" key={s.label}>
-              <span className="wsw-dashboard__stat-icon">{s.icon}</span>
-              <div>
-                <span className="wsw-dashboard__stat-value">{s.value}</span>
-                <span className="wsw-dashboard__stat-label">{s.label}</span>
-              </div>
+      <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <StatTile label="Upcoming" value={pendingBookings.length} icon={CalIc} tone="lime" />
+        <StatTile label="Completed" value={completedCount} icon={CheckIc} tone="pine" />
+        <StatTile label="Spent this year" value={spentThisYear} prefix="Rs. " icon={CoinIc} tone="teal" />
+        <StatTile label="Avg rating given" value={avgRating ? Number(avgRating) : 0} count={false} suffix="★" icon={StarIc} tone="amber" />
+      </div>
+
+      <div className="grid gap-5 lg:grid-cols-[1.5fr_1fr]">
+        {/* next visit — live timeline */}
+        <Card className="relative overflow-hidden p-6">
+          <span className="absolute inset-y-0 left-0 w-1 bg-[#D1FE17]" aria-hidden="true" />
+          {pendingLoading || stagesLoading ? (
+            <div className="space-y-3">
+              <div className="h-5 w-40 animate-pulse rounded bg-[#ECEEE0]" />
+              <div className="h-14 w-full animate-pulse rounded bg-[#ECEEE0]" />
+              <div className="h-2 w-full animate-pulse rounded-full bg-[#ECEEE0]" />
             </div>
-          ))}
-        </section>
-
-        <div className="wsw-dashboard__grid">
-          <div className="wsw-dashboard__main">
-            {isLoadingUpcoming ? (
-              <section className="wsw-dashboard__panel" aria-label="Loading">
-                <p className="wsw-dashboard__loading-note">Loading your bookings…</p>
-              </section>
-            ) : (
-              activeJob && (
-                <section className="wsw-dashboard__panel wsw-dashboard__panel--active" aria-label="Active job status">
-                  <div className="wsw-dashboard__panel-head">
-                    <h2 className="wsw-dashboard__panel-title">
-                      <span className="wsw-dashboard__live-pill">
-                        <span className="wsw-dashboard__live-dot" />
-                        Live
-                      </span>
-                      Active job
-                    </h2>
-                    <span className="wsw-dashboard__job-code">{activeJob.code}</span>
-                  </div>
-
-                  <div className="wsw-dashboard__active-job">
-                    <div className="wsw-dashboard__active-job-info">
-                      <div className="wsw-dashboard__active-job-service-row">
-                        <span className="wsw-dashboard__service-glyph">{serviceGlyph(activeJob.service)}</span>
-                        <div>
-                          <h3 className="wsw-dashboard__active-job-service">{activeJob.service}</h3>
-                          <p className="wsw-dashboard__active-job-meta">
-                            {activeJob.category && `${activeJob.category} · `}
-                            {activeJob.date && `${fmtDate(activeJob.date)}`}
-                            {activeJob.slot && `, ${activeJob.slot}`}
-                          </p>
-                        </div>
-                      </div>
-                      {activeJob.address && (
-                        <p className="wsw-dashboard__active-job-address">📍 {activeJob.address}</p>
-                      )}
-                    </div>
-
-                    {activeJob.technician && activeJob.technician.name && (
-                      <div className="wsw-dashboard__technician">
-                        <span className="wsw-dashboard__technician-avatar">
-                          {initials(activeJob.technician.name)}
-                        </span>
-                        <div className="wsw-dashboard__technician-info">
-                          <p className="wsw-dashboard__technician-role">Technician</p>
-                          <p className="wsw-dashboard__technician-name">{activeJob.technician.name}</p>
-                          {activeJob.technician.rating && (
-                            <p className="wsw-dashboard__technician-rating">★ {activeJob.technician.rating}</p>
-                          )}
-                        </div>
-                        {activeJob.technician.phone && (
-                          <a
-                            className="wsw-dashboard__technician-call"
-                            href={`tel:${activeJob.technician.phone.replace(/[^\d+]/g, "")}`}
-                          >
-                            Call
-                          </a>
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  {stages.length > 0 && (
-                    <ol className="wsw-dashboard__stage-tracker" aria-label="Job progress">
-                      {stages.map((stage, i) => (
-                        <li
-                          key={stage}
-                          className={
-                            "wsw-dashboard__stage" +
-                            (i < activeStageIndex ? " wsw-dashboard__stage--done" : "") +
-                            (i === activeStageIndex ? " wsw-dashboard__stage--current" : "")
-                          }
-                        >
-                          <span className="wsw-dashboard__stage-dot">
-                            {i < activeStageIndex && "✓"}
-                          </span>
-                          <span className="wsw-dashboard__stage-label">{stage}</span>
-                        </li>
-                      ))}
-                    </ol>
-                  )}
-                </section>
-              )
-            )}
-
-            <section className="wsw-dashboard__panel" aria-label="Bookings">
-              <div className="wsw-dashboard__panel-head">
-                <h2 className="wsw-dashboard__panel-title">Bookings</h2>
-                <div className="wsw-dashboard__tabs" role="tablist">
-                  <button
-                    type="button"
-                    role="tab"
-                    aria-selected={tab === "upcoming"}
-                    className={"wsw-dashboard__tab" + (tab === "upcoming" ? " wsw-dashboard__tab--active" : "")}
-                    onClick={() => setTab("upcoming")}
-                  >
-                    Upcoming
-                    <span className="wsw-dashboard__tab-count">{pendingBookings.length}</span>
-                  </button>
-                  <button
-                    type="button"
-                    role="tab"
-                    aria-selected={tab === "history"}
-                    className={"wsw-dashboard__tab" + (tab === "history" ? " wsw-dashboard__tab--active" : "")}
-                    onClick={() => setTab("history")}
-                  >
-                    History
-                    <span className="wsw-dashboard__tab-count">{historyBookings.length}</span>
-                  </button>
+          ) : activeJob ? (
+            <>
+              <div className="flex items-center justify-between">
+                <SectionLabel>Next visit</SectionLabel>
+                <Pill tone="amber" pulse>{activeJob.status || "In progress"}</Pill>
+              </div>
+              <div className="mt-3 flex flex-wrap items-center gap-4">
+                <Avatar name={activeJob.technician?.name || "?"} size="h-14 w-14 text-[17px]" />
+                <div>
+                  <p className="font-display text-xl font-extrabold text-[#010A08]">{activeJob.service}</p>
+                  <p className="text-[13px] text-[#5C6B60]">
+                    {activeJob.technician?.name ? `${activeJob.technician.name} · ` : "Technician not yet assigned · "}
+                    {activeJob.date && fmtDate(activeJob.date)}{activeJob.slot && `, ${activeJob.slot}`}
+                  </p>
+                  {activeJob.address && <p className="mt-0.5 text-[12px] text-[#9aa89d]">📍 {activeJob.address}</p>}
                 </div>
               </div>
-
-              {tab === "upcoming" ? (
-                isLoadingUpcoming ? (
-                  <p className="wsw-dashboard__loading-note">Loading upcoming bookings…</p>
-                ) : pendingBookings.length > 0 ? (
-                  <ul className="wsw-dashboard__booking-list">
-                    {pendingBookings.map((b) => (
-                      <li className="wsw-dashboard__booking-row" key={b.code}>
-                        <span className="wsw-dashboard__row-glyph">{serviceGlyph(b.service)}</span>
-                        <div className="wsw-dashboard__booking-main">
-                          <span className="wsw-dashboard__booking-service">{b.service}</span>
-                          <span className="wsw-dashboard__booking-meta">
-                            {b.category && `${b.category} · `}
-                            {b.date && `${fmtDate(b.date)}`}
-                            {b.slot && `, ${b.slot}`}
-                          </span>
-                          {b.address && <span className="wsw-dashboard__booking-address">📍 {b.address}</span>}
-                        </div>
-                        <div className="wsw-dashboard__booking-side">
-                          <span className={"wsw-dashboard__status wsw-dashboard__status--" + statusClass(b.status)}>
-                            {b.status}
-                          </span>
-                          <button
-                            type="button"
-                            className="wsw-dashboard__link-btn wsw-dashboard__link-btn--danger"
-                            onClick={() => handleCancelBooking(b)}
-                            disabled={cancellingId === b.id}
-                          >
-                            {cancellingId === b.id ? "Cancelling…" : "Cancel"}
-                          </button>
-                        </div>
-                      </li>
+              {stages.length > 0 && (
+                <div className="mt-6">
+                  <div className="flex justify-between font-mono text-[10.5px] font-bold uppercase tracking-[0.12em] text-[#5C6B60]">
+                    {stages.map((s, i) => (
+                      <span key={s} className={i === activeStageIndex ? "text-[#074C3A]" : ""}>{s}</span>
                     ))}
-                  </ul>
-                ) : (
-                  <EmptyState
-                    title="No upcoming bookings"
-                    body="When you book a service, it'll show up here with live status updates."
-                  />
-                )
-              ) : isLoadingHistory ? (
-                <p className="wsw-dashboard__loading-note">Loading history…</p>
-              ) : historyBookings.length > 0 ? (
-                <ul className="wsw-dashboard__booking-list">
-                  {historyBookings.map((b) => (
-                    <li className="wsw-dashboard__booking-row" key={b.code}>
-                      <span className="wsw-dashboard__row-glyph">{serviceGlyph(b.service)}</span>
-                      <div className="wsw-dashboard__booking-main">
-                        <span className="wsw-dashboard__booking-service">{b.service}</span>
-                        <span className="wsw-dashboard__booking-meta">
-                          {b.category && `${b.category} · `}
-                          {b.date && `${fmtDate(b.date)} · `}
-                          {b.price && formatRs(b.price)}
-                        </span>
-                        <span className="wsw-dashboard__booking-code">{b.code}</span>
+                  </div>
+                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-[#F0F2E2]">
+                    <div className="h-full rounded-full bg-[#074C3A] transition-all duration-1000" style={{ width: `${progressPct}%` }} />
+                  </div>
+                </div>
+              )}
+              <div className="mt-5 flex flex-wrap gap-2.5">
+                {activeJob.technician?.phone && (
+                  <GhostButton onClick={() => { window.location.href = `tel:${activeJob.technician.phone.replace(/[^\d+]/g, "")}`; }}>
+                    <PhoneIc className="h-4 w-4" /> Call technician
+                  </GhostButton>
+                )}
+                {activeJob.address && (
+                  <GhostButton onClick={() => push("Live location shared")}><PinIc className="h-4 w-4" /> Track on map</GhostButton>
+                )}
+                <GhostButton
+                  className="border-[#C0392B] text-[#C0392B] hover:bg-[rgba(192,57,43,0.08)]"
+                  onClick={() => handleCancelBooking(activeJob)}
+                  disabled={cancellingId === activeJob.id}
+                >
+                  {cancellingId === activeJob.id ? "Cancelling…" : "Cancel booking"}
+                </GhostButton>
+              </div>
+            </>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-10 text-center">
+              <p className="font-display text-lg font-extrabold text-[#010A08]">No upcoming visits</p>
+              <p className="mt-1 max-w-xs text-[13px] text-[#5C6B60]">Book a service and it'll show up here with live status updates.</p>
+              <LimeButton className="mt-4" onClick={() => { window.location.hash = "#/console/customer/booking"; }}>Book a service</LimeButton>
+            </div>
+          )}
+        </Card>
+
+        {/* profile + recent */}
+        <div className="flex flex-col gap-5">
+          <Card className="p-5">
+            <SectionLabel>Account</SectionLabel>
+            {profileLoading ? (
+              <div className="h-14 w-full animate-pulse rounded bg-[#ECEEE0]" />
+            ) : (
+              <div className="flex items-center gap-3.5">
+                <Avatar name={profileData?.name || profileData?.fullName || "WS"} size="h-12 w-12 text-[15px]" />
+                <div className="min-w-0">
+                  <p className="truncate font-display text-[15px] font-extrabold text-[#010A08]">{profileData?.name || profileData?.fullName || "—"}</p>
+                  <p className="truncate text-[12px] text-[#5C6B60]">{profileData?.phoneNumber || profileData?.phone || profileData?.emailAddress || ""}</p>
+                </div>
+              </div>
+            )}
+          </Card>
+          <Card className="flex-1 p-5">
+            <SectionLabel>Recent activity</SectionLabel>
+            {historyLoading || cancelledLoading ? (
+              <ul className="space-y-3">
+                {[0, 1, 2].map((i) => <li key={i} className="h-9 w-full animate-pulse rounded bg-[#ECEEE0]" />)}
+              </ul>
+            ) : historyBookings.length > 0 ? (
+              <ul className="space-y-3">
+                {historyBookings.slice(0, 5).map((b) => (
+                  <li key={b.code} className="flex items-center gap-3">
+                    <span
+                      className="h-2 w-2 shrink-0 rounded-full"
+                      style={{ background: { lime: "#9db800", amber: "#E8A33D", red: "#C0392B" }[serviceTone(b.status)] }}
+                      aria-hidden="true"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-[13.5px] font-bold text-[#010A08]">{b.service}</p>
+                      <p className="text-[11.5px] text-[#5C6B60]">{b.status} · {formatRs(b.price)}</p>
+                    </div>
+                    <span className="font-mono text-[11px] text-[#9aa89d]">{fmtDate(b.date)}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="py-4 text-center text-[12.5px] text-[#9aa89d]">Nothing here yet.</p>
+            )}
+          </Card>
+        </div>
+      </div>
+
+      {/* upcoming list + rate completed jobs */}
+      <div className="mt-5 grid gap-5 lg:grid-cols-2">
+        <Card className="p-5">
+          <SectionLabel>Upcoming bookings</SectionLabel>
+          {pendingLoading ? (
+            <div className="h-24 w-full animate-pulse rounded bg-[#ECEEE0]" />
+          ) : pendingBookings.length > 0 ? (
+            <ul className="divide-y divide-[#E3E5D6]">
+              {pendingBookings.map((b) => (
+                <li key={b.code} className="flex items-center justify-between gap-3 py-3">
+                  <div className="min-w-0">
+                    <p className="truncate text-[13.5px] font-bold text-[#010A08]">{b.service}</p>
+                    <p className="text-[11.5px] text-[#5C6B60]">{fmtDate(b.date)}{b.slot && `, ${b.slot}`} · {b.category}</p>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-2.5">
+                    <Pill tone={serviceTone(b.status)}>{b.status}</Pill>
+                    <button
+                      onClick={() => handleCancelBooking(b)}
+                      disabled={cancellingId === b.id}
+                      className="font-mono text-[11px] font-bold text-[#C0392B] hover:underline disabled:opacity-50"
+                    >
+                      {cancellingId === b.id ? "…" : "Cancel"}
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="py-4 text-center text-[12.5px] text-[#9aa89d]">No upcoming bookings.</p>
+          )}
+        </Card>
+
+        <Card className="p-5">
+          <SectionLabel>Rate completed jobs</SectionLabel>
+          {historyLoading ? (
+            <div className="h-24 w-full animate-pulse rounded bg-[#ECEEE0]" />
+          ) : (
+            (() => {
+              const toRate = historyBookings.filter((b) => b.status?.toLowerCase() === "completed" && b.rated == null && !ratingDraft[b.code]);
+              return toRate.length > 0 ? (
+                <ul className="divide-y divide-[#E3E5D6]">
+                  {toRate.map((b) => (
+                    <li key={b.code} className="flex items-center justify-between gap-3 py-3">
+                      <div className="min-w-0">
+                        <p className="truncate text-[13.5px] font-bold text-[#010A08]">{b.service}</p>
+                        <p className="text-[11.5px] text-[#5C6B60]">{fmtDate(b.date)}</p>
                       </div>
-                      <div className="wsw-dashboard__booking-side">
-                        <span className={"wsw-dashboard__status wsw-dashboard__status--" + statusClass(b.status)}>
-                          {b.status}
-                        </span>
-                        {b.status?.toLowerCase() === "completed" && b.rated == null && !ratingDraft[b.code] && (
-                          <RatingPicker value={0} onRate={(rating) => submitRating(b, rating)} />
-                        )}
-                        {b.status?.toLowerCase() === "completed" && (b.rated != null || ratingDraft[b.code]) && (
-                          <span className="wsw-dashboard__rated">★ {b.rated ?? ratingDraft[b.code]}/5</span>
-                        )}
-                        {b.status?.toLowerCase() === "completed" && (
-                          <button type="button" className="wsw-dashboard__link-btn">
-                            Rebook
+                      <div className="flex shrink-0 items-center gap-1">
+                        {[1, 2, 3, 4, 5].map((n) => (
+                          <button key={n} onClick={() => submitRating(b, n)} aria-label={`${n} star`} className="transition-transform duration-150 hover:scale-125">
+                            <StarIc className="h-4.5 w-4.5 text-[#d8dcc8]" style={{ width: "1.05rem", height: "1.05rem" }} />
                           </button>
-                        )}
+                        ))}
                       </div>
                     </li>
                   ))}
                 </ul>
               ) : (
-                <EmptyState title="No past bookings" body="Completed and cancelled bookings will show up here." />
-              )}
-            </section>
-          </div>
-
-          <aside className="wsw-dashboard__side">
-            <section className="wsw-dashboard__panel wsw-dashboard__panel--compact" aria-label="Account details">
-              <h2 className="wsw-dashboard__panel-title">Account</h2>
-              {profileLoading ? (
-                <p className="wsw-dashboard__loading-note">Loading profile...</p>
-              ) : userProfile ? (
-                <>
-                  <div className="wsw-dashboard__profile">
-                    <span className="wsw-dashboard__profile-avatar">{initials(userProfile.name)}</span>
-                    <div>
-                      {userProfile.name && <p className="wsw-dashboard__profile-name">{userProfile.name}</p>}
-                      {userProfile.memberSince && (
-                        <p className="wsw-dashboard__profile-since">Customer since {userProfile.memberSince}</p>
-                      )}
-                    </div>
-                  </div>
-                  <dl className="wsw-dashboard__detail-list">
-                    {userProfile.phone && (
-                      <div className="wsw-dashboard__detail-item">
-                        <dt>Phone</dt>
-                        <dd>{userProfile.phone}</dd>
-                      </div>
-                    )}
-                    {userProfile.email && (
-                      <div className="wsw-dashboard__detail-item">
-                        <dt>Email</dt>
-                        <dd>{userProfile.email}</dd>
-                      </div>
-                    )}
-                  </dl>
-                  <button type="button" className="wsw-dashboard__link-btn wsw-dashboard__link-btn--block">
-                    Edit profile
-                  </button>
-                </>
-              ) : null}
-            </section>
-
-            <section
-              className="wsw-dashboard__panel wsw-dashboard__panel--compact wsw-dashboard__panel--dark"
-              aria-label="Support"
-            >
-              <span className="wsw-dashboard__support-tag">24/7 support</span>
-              <h2 className="wsw-dashboard__panel-title">Need help?</h2>
-              <p className="wsw-dashboard__support-copy">
-                Reach our support team for booking changes, billing questions or complaints.
-              </p>
-              <div className="wsw-dashboard__support-actions">
-                <a className="wsw-dashboard__support-btn" href="tel:+97714445566">
-                  Call support
-                </a>
-                <a className="wsw-dashboard__support-btn wsw-dashboard__support-btn--ghost" href="mailto:help@wowsewa.com">
-                  Email us
-                </a>
-              </div>
-            </section>
-          </aside>
-        </div>
+                <p className="py-4 text-center text-[12.5px] text-[#9aa89d]">All caught up — nothing to rate.</p>
+              );
+            })()
+          )}
+        </Card>
       </div>
-    </div>
-  );
-}
 
-// ---- Subcomponents --------------------------------------------------------------
+      {/* support strip */}
+      <Card className="relative mt-5 overflow-hidden bg-[#074C3A] p-6 text-[#F8FAEA]">
+        <span className="absolute inset-y-0 left-0 w-1 bg-[#D1FE17]" aria-hidden="true" />
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <HeadsetIc className="h-7 w-7 text-[#D1FE17]" />
+            <div>
+              <p className="font-display text-lg font-extrabold">Need a hand?</p>
+              <p className="text-[13px] text-[#F8FAEA]/70">Booking changes, billing, or complaints — 7am to 9pm, every day.</p>
+            </div>
+          </div>
+          <div className="flex gap-2.5">
+            <GhostButton className="border-[rgba(248,250,234,0.3)] text-[#F8FAEA] hover:bg-[rgba(248,250,234,0.1)]" onClick={() => { window.location.href = "tel:+97714445566"; }}>
+              <PhoneIc className="h-4 w-4" /> Call support
+            </GhostButton>
+            <GhostButton className="border-[rgba(248,250,234,0.3)] text-[#F8FAEA] hover:bg-[rgba(248,250,234,0.1)]" onClick={() => { window.location.href = "mailto:help@wowsewa.com"; }}>
+              <MailIc className="h-4 w-4" /> Email us
+            </GhostButton>
+          </div>
+        </div>
+      </Card>
 
-function EmptyState({ title, body }) {
-  return (
-    <div className="wsw-dashboard__empty">
-      <span className="wsw-dashboard__empty-glyph">🗂</span>
-      <p className="wsw-dashboard__empty-title">{title}</p>
-      <p className="wsw-dashboard__empty-body">{body}</p>
-    </div>
-  );
-}
-
-function RatingPicker({ value, onRate }) {
-  return (
-    <div className="wsw-dashboard__rating-picker" role="radiogroup" aria-label="Rate this service">
-      {[1, 2, 3, 4, 5].map((n) => (
-        <button
-          type="button"
-          key={n}
-          role="radio"
-          aria-checked={value === n}
-          className={"wsw-dashboard__rating-star" + (n <= value ? " wsw-dashboard__rating-star--filled" : "")}
-          onClick={() => onRate(n)}
-        >
-          ★
-        </button>
-      ))}
+      <ToastHost toasts={toasts} />
     </div>
   );
 }

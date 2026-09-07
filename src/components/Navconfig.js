@@ -15,8 +15,8 @@
     { key: "settings", label: "Settings", path: "/settings", icon: MdSettings, roles: ["customer"], group: "Account" },
 
     // ---- Receptionist ----
-    { key: "queue", label: "Booking queue", path: "/receptionist/queue", icon: MdAssignmentInd, roles: ["receptionist"], group: "Operations" },
-    { key: "technicians", label: "Technicians", path: "/receptionist/technicians", icon: MdBuild, roles: ["receptionist"], group: "Operations" },
+    { key: "queue", label: "Booking queue", path: "/reception/dashboard", icon: MdAssignmentInd, roles: ["frontdesk"], group: "Operations" },
+    { key: "technicians", label: "Technicians", path: "/reception/bookings", icon: MdBuild, roles: ["frontdesk"], group: "Operations" },
 
     // ---- Admin ----
     { key: "dashboard-admin", label: "Dashboard", path: "/admin/dashboard", icon: MdSpaceDashboard, roles: ["admin"], group: "Overview" },
@@ -28,7 +28,7 @@
     { key: "receivable", label: "Receivable Payable", path: "/admin/receivable-payable", icon: MdReceiptLong, roles: ["admin"], group: "Finance" },
 
     // ---- Shared ----
-    { key: "support", label: "Support", path: "/support", icon: MdSupportAgent, roles: ["customer", "receptionist", "admin"], group: "Account" },
+    { key: "support", label: "Support", path: "/support", icon: MdSupportAgent, roles: ["customer", "frontdesk", "admin"], group: "Account" },
   ];
 
   // Controls the order sections render in, per role. Anything not listed

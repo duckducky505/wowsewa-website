@@ -1,9 +1,19 @@
-import React, { useMemo, useState } from "react";
-import "./ReceptionDashboard.css";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import * as signalR from "@microsoft/signalr";
 import { fetchHook } from "../../../hooks/fetchHook";
 import { fetchAPI } from "../../../utils/fetchAPI";
+import { PageHead, Card, Pill, Avatar, useToast, ToastHost } from "../../../ui/ui";
 
-// ---- Helpers --------------------------------------------------------------
+// ---- Icons (from ReceptionPages.jsx) ---------------------------------------
+
+const Ic = (d) => (p) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...p}>
+    {d}
+  </svg>
+);
+const PinIc = Ic(<><path d="M12 21s-7-6.1-7-11a7 7 0 1 1 14 0c0 4.9-7 11-7 11z" /><circle cx="12" cy="10" r="2.5" /></>);
+
+// ---- Helpers (real-data normalizers) ---------------------------------------
 
 function initials(name) {
   return (name || "")
@@ -43,24 +53,48 @@ function normalizeEmployee(raw) {
   };
 }
 
+// Derives the kanban stage straight from the raw BookingStatus value that
+// comes back on every SignalR "BookingUpdated" push and every initial fetch,
+// so a single normalizer now covers both — no more per-endpoint "stage" tag.
+function stageFromStatus(status) {
+  if (status === "Completed" || status === 2) return "Done";
+  if (status === "InProcess" || status === 1) return "In progress";
+  return "New"; // Pending / 0
+}
+
 function normalizeBooking(raw) {
+  const status = raw.bookingStatus ?? raw.BookingStatus ?? raw.status ?? raw.Status;
   return {
-    id: raw.bookingId,
-    code: raw.bookingCode,
-    customer: raw.customerName,
-    phone: raw.phoneNumber,
-    category: raw.industry.industryName,
-    industryId: raw.industryId,
-    service: raw.duty.dutyName,
-    address: raw.address,
-    date: raw.preferredDate,
-    slot: raw.preferredTime,
+    id: raw.bookingId ?? raw.BookingId,
+    code: raw.bookingCode ?? raw.BookingCode,
+    customer: raw.customerName ?? raw.CustomerName,
+    phone: raw.phoneNumber ?? raw.PhoneNumber,
+    category: raw.industry?.industryName ?? raw.Industry?.IndustryName ?? "",
+    industryId: raw.industryId ?? raw.IndustryId,
+    service: raw.duty?.dutyName ?? raw.Duty?.DutyName ?? "",
+    address: raw.address ?? raw.Address,
+    date: raw.preferredDate ?? raw.PreferredDate,
+    slot: raw.preferredTime ?? raw.PreferredTime,
     source: raw.source ?? raw.Source ?? "App",
-    status: raw.status ?? raw.Status ?? "Pending",
+    status,
     priority: raw.priority ?? raw.Priority ?? "normal",
-    technicianId: raw.technicianId ?? raw.TechnicianId ?? null,
-    technicianName: raw.technicianName ?? raw.TechnicianName ?? null,
+    technicianId: raw.employeeId ?? raw.EmployeeId ?? raw.technicianId ?? raw.TechnicianId ?? null,
+    technicianName:
+      raw.technicianName ?? raw.TechnicianName ?? raw.employee?.fullName ?? raw.Employee?.FullName ?? null,
+    stage: stageFromStatus(status),
   };
+}
+
+const COLS = [
+  { key: "New", dot: "#C0392B" },
+  { key: "In progress", dot: "#4E9C7F" },
+  { key: "Done", dot: "#9db800" },
+];
+
+// Real BookingStatus enum member name the "Advance" button PATCHes to.
+function nextRealStatus(stage) {
+  if (stage === "In progress") return "Completed";
+  return null;
 }
 
 const STATUS_LABEL = {
@@ -68,17 +102,33 @@ const STATUS_LABEL = {
   "on-job": "On a job",
 };
 
+const HUB_URL = "https://localhost:7011/hub/notification"; // update to match Program.cs MapHub route
+
 // ---- Component --------------------------------------------------------------
 
 export default function ReceptionistPage() {
+  const { toasts, push } = useToast();
   const [view, setView] = useState("queue");
   const [showNewBooking, setShowNewBooking] = useState(false);
-  const [search, setSearch] = useState("");
+  const [openId, setOpenId] = useState(null);
   const [assigningId, setAssigningId] = useState(null);
+  const [advancingId, setAdvancingId] = useState(null);
   const [dismissingId, setDismissingId] = useState(null);
 
-  const { data: rawBookings, loading: bookingsLoading } = fetchHook(
+  // Bookings now live in local state, seeded once from the three status
+  // endpoints and kept in sync live via SignalR — no reload() needed after
+  // any mutation, since the server pushes the same update back to us.
+  const [bookings, setBookings] = useState([]);
+  const [bookingsSeeded, setBookingsSeeded] = useState(false);
+
+  const { data: rawPending, loading: pendingLoading } = fetchHook(
     "https://localhost:7011/api/Booking/getAllPendingBookings"
+  );
+  const { data: rawInProgress, loading: inProgressLoading } = fetchHook(
+    "https://localhost:7011/api/Booking/getAllInProgressBookings"
+  );
+  const { data: rawCompletedToday, loading: completedLoading } = fetchHook(
+    "https://localhost:7011/api/Booking/todaysCompletedBookings"
   );
   const { data: rawEmployees, loading: staffLoading } = fetchHook(
     "https://localhost:7011/api/Employee/getEmployeesDetail"
@@ -87,19 +137,75 @@ export default function ReceptionistPage() {
     "https://localhost:7011/api/industry/getIndustryData"
   );
 
-  const bookings = useMemo(() => (rawBookings || []).map(normalizeBooking), [rawBookings]);
+  // Seed local booking state once all three lists have arrived. After this,
+  // SignalR events are the only thing that mutate `bookings`.
+  useEffect(() => {
+    if (bookingsSeeded) return;
+    if (pendingLoading || inProgressLoading || completedLoading) return;
+
+    const seeded = [
+      ...(rawPending || []),
+      ...(rawInProgress || []),
+      ...(rawCompletedToday || []),
+    ].map(normalizeBooking);
+
+    setBookings(seeded);
+    setBookingsSeeded(true);
+  }, [bookingsSeeded, pendingLoading, inProgressLoading, completedLoading, rawPending, rawInProgress, rawCompletedToday]);
+
+  // ---- SignalR live sync ----------------------------------------------------
+  const connectionRef = useRef(null);
+
+  const upsertBooking = useCallback((raw) => {
+    const updated = normalizeBooking(raw);
+    setBookings((prev) => {
+      const exists = prev.some((b) => b.id === updated.id);
+      if (exists) return prev.map((b) => (b.id === updated.id ? updated : b));
+      return [...prev, updated];
+    });
+    return updated;
+  }, []);
+
+  const removeBooking = useCallback((id) => {
+    setBookings((prev) => prev.filter((b) => b.id !== id));
+  }, []);
+
+  useEffect(() => {
+    const connection = new signalR.HubConnectionBuilder()
+      .withUrl(HUB_URL, {
+        accessTokenFactory: () => localStorage.getItem("Token"),
+      })
+      .withAutomaticReconnect()
+      .build()
+
+    connection.on("BookingUpdated", (raw) => {
+      const updated = upsertBooking(raw);
+      push(`${updated.code} → ${updated.stage}`);
+    });
+
+    connection.on("BookingDeleted", (id) => {
+      removeBooking(id);
+    });
+
+    connection.on("BookingNotification", (n) => {
+      push(n?.message ?? "New booking received");
+    });
+
+    connection.start().catch((err) => {
+      console.error("SignalR connection failed:", err);
+    });
+
+    connectionRef.current = connection;
+
+    return () => {
+      connection.stop();
+    };
+  }, [upsertBooking, removeBooking, push]);
+
   const industries = useMemo(() => (rawIndustries || []).map(normalizeIndustry), [rawIndustries]);
 
-  const queue = useMemo(
-    () => bookings.filter((b) => b.status === "Pending" && !b.technicianId),
-    [bookings]
-  );
-
   const todaysSchedule = useMemo(
-    () =>
-      bookings.filter(
-        (b) => isToday(b.date) && (b.status === "In progress" || b.status === "Completed")
-      ),
+    () => bookings.filter((b) => (b.stage === "In progress" && isToday(b.date)) || b.stage === "Done"),
     [bookings]
   );
 
@@ -110,63 +216,61 @@ export default function ReceptionistPage() {
         emp.employeeStatus === "Available" || emp.employeeStatus === 1
           ? "available"
           : "on-job";
-
-      const activeJob = bookings.find(
-        (b) => b.technicianId === emp.id && b.status === "In progress"
-      );
-
       return {
         id: emp.id,
         name: emp.name,
         skill: emp.industryName,
         industryId: emp.industryId,
         status,
-        jobCode: activeJob?.code ?? null,
       };
     });
-  }, [rawEmployees, bookings]);
+  }, [rawEmployees]);
 
-  const filteredQueue = useMemo(() => {
-    if (!search.trim()) return queue;
-    const q = search.toLowerCase();
-    return queue.filter(
-      (item) =>
-        item.customer.toLowerCase().includes(q) ||
-        item.code.toLowerCase().includes(q) ||
-        item.phone.includes(q)
-    );
-  }, [queue, search]);
+  const availableTechs = useMemo(
+    () => technicians.filter((t) => t.status === "available"),
+    [technicians]
+  );
 
-  const stats = useMemo(() => {
-    const available = technicians.filter((t) => t.status === "available").length;
-    const urgent = queue.filter((q) => q.priority === "urgent").length;
-    return [
-      { label: "Needs assignment", value: queue.length },
-      { label: "Urgent", value: urgent },
-      { label: "Technicians available", value: available },
-      { label: "Jobs today", value: todaysSchedule.length },
-    ];
-  }, [queue, technicians, todaysSchedule]);
+  const counts = useMemo(
+    () =>
+      Object.fromEntries(
+        COLS.map((c) => [c.key, bookings.filter((b) => b.stage === c.key).length])
+      ),
+    [bookings]
+  );
 
-  function matchingTechnicians() {
-    return technicians.filter((t) => t.status === "available");
-  }
+  const toggleAssign = (id) => setOpenId((p) => (p === id ? null : id));
 
-  async function handleAssign(booking, technicianId) {
-    const tech = technicians.find((t) => t.id === technicianId);
-    if (!tech) return;
 
+  async function assign(booking, technicianId) {
     setAssigningId(booking.id);
     const res = await fetchAPI(
       `https://localhost:7011/api/Booking/assignTechnician/${booking.id}?technicianId=${technicianId}`,
       "PATCH"
     );
     setAssigningId(null);
+    setOpenId(null);
 
-    if (res) {
-      window.location.reload();
-    } else {
+    if (!res) {
       window.alert("Couldn't assign this technician. Please try again.");
+    }
+  }
+
+  async function advance(booking) {
+    const next = nextRealStatus(booking.stage);
+    if (!next) return;
+
+    setAdvancingId(booking.id);
+    const patchPayload = [{ op: "replace", path: "/BookingStatus", value: next }];
+    const res = await fetchAPI(
+      `https://localhost:7011/api/Booking/updateBookingDetails/${booking.id}`,
+      "PATCH",
+      patchPayload
+    );
+    setAdvancingId(null);
+
+    if (!res) {
+      window.alert("Couldn't advance this job. Please try again.");
     }
   }
 
@@ -176,11 +280,11 @@ export default function ReceptionistPage() {
     const res = await fetchAPI(`https://localhost:7011/api/Booking/deleteBooking/${booking.id}`, "DELETE");
     setDismissingId(null);
 
-    if (res) {
-      window.location.reload();
-    } else {
+    if (!res) {
       window.alert("Couldn't cancel this booking. Please try again.");
     }
+    // On success, "BookingDeleted" arrives over SignalR and removeBooking()
+    // takes it out of state — no local removal needed here.
   }
 
   async function handleCreateBooking(form) {
@@ -212,175 +316,268 @@ export default function ReceptionistPage() {
       );
       if (!assignRes) {
         window.alert("Booking was created, but assigning the technician failed. You can assign them from the queue.");
-        window.location.reload();
         return;
       }
     }
 
-    window.alert("Booking added to the queue.");
-    window.location.reload();
+    // AddBooking's controller currently doesn't broadcast the new booking's
+    // full payload over SignalR (only a "BookingNotification" toast) — see
+    // note below the code block for the one-line backend fix this needs.
+    setShowNewBooking(false);
   }
 
-  const isLoading = bookingsLoading || staffLoading || industriesLoading;
+  const isLoading = !bookingsSeeded || staffLoading || industriesLoading;
 
   return (
-    <div className="wsw-receptionist">
-      <header className="wsw-receptionist__header">
-        <div className="wsw-receptionist__header-inner">
-          <div>
-            <span className="wsw-receptionist__eyebrow">Front desk</span>
-            <h1 className="wsw-receptionist__title">Booking queue</h1>
-            <p className="wsw-receptionist__subtitle">Assign technicians and manage today's schedule.</p>
-          </div>
-          <div className="wsw-receptionist__header-actions">
-            <input
-              type="search"
-              className="wsw-receptionist__search"
-              placeholder="Search customer, phone or job code"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              aria-label="Search bookings"
-            />
-            <button type="button" className="wsw-receptionist__new-booking" onClick={() => setShowNewBooking(true)}>
-              + Phone booking
-            </button>
-          </div>
+    <div className="mx-auto max-w-[1400px] px-4 py-6 sm:px-6">
+      <PageHead
+        eyebrow="Operations · Triage"
+        title="Booking queue"
+        sub="Assign a free technician to move a job into progress, then mark it complete when it's done."
+      >
+        <div className="flex items-center gap-2">
+          <Pill tone="lime" pulse>
+            {counts["New"] + counts["In progress"]} active
+          </Pill>
+          <button
+            type="button"
+            onClick={() => setShowNewBooking(true)}
+            className="rounded-lg bg-[#074C3A] px-4 py-2 text-[13px] font-bold text-[#D1FE17] transition-transform duration-150 hover:-translate-y-0.5"
+          >
+            + Phone booking
+          </button>
         </div>
-      </header>
+      </PageHead>
 
-      <div className="wsw-receptionist__body">
-        <section className="wsw-receptionist__stats" aria-label="Front desk overview">
-          {stats.map((s) => (
-            <div className="wsw-receptionist__stat-card" key={s.label}>
-              <span className="wsw-receptionist__stat-value">{s.value}</span>
-              <span className="wsw-receptionist__stat-label">{s.label}</span>
-            </div>
-          ))}
-        </section>
-
-        <div className="wsw-receptionist__grid">
-          <div className="wsw-receptionist__main">
-            <div className="wsw-receptionist__tabs" role="tablist">
+      <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+        <div>
+          <div className="mb-4 flex gap-2" role="tablist">
+            {[
+              { key: "queue", label: "Assignment queue" },
+              { key: "schedule", label: "Today's schedule" },
+            ].map((t) => (
               <button
+                key={t.key}
                 type="button"
                 role="tab"
-                aria-selected={view === "queue"}
-                className={"wsw-receptionist__tab" + (view === "queue" ? " wsw-receptionist__tab--active" : "")}
-                onClick={() => setView("queue")}
+                aria-selected={view === t.key}
+                onClick={() => setView(t.key)}
+                className={`rounded-lg px-4 py-2 text-[13px] font-bold transition-colors ${
+                  view === t.key ? "bg-[#074C3A] text-[#D1FE17]" : "bg-[#074C3A]/5 text-[#5C6B60] hover:bg-[#074C3A]/10"
+                }`}
               >
-                Assignment queue
+                {t.label}
               </button>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={view === "schedule"}
-                className={"wsw-receptionist__tab" + (view === "schedule" ? " wsw-receptionist__tab--active" : "")}
-                onClick={() => setView("schedule")}
-              >
-                Today's schedule
-              </button>
-            </div>
+            ))}
+          </div>
 
-            {isLoading ? (
-              <section className="wsw-receptionist__panel" aria-label="Loading">
-                <p className="wsw-receptionist__loading-note">Loading bookings…</p>
-              </section>
-            ) : view === "queue" ? (
-              <section className="wsw-receptionist__panel" aria-label="Bookings needing assignment">
-                {filteredQueue.length > 0 ? (
-                  <ul className="wsw-receptionist__queue-list">
-                    {filteredQueue.map((item) => (
-                      <QueueRow
-                        key={item.id}
-                        item={item}
-                        options={matchingTechnicians()}
-                        onAssign={handleAssign}
-                        onCancel={handleCancel}
-                        assigning={assigningId === item.id}
-                        cancelling={dismissingId === item.id}
-                      />
-                    ))}
-                  </ul>
-                ) : (
-                  <div className="wsw-receptionist__empty">
-                    <p className="wsw-receptionist__empty-title">Queue is clear</p>
-                    <p className="wsw-receptionist__empty-body">
-                      Every booking has a technician assigned. New requests will appear here.
-                    </p>
+          {isLoading ? (
+            <Card className="p-6">
+              <p className="text-sm text-[#5C6B60]">Loading bookings…</p>
+            </Card>
+          ) : view === "queue" ? (
+            <>
+              <div className="mb-6 grid grid-cols-3 gap-4">
+                {COLS.map((c) => (
+                  <div key={c.key} className="relative overflow-hidden rounded-xl border border-[#E3E5D6] bg-white p-4">
+                    <span className="absolute inset-y-0 left-0 w-1" style={{ background: c.dot }} aria-hidden="true" />
+                    <p className="font-mono text-[10.5px] font-bold uppercase tracking-[0.16em] text-[#5C6B60]">{c.key}</p>
+                    <p className="mt-1.5 font-display text-2xl font-extrabold text-[#010A08]">{counts[c.key]}</p>
                   </div>
-                )}
-              </section>
-            ) : (
-              <section className="wsw-receptionist__panel" aria-label="Today's schedule">
-                {todaysSchedule.length > 0 ? (
-                  <ul className="wsw-receptionist__schedule-list">
-                    {todaysSchedule.map((row) => (
-                      <li className="wsw-receptionist__schedule-row" key={row.id}>
-                        <span className="wsw-receptionist__schedule-time">{row.slot}</span>
-                        <div className="wsw-receptionist__schedule-main">
-                          <p className="wsw-receptionist__schedule-service">{row.service}</p>
-                          <p className="wsw-receptionist__schedule-meta">
-                            {row.customer} · {row.technicianName || "Unassigned"}
-                          </p>
+                ))}
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                {COLS.map((col) => {
+                  const rows = bookings.filter((b) => b.stage === col.key);
+                  return (
+                    <div key={col.key} className="flex flex-col gap-3">
+                      <p className="flex items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-[#5C6B60]">
+                        <span className="h-2 w-2 rounded-full" style={{ background: col.dot }} aria-hidden="true" />
+                        {col.key}
+                      </p>
+                      {rows.map((r) => {
+                        const next = nextRealStatus(col.key);
+                        return (
+                          <Card
+                            key={r.id}
+                            className={`p-4 transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_22px_40px_-24px_rgba(1,10,8,0.35)] ${
+                              openId === r.id ? "relative z-30" : "relative z-0"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="font-mono text-[11px] font-bold text-[#9aa89d]">{r.code}</span>
+                              {r.priority === "urgent" && <Pill tone="red">Urgent</Pill>}
+                            </div>
+                            <p className="mt-1.5 font-display text-[15.5px] font-extrabold text-[#010A08]">
+                              {r.service} · {r.category}
+                            </p>
+                            <p className="mt-0.5 flex items-center gap-1 text-[12px] text-[#5C6B60]">
+                              <PinIc className="h-3.5 w-3.5" /> {r.address} · {r.customer}
+                            </p>
+                            <p className="mt-0.5 text-[11.5px] text-[#5C6B60]">
+                              {r.date} · {r.slot}
+                            </p>
+
+                            {col.key === "New" && (
+                              <div className="relative mt-2">
+                                <button
+                                  onClick={() => toggleAssign(r.id)}
+                                  className={`flex w-full items-center justify-center gap-1.5 rounded-md border-2 border-dashed px-2 py-1.5 text-[11.5px] font-bold transition-all duration-150 ${
+                                    openId === r.id
+                                      ? "border-[#074C3A] bg-[#074C3A] text-[#D1FE17]"
+                                      : "border-[#E3E5D6] text-[#5C6B60] hover:border-[#074C3A] hover:text-[#074C3A]"
+                                  }`}
+                                >
+                                  + Assign technician
+                                </button>
+
+                                {openId === r.id && (
+                                  <div className="absolute left-0 top-full z-30 mt-1.5 w-60 overflow-hidden rounded-xl border border-[#E3E5D6] bg-white shadow-[0_24px_50px_-16px_rgba(1,10,8,0.35)]">
+                                    <p className="flex items-center justify-between border-b border-[#E3E5D6] bg-[#F8FAEA]/60 px-3 py-2 font-mono text-[9.5px] font-bold uppercase tracking-[0.16em] text-[#5C6B60]">
+                                      Assign {r.code} to
+                                    </p>
+                                    <div className="max-h-52 overflow-y-auto py-1">
+                                      {availableTechs.length === 0 && (
+                                        <p className="px-3 py-2 text-[12px] text-[#5C6B60]">No available technicians</p>
+                                      )}
+                                      {availableTechs.map((t) => (
+                                        <button
+                                          key={t.id}
+                                          onClick={() => assign(r, t.id)}
+                                          disabled={assigningId === r.id}
+                                          className="flex w-full items-center gap-2.5 px-3 py-2 text-left transition-colors duration-150 hover:bg-[#F8FAEA]"
+                                        >
+                                          <Avatar name={t.name} size="h-7 w-7 text-[10px]" />
+                                          <span className="min-w-0 flex-1">
+                                            <span className="block truncate text-[12.5px] font-bold text-[#010A08]">{t.name}</span>
+                                            <span className="block text-[10.5px] text-[#5C6B60]">{t.skill}</span>
+                                          </span>
+                                        </button>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+
+                            {col.key !== "New" && r.technicianName && (
+                              <p className="mt-2 flex items-center gap-2 text-[12px] font-semibold text-[#074C3A]">
+                                <Avatar name={r.technicianName} size="h-6 w-6 text-[9px]" /> {r.technicianName}
+                              </p>
+                            )}
+
+                            <div className="mt-3 flex items-center justify-between border-t border-dashed border-[#E3E5D6] pt-3">
+                              <button
+                                type="button"
+                                onClick={() => handleCancel(r)}
+                                disabled={dismissingId === r.id}
+                                className="text-[11px] font-bold text-[#C0392B] transition-colors hover:underline disabled:opacity-50"
+                              >
+                                {dismissingId === r.id ? "…" : "Cancel"}
+                              </button>
+                              {next && (
+                                <button
+                                  onClick={() => advance(r)}
+                                  disabled={advancingId === r.id}
+                                  className="rounded-md bg-[#074C3A] px-2.5 py-1 text-[11px] font-bold text-[#D1FE17] transition-transform duration-150 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-55"
+                                >
+                                  {advancingId === r.id ? "…" : `Advance → ${next}`}
+                                </button>
+                              )}
+                            </div>
+                          </Card>
+                        );
+                      })}
+                      {counts[col.key] === 0 && (
+                        <div className="grid h-24 place-items-center rounded-xl border-2 border-dashed border-[#E3E5D6] font-mono text-[11px] uppercase tracking-widest text-[#9aa89d]">
+                          Empty
                         </div>
-                        <span
-                          className={
-                            "wsw-receptionist__status wsw-receptionist__status--" +
-                            row.status.toLowerCase().replace(/\s+/g, "-")
-                          }
-                        >
-                          {row.status}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <div className="wsw-receptionist__empty">
-                    <p className="wsw-receptionist__empty-title">Nothing in progress yet</p>
-                    <p className="wsw-receptionist__empty-body">
-                      Jobs that are in progress or completed today will show up here.
-                    </p>
-                  </div>
-                )}
-              </section>
-            )}
-
-            <section className="wsw-receptionist__panel" aria-label="Recent calls">
-              <div className="wsw-receptionist__panel-head">
-                <h2 className="wsw-receptionist__panel-title">Recent calls</h2>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
-              <p className="wsw-receptionist__loading-note">Call log integration coming soon.</p>
-            </section>
-          </div>
 
-          <aside className="wsw-receptionist__side">
-            <section className="wsw-receptionist__panel wsw-receptionist__panel--compact" aria-label="Technician roster">
-              <div className="wsw-receptionist__panel-head">
-                <h2 className="wsw-receptionist__panel-title">Technicians</h2>
-              </div>
-              {staffLoading ? (
-                <p className="wsw-receptionist__loading-note">Loading roster…</p>
+              {openId && <div className="fixed inset-0 z-20" onClick={() => setOpenId(null)} aria-hidden="true" />}
+            </>
+          ) : (
+            <Card className="overflow-x-auto !p-0">
+              {todaysSchedule.length > 0 ? (
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="border-b border-[#E3E5D6]">
+                      {["Slot", "Service", "Customer / Technician", "Status", ""].map((h) => (
+                        <th key={h} className="px-5 py-3.5 font-mono text-[10px] font-bold uppercase tracking-[0.12em] text-[#5C6B60]">
+                          {h}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {todaysSchedule.map((row) => {
+                      const next = nextRealStatus(row.stage);
+                      return (
+                        <tr key={row.id} className="border-b border-[#E3E5D6] transition-colors last:border-0 hover:bg-[#F8FAEA]">
+                          <td className="px-5 py-3.5 font-mono text-[13px] font-bold text-[#074C3A]">{row.slot}</td>
+                          <td className="px-5 py-3.5 text-sm font-semibold text-[#010A08]">{row.service}</td>
+                          <td className="px-5 py-3.5 text-sm text-[#5C6B60]">
+                            {row.customer} · {row.technicianName || "Unassigned"}
+                          </td>
+                          <td className="px-5 py-3.5">
+                            <Pill tone={row.stage === "Done" ? "lime" : "amber"}>{row.stage === "Done" ? "Completed" : "In progress"}</Pill>
+                          </td>
+                          <td className="px-5 py-3.5 text-right">
+                            {next && (
+                              <button
+                                type="button"
+                                onClick={() => advance(row)}
+                                disabled={advancingId === row.id}
+                                className="rounded-lg bg-[#074C3A] px-3.5 py-1.5 text-[12px] font-bold text-[#D1FE17] transition-transform duration-150 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-55"
+                              >
+                                {advancingId === row.id ? "…" : `→ ${next}`}
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               ) : (
-                <ul className="wsw-receptionist__roster-list">
-                  {technicians.map((t) => (
-                    <li className="wsw-receptionist__roster-row" key={t.id}>
-                      <span className="wsw-receptionist__roster-avatar">{initials(t.name)}</span>
-                      <div className="wsw-receptionist__roster-main">
-                        <p className="wsw-receptionist__roster-name">{t.name}</p>
-                        <p className="wsw-receptionist__roster-skill">{t.skill}</p>
-                      </div>
-                      <span
-                        className={"wsw-receptionist__roster-status wsw-receptionist__roster-status--" + t.status}
-                      >
-                        {STATUS_LABEL[t.status]}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
+                <div className="py-10 text-center">
+                  <p className="mb-1.5 font-display text-base font-bold text-[#074C3A]">Nothing in progress yet</p>
+                  <p className="text-sm text-[#5C6B60]">Jobs that are in progress or completed today will show up here.</p>
+                </div>
               )}
-            </section>
-          </aside>
+            </Card>
+          )}
         </div>
+
+        <aside>
+          <Card className="py-5 px-3">
+            <h2 className="font-display text-base font-bold text-[#010A08]">Technicians</h2>
+            {staffLoading ? (
+              <p className="mt-3 text-sm text-[#5C6B60]">Loading roster…</p>
+            ) : (
+              <ul className="mt-4 flex flex-col gap-2.5">
+                {technicians.map((t) => (
+                  <li
+                    key={t.id}
+                    className="flex items-center gap-3 border-b border-dashed border-[#E3E5D6] pb-2.5 last:border-0 last:pb-0"
+                  >
+                    <Avatar name={t.name} size="h-9 w-9 text-[11px]" />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-[13px] font-semibold text-[#010A08]">{t.name}</p>
+                      <p className="truncate text-[11.5px] text-[#5C6B60]">{t.skill}</p>
+                    </div>
+                    <Pill tone={t.status === "available" ? "lime" : "muted"}>{STATUS_LABEL[t.status]}</Pill>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Card>
+        </aside>
       </div>
 
       {showNewBooking && (
@@ -391,73 +588,13 @@ export default function ReceptionistPage() {
           onCreate={handleCreateBooking}
         />
       )}
+
+      <ToastHost toasts={toasts} />
     </div>
   );
 }
 
-// ---- Subcomponents --------------------------------------------------------------
-
-function QueueRow({ item, options, onAssign, onCancel, assigning, cancelling }) {
-  const [pickedTech, setPickedTech] = useState("");
-
-  return (
-    <li
-      className={
-        "wsw-receptionist__queue-row" +
-        (item.priority === "urgent" ? " wsw-receptionist__queue-row--urgent" : "")
-      }
-    >
-      <div className="wsw-receptionist__queue-main">
-        <div className="wsw-receptionist__queue-top">
-          <p className="wsw-receptionist__queue-customer">{item.customer}</p>
-          {item.priority === "urgent" && <span className="wsw-receptionist__urgent-tag">Urgent</span>}
-          <span className="wsw-receptionist__source-tag">{item.source}</span>
-        </div>
-        <p className="wsw-receptionist__queue-service">
-          {item.service} · {item.category}
-        </p>
-        <p className="wsw-receptionist__queue-meta">
-          {item.slot} · {item.address}
-        </p>
-        <p className="wsw-receptionist__queue-meta">
-          {item.phone} · <span className="wsw-receptionist__queue-code">{item.code}</span>
-        </p>
-      </div>
-
-      <div className="wsw-receptionist__queue-actions">
-        <select
-          className="wsw-receptionist__assign-select"
-          value={pickedTech}
-          onChange={(e) => setPickedTech(e.target.value)}
-          aria-label={`Assign technician for ${item.customer}`}
-        >
-          <option value="">Assign technician…</option>
-          {options.map((t) => (
-            <option key={t.id} value={t.id}>
-              {t.name} ({STATUS_LABEL[t.status]})
-            </option>
-          ))}
-        </select>
-        <button
-          type="button"
-          className="wsw-receptionist__assign-btn"
-          disabled={!pickedTech || assigning}
-          onClick={() => onAssign(item, pickedTech)}
-        >
-          {assigning ? "Assigning…" : "Assign"}
-        </button>
-        <button
-          type="button"
-          className="wsw-receptionist__dismiss-btn"
-          onClick={() => onCancel(item)}
-          disabled={cancelling}
-        >
-          {cancelling ? "…" : "Cancel"}
-        </button>
-      </div>
-    </li>
-  );
-}
+// ---- Phone booking modal (unchanged real-API flow) -------------------------
 
 function NewBookingModal({ industries, technicians, onClose, onCreate }) {
   const [form, setForm] = useState({
@@ -489,121 +626,120 @@ function NewBookingModal({ industries, technicians, onClose, onCreate }) {
   }
 
   const availableTechs = technicians.filter((t) => t.status === "available");
+  const inputClass =
+    "w-full rounded-lg border border-[#E3E5D6] bg-white px-3.5 py-2.5 text-[13.5px] font-semibold text-[#010A08] outline-none transition-colors focus:border-[#074C3A]";
+  const labelClass =
+    "mb-1.5 block font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-[#5C6B60]";
 
   return (
-    <div className="wsw-receptionist__modal-backdrop" role="dialog" aria-modal="true" aria-label="Create phone booking">
-      <div className="wsw-receptionist__modal">
-        <div className="wsw-receptionist__modal-head">
-          <h2 className="wsw-receptionist__panel-title">New phone booking</h2>
-          <button type="button" className="wsw-receptionist__modal-close" onClick={onClose} aria-label="Close">
+    <div
+      className="fixed inset-0 z-[60] grid place-items-center bg-[#010A08]/55 p-6 backdrop-blur-[2px]"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Create phone booking"
+    >
+      <div className="max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-2xl border border-[#E3E5D6] bg-[#F8FAEA] shadow-[0_24px_60px_-20px_rgba(1,10,8,0.4)]">
+        <div className="flex items-center justify-between bg-[#074C3A] px-6 py-5">
+          <h2 className="font-display text-base font-bold text-[#F8FAEA]">New phone booking</h2>
+          <button type="button" onClick={onClose} aria-label="Close" className="text-2xl leading-none text-[#F8FAEA]">
             ×
           </button>
         </div>
 
-        <form className="wsw-receptionist__modal-form" onSubmit={handleSubmit}>
-          <div className="wsw-receptionist__field-row">
-            <ModalField id="m-customer" label="Customer name" value={form.customer} onChange={(v) => update("customer", v)} />
-            <ModalField id="m-phone" label="Phone number" value={form.phone} onChange={(v) => update("phone", v)} type="tel" />
+        <form className="flex flex-col gap-4.5 p-6" onSubmit={handleSubmit}>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className={labelClass} htmlFor="m-customer">Customer name</label>
+              <input id="m-customer" className={inputClass} value={form.customer} onChange={(e) => update("customer", e.target.value)} />
+            </div>
+            <div>
+              <label className={labelClass} htmlFor="m-phone">Phone number</label>
+              <input id="m-phone" type="tel" className={inputClass} value={form.phone} onChange={(e) => update("phone", e.target.value)} />
+            </div>
           </div>
 
-          <div className="wsw-receptionist__field-row">
-            <div className="wsw-receptionist__field">
-              <label className="wsw-receptionist__label" htmlFor="m-category">
-                Category
-              </label>
-              <select
-                id="m-category"
-                className="wsw-receptionist__select"
-                value={form.industryId}
-                onChange={(e) => update("industryId", e.target.value)}
-              >
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className={labelClass} htmlFor="m-category">Category</label>
+              <select id="m-category" className={inputClass} value={form.industryId} onChange={(e) => update("industryId", e.target.value)}>
                 {industries.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
+                  <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
               </select>
             </div>
-            <ModalField
-              id="m-notes"
-              label="Service notes"
-              value={form.notes}
-              onChange={(v) => update("notes", v)}
-              placeholder="e.g. Leak repair — kitchen sink"
-            />
+            <div>
+              <label className={labelClass} htmlFor="m-notes">Service notes</label>
+              <input
+                id="m-notes"
+                className={inputClass}
+                value={form.notes}
+                placeholder="e.g. Leak repair — kitchen sink"
+                onChange={(e) => update("notes", e.target.value)}
+              />
+            </div>
           </div>
 
-          <ModalField id="m-address" label="Service address" value={form.address} onChange={(v) => update("address", v)} />
-
-          <div className="wsw-receptionist__field-row">
-            <ModalField id="m-date" label="Date" value={form.date} onChange={(v) => update("date", v)} type="date" />
-            <ModalField id="m-slot" label="Requested slot" value={form.slot} onChange={(v) => update("slot", v)} placeholder="e.g. 4:00 PM – 6:00 PM" />
+          <div>
+            <label className={labelClass} htmlFor="m-address">Service address</label>
+            <input id="m-address" className={inputClass} value={form.address} onChange={(e) => update("address", e.target.value)} />
           </div>
 
-          <div className="wsw-receptionist__field-row">
-            <div className="wsw-receptionist__field">
-              <label className="wsw-receptionist__label" htmlFor="m-priority">
-                Priority
-              </label>
-              <select
-                id="m-priority"
-                className="wsw-receptionist__select"
-                value={form.priority}
-                onChange={(e) => update("priority", e.target.value)}
-              >
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className={labelClass} htmlFor="m-date">Date</label>
+              <input id="m-date" type="date" className={inputClass} value={form.date} onChange={(e) => update("date", e.target.value)} />
+            </div>
+            <div>
+              <label className={labelClass} htmlFor="m-slot">Requested slot</label>
+              <input
+                id="m-slot"
+                className={inputClass}
+                value={form.slot}
+                placeholder="e.g. 4:00 PM – 6:00 PM"
+                onChange={(e) => update("slot", e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className={labelClass} htmlFor="m-priority">Priority</label>
+              <select id="m-priority" className={inputClass} value={form.priority} onChange={(e) => update("priority", e.target.value)}>
                 <option value="normal">Normal</option>
                 <option value="urgent">Urgent</option>
               </select>
             </div>
-
-            <div className="wsw-receptionist__field">
-              <label className="wsw-receptionist__label" htmlFor="m-technician">
-                Assign technician <span style={{ fontWeight: 400 }}>(optional)</span>
+            <div>
+              <label className={labelClass} htmlFor="m-technician">
+                Assign technician <span className="font-normal normal-case tracking-normal">(optional)</span>
               </label>
-              <select
-                id="m-technician"
-                className="wsw-receptionist__select"
-                value={form.technicianId}
-                onChange={(e) => update("technicianId", e.target.value)}
-              >
+              <select id="m-technician" className={inputClass} value={form.technicianId} onChange={(e) => update("technicianId", e.target.value)}>
                 <option value="">Leave unassigned</option>
                 {availableTechs.map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.name} — {t.skill}
-                  </option>
+                  <option key={t.id} value={t.id}>{t.name} — {t.skill}</option>
                 ))}
               </select>
             </div>
           </div>
 
-          <div className="wsw-receptionist__modal-actions">
-            <button type="submit" className="wsw-receptionist__primary-btn" disabled={submitting}>
+          <div className="flex gap-3 pt-1">
+            <button
+              type="submit"
+              disabled={submitting}
+              className="rounded-lg bg-[#074C3A] px-5 py-2.5 text-[13.5px] font-bold text-[#D1FE17] transition-transform duration-150 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-55"
+            >
               {submitting ? "Adding…" : "Add to queue"}
             </button>
-            <button type="button" className="wsw-receptionist__ghost-btn" onClick={onClose}>
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-lg border border-[#E3E5D6] px-5 py-2.5 text-[13.5px] font-bold text-[#074C3A] transition-colors hover:border-[#074C3A]"
+            >
               Cancel
             </button>
           </div>
         </form>
       </div>
-    </div>
-  );
-}
-
-function ModalField({ id, label, value, onChange, type = "text", placeholder }) {
-  return (
-    <div className="wsw-receptionist__field">
-      <label className="wsw-receptionist__label" htmlFor={id}>
-        {label}
-      </label>
-      <input  
-        id={id}
-        type={type}
-        className="wsw-receptionist__input"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-      />
     </div>
   );
 }
