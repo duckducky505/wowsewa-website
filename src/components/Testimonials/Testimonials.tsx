@@ -27,7 +27,7 @@ export default function Voices() {
           <div>
             <Reveal>
               <p className="mb-4 flex items-center gap-3 font-mono text-[11px] font-bold tracking-[0.3em] text-lime">
-                <span className="h-[3px] w-10 bg-lime" /> NEIGHBOURHOOD WORD — 8,200+ REVIEWS
+                <span className="h-[3px] w-10 bg-lime" /> NEIGHBOURHOOD WORD — 1000+ REVIEWS
               </p>
             </Reveal>
             <Reveal delay={100}>
@@ -41,7 +41,7 @@ export default function Voices() {
               <p className="font-display text-4xl font-extrabold leading-none text-lime">4.9</p>
               <div>
                 <StarRow />
-                <p className="mt-1 font-mono text-[10.5px] tracking-wide text-cream/55">ACROSS GOOGLE & APP STORE</p>
+                <p className="mt-1 font-mono text-[10.5px] tracking-wide text-cream/55">ACROSS GOOGLE</p>
               </div>
             </div>
           </Reveal>

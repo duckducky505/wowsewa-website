@@ -33,7 +33,7 @@ export default function Rates() {
             <div className="flex items-center gap-3 rounded-md border-2 border-pine bg-mist px-5 py-4">
               <IconSpark className="h-5 w-5 shrink-0 text-pine" />
               <p className="max-w-[260px] text-[13px] font-medium leading-snug text-pine/80">
-                Parts billed at MRP with bill photo attached. Quote changes need your approval first.
+                Prices are also Quotation based. Contact us through WhatsApp for more information.  
               </p>
             </div>
           </Reveal>

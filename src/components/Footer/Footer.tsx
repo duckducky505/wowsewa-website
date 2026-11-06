@@ -1,8 +1,9 @@
 import { Reveal, emitPrefill } from "../../lib/lib";
 import { LogoMark, IconPhone, IconChat, IconPin } from "../../assets/icons/Icons";
 import {
-  PHONE_TEL, PHONE_DISPLAY,
+  PHONE_TEL, PHONE_2_TEL, PHONE_DISPLAY,
   EMAIL, ADDRESS, SOCIALS,
+  PHONE_2_DISPLAY,
 } from "../../data/data";
 import logo from "../../assets/images/wowLogo2.png";
 
@@ -174,6 +175,10 @@ export default function Footer() {
                   <IconPhone className="mt-0.5 h-4 w-4 shrink-0 text-lime" />
                   <span className="flex flex-wrap gap-x-2 text-cream/70">
                     <a href={`tel:${PHONE_DISPLAY}`} className="transition-colors hover:text-lime">{PHONE_TEL}</a>
+                  </span>
+
+                  <span className="flex flex-wrap gap-x-2 text-cream/70">
+                    <a href={`tel:${PHONE_2_DISPLAY}`} className="transition-colors hover:text-lime">{PHONE_2_TEL}</a>
                   </span>
                 </li>
                 <li className="flex items-start gap-3">

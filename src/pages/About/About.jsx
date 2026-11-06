@@ -96,7 +96,7 @@ export default function About() {
                     </div>
                   </div>
                   <div className="absolute -left-2 bottom-6 -rotate-3 rounded-md bg-lime px-3.5 py-2 font-mono text-[11px] font-bold tracking-[0.12em] text-ink shadow-[5px_5px_0_0_rgba(1,10,8,0.6)] sm:-left-6">
-                    482 PROS ON CALL
+                     BOOK A SERVICE NOW
                   </div>
                 </div>
               </Reveal>
@@ -106,9 +106,9 @@ export default function About() {
               <div className="mt-16 grid grid-cols-2 gap-x-6 gap-y-8 border-t border-cream/15 pt-8 lg:grid-cols-4">
                 {[
                   { n: <><CountUp to={38} />k+</>, l: "HOMES SERVED" },
-                  { n: <CountUp to={482} />, l: "VETTED PROS" },
-                  { n: <>4.92<span className="text-[0.6em]">★</span></>, l: "AVERAGE RATING" },
-                  { n: <CountUp to={7} />, l: "CITIES COVERED" },
+                  { n: <CountUp to={50} />, l: "VETTED PROS" },
+                  { n: <>4.9<span className="text-[0.6em]">★</span></>, l: "AVERAGE RATING" },
+                  { n: <CountUp to={3} />, l: "CITIES COVERED" },
                 ].map((s) => (
                   <div key={s.l} className="group">
                     <p className="font-display text-[clamp(2rem,4vw,3rem)] font-extrabold leading-none text-lime transition-transform duration-300 group-hover:-translate-y-1">{s.n}</p>
@@ -170,7 +170,7 @@ export default function About() {
                     <IconShield className="h-4 w-4" /> THE 90-DAY PROMISE
                   </p>
                   <p className="mt-2.5 text-[13.5px] leading-relaxed text-cream/75">
-                    If the same fault returns within 90 days, we come back and fix it free. No forms,
+                    If the same fault returns within 30 days, we come back and fix it free. No forms,
                     no arguments — that's the whole policy.
                   </p>
                 </div>
@@ -246,8 +246,8 @@ export default function About() {
                       a reliable, all-in-one technical solution for the community.
                     </p>
                     <p>
-                      Under his leadership, WowSewa has grown to 40 trained professionals across seven
-                      cities, completing over 38,000 jobs with a 4.92-star average — while keeping the
+                      Under his leadership, WowSewa has grown to 50 trained professionals across seven
+                      cities, completing over 38,000 jobs with a 4.9-star average — while keeping the
                       promise that started it all: one trusted number for the whole home.
                     </p>
                   </div>
@@ -328,7 +328,7 @@ export default function About() {
                   Book a pro now <IconArrow className="h-5 w-5" />
                 </Link>
                 <Link
-                  to="/pro"
+                  to="/#book"
                   className="inline-flex items-center gap-2.5 rounded-md border-2 border-cream/30 px-7 py-3.5 font-display text-base font-bold text-cream transition-colors duration-300 hover:border-lime hover:text-lime"
                 >
                   Become a WowSewa pro

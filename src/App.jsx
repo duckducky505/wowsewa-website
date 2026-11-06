@@ -12,6 +12,7 @@ import WhattsappIcon from './components/Whattsapp/Whattsapp';
 import PrivacyPolicy from './pages/TermsAndConditions/WowPrivacy';
 import TermsAndConditions from './pages/TermsAndConditions/TermsAndConditions';
 import AMC from './pages/AMC/AMC';
+import AllServicesPage from './pages/AllServices/AllServices';
 
 function App() {
   return (
@@ -24,10 +25,7 @@ function App() {
           <Route path="/about-us" element={<About/>}/>
           <Route path="/amc" element={<AMC/>}/>
           <Route path="/training-wowsewa" element={<Training/>}/>
-          <Route path="/services/Plumbing-wowsewa" element={<Plumbing/>}/>
-          <Route path="/services/IT-wowsewa" element={<IT/>}/>
-          <Route path="/services/Electrical-wowsewa" element={<Electrical/>}/>
-          <Route path="/services/Appliances-wowsewa" element={<Appliances/>}/>
+          <Route path="/services" element={<AllServicesPage/>}/>
           <Route path="/linktree" element={<Linktree/>}/>
           <Route path="/privacy-policy" element={<PrivacyPolicy/>}/>
           <Route path="/terms-and-conditions" element={<TermsAndConditions/>}/>

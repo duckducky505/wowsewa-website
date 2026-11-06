@@ -30,8 +30,7 @@ export default function Process() {
           </Reveal>
           <Reveal delay={200}>
             <p className="mt-6 max-w-md text-[16px] leading-relaxed text-cream/70">
-              We built WowSewa because hiring a Sewa shouldn't mean three phone calls, a vague
-              "bholi aaunchu" and surprise bills. Four steps. Zero drama.
+              We built WowSewa because hiring a Sewa shouldn't mean three phone calls, and surprise bills. Four steps. Zero drama.
             </p>
           </Reveal>
           <Reveal delay={300}>

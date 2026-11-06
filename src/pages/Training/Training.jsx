@@ -16,7 +16,7 @@ const scrollToId = (id) =>
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 
 export default function Training() {
-  const [open, setOpen] = useState({ plumbing: true });
+  const [open, setOpen] = useState({ plumbing: true,electrician:true });
   const [track, setTrack] = useState(TRAINING_COURSES[0].name);
   const [form, setForm] = useState({ name: "", phone: "+977 ", city: "" });
   const [errs, setErrs] = useState({});
@@ -319,17 +319,16 @@ export default function Training() {
               <Reveal delay={200}>
                 <p className="mt-5 max-w-lg text-[15px] leading-relaxed text-cream/70">
                   Tell us which track interests you and our admissions team will reach out with the
-                  next batch dates, EMI options and campus details. Scholarships available for
-                  eligible candidates.
+                  next batch dates.
                 </p>
               </Reveal>
               <Reveal delay={300}>
                 <div className="mt-8 flex flex-wrap gap-3">
                   <span className="flex items-center gap-2.5 rounded-md border border-lime/40 bg-lime/10 px-4 py-2.5 font-mono text-[11px] font-bold tracking-[0.14em] text-lime">
-                    <span className="blink-dot h-1.5 w-1.5 rounded-full bg-lime" /> NEXT BATCH · 1 JULY 2026
+                    <span className="blink-dot h-1.5 w-1.5 rounded-full bg-lime" /> Learn with Fun.
                   </span>
                   <span className="rounded-md border border-cream/20 px-4 py-2.5 font-mono text-[11px] font-bold tracking-[0.14em] text-cream/70">
-                    EMI FROM RS. 1,500/MO
+                    Enroll Now
                   </span>
                 </div>
               </Reveal>

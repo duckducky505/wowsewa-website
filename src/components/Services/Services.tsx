@@ -116,8 +116,7 @@ export default function Services() {
           </div>
           <Reveal delay={200}>
             <p className="max-w-sm text-[15px] leading-relaxed text-ink/65">
-              Eight specialist crews, one dispatch desk. Every technician is trained at our Naxal
-              centre, carries original spare parts, and leaves a photo report before leaving your gate.
+              Eight specialist crews. Every technician has years of experience and professionalism.
             </p>
           </Reveal>
         </div>

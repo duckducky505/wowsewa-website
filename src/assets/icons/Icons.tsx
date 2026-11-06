@@ -58,6 +58,12 @@ export const IconBolt = ({ className = "h-6 w-6" }: P) => (
   </svg>
 );
 
+export const IconClose = ({ className = "h-6 w-6" }: P) => (
+  <svg {...S({ className })}>
+    <path d="M6 6l12 12M18 6 6 18" />
+  </svg>
+);
+
 export const IconWasher = ({ className = "h-6 w-6" }: P) => (
   <svg {...S({ className })}>
     <rect x="4" y="2.8" width="16" height="18.4" rx="2" />

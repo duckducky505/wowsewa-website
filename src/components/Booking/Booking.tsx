@@ -108,8 +108,7 @@ export default function Booking() {
           <Reveal delay={200}>
             <p className="mt-6 max-w-md text-[15.5px] leading-relaxed text-cream/70">
               Fill the desk form and a dispatcher calls you back within
-              <strong className="text-lime"> 5 minutes</strong> to confirm price and arrival window. Or just call —
-              a human picks up, day or night.
+              <strong className="text-lime"> 5 minutes</strong> to confirm price and arrival window. Or just call.
             </p>
           </Reveal>
 
@@ -118,8 +117,8 @@ export default function Booking() {
               {[
                 { Icon: IconClock, text: "45-minute average arrival inside ring-road" },
                 { Icon: IconShield, text: "30-day warranty — free revisit, same technician" },
-                { Icon: IconUser, text: "You approve the technician after seeing their profile" },
-                { Icon: IconPhone, text: "24/7 emergency line: 9762424318"}
+                { Icon: IconUser, text: "Verified Technicians." },
+                { Icon: IconPhone, text: "24/7 emergency line: 9762424318, 9824232439"}
               ].map(({ Icon, text }) => (
                 <li key={text} className="flex items-center gap-3.5 text-[14.5px] font-medium text-cream/80">
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-lime/40 bg-ink/40 text-lime">

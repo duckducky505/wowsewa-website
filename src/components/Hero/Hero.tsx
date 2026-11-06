@@ -2,9 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { Reveal, Scramble, emitPrefill } from "../../lib/lib";
 import { IconArrow, IconStar, IconCheck, IconUser } from "../../assets/icons/Icons";
 import { SERVICES, AREAS, PHONE_TEL } from "../../data/data";
-// import {fieldVideo} from "../../assets/videos/field-work.mp4"; 
-
-const SLIDE_MS = 14000;
 
 /* ---- feed icons (match the network card exactly) ---- */
 const Plumb = ({ s = 18 }: { s?: number }) => (
@@ -61,13 +58,12 @@ const clamp = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, n
 
 /* ---------------- LIVE FEED PANEL ---------------- */
 
-function LiveFeedPanel({ active }: { active: boolean }) {
+function LiveFeedPanel() {
   const [feed, setFeed] = useState(SEED);
   const [stats, setStats] = useState({ pros: 124, resp: 38 });
   const idRef = useRef(SEED.length);
 
   useEffect(() => {
-    if (!active) return;
     const tick = window.setInterval(() => {
       setFeed((prev) => {
         let job = JOB_POOL[Math.floor(Math.random() * JOB_POOL.length)];
@@ -85,10 +81,10 @@ function LiveFeedPanel({ active }: { active: boolean }) {
       }));
     }, 2800);
     return () => window.clearInterval(tick);
-  }, [active]);
+  }, []);
 
   return (
-    <div className="flex h-full flex-col bg-cream p-5 text-pine-deep">
+    <div className="flex h-full flex-col bg-cream p-5 text-pine-deep rounded-lg border-2 border-lime/40 shadow-hard-lime">
       {/* head */}
       <div className="flex items-center gap-3">
         <span className="grid h-[30px] w-[30px] shrink-0 place-items-center rounded-full bg-lime/25">
@@ -152,170 +148,6 @@ function LiveFeedPanel({ active }: { active: boolean }) {
               <span className={`h-[6px] w-[6px] rounded-full ${row.status === "done" ? "bg-[#16a34a]" : "bg-[#e0a106]"}`} />
               {row.status === "done" ? "Completed" : "In progress"}
             </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/* ---------------- FIELD FILM PANEL (real video) ---------------- */
-
-function FilmPanel({ active }: { active: boolean }) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [playing, setPlaying] = useState(true);
-  const [muted, setMuted] = useState(true);
-
-  // Pause the video when this slide isn't showing, resume when it comes back
-  // into view (matches how the other panels gate their intervals on `active`).
-  useEffect(() => {
-    const vid = videoRef.current;
-    if (!vid) return;
-    if (active && playing) {
-      vid.play().catch(() => {});
-    } else {
-      vid.pause();
-    }
-  }, [active, playing]);
-
-  const togglePlay = () => setPlaying((p) => !p);
-  const toggleMute = () => {
-    setMuted((m) => {
-      const next = !m;
-      if (videoRef.current) videoRef.current.muted = next;
-      return next;
-    });
-  };
-
-  return (
-    <div className="flex h-full flex-col">
-      {/* film header */}
-      <div className="flex items-center justify-between border-b border-cream/10 px-5 py-3">
-        <div className="flex items-center gap-2.5">
-          <span className={`h-2.5 w-2.5 rounded-full ${playing ? "blink-dot bg-[#ff5a4e]" : "bg-cream/30"}`} />
-          <p className="font-mono text-[11px] font-bold tracking-[0.22em] text-lime">FIELD CAM · KTM VALLEY</p>
-        </div>
-        <button
-          onClick={toggleMute}
-          aria-label={muted ? "Unmute video" : "Mute video"}
-          className="font-mono text-[11px] font-bold tracking-widest text-cream/70 transition-colors hover:text-lime"
-        >
-          {muted ? "MUTED" : "SOUND ON"}
-        </button>
-      </div>
-
-      {/* screen */}
-      <div className="group relative flex-1 overflow-hidden bg-ink">
-        <video
-          ref={videoRef}
-          // src={fieldVideo}
-          className="h-full w-full object-cover"
-          autoPlay
-          loop
-          muted={muted}
-          playsInline
-        />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-ink/20" aria-hidden="true" />
-
-        {/* play / pause */}
-        <button
-          onClick={togglePlay}
-          aria-label={playing ? "Pause video" : "Play video"}
-          className={`absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-lime text-ink shadow-hard transition-all duration-300 hover:scale-110 ${
-            playing ? "opacity-0 group-hover:opacity-100" : "opacity-100"
-          }`}
-        >
-          {playing ? (
-            <svg viewBox="0 0 24 24" className="h-7 w-7" fill="currentColor"><path d="M7 5h4v14H7zM13 5h4v14h-4z" /></svg>
-          ) : (
-            <svg viewBox="0 0 24 24" className="ml-1 h-7 w-7" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
-          )}
-        </button>
-      </div>
-    </div>
-  );
-}
-
-/* ---------------- SHOWCASE SHELL ---------------- */
-
-const SLIDES = [
-  { id: "live", label: "LIVE FEED" },
-  { id: "film", label: "FIELD FILM" },
-] as const;
-
-function Showcase() {
-  const reduced =
-    typeof window !== "undefined" &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  const [idx, setIdx] = useState(0);
-  const [paused, setPaused] = useState(reduced);
-  const [cycle, setCycle] = useState(0);
-
-  useEffect(() => {
-    if (paused) return;
-    const t = window.setTimeout(() => {
-      setIdx((i) => (i + 1) % SLIDES.length);
-      setCycle((c) => c + 1);
-    }, SLIDE_MS);
-    return () => window.clearTimeout(t);
-  }, [idx, paused, cycle]);
-
-  const panels = [
-    <LiveFeedPanel key="live" active={idx === 0} />,
-    <FilmPanel key="film" active={idx === 1} />,
-  ];
-
-  return (
-    <div className="relative overflow-hidden rounded-lg border-2 border-lime/40 bg-pine-deep shadow-hard-lime">
-      {/* tab header */}
-      <div className="flex items-center justify-between gap-2 border-b border-cream/10 bg-ink/40 px-3 py-2.5">
-        <div className="flex flex-1 items-center gap-1.5">
-          {SLIDES.map((s, i) => (
-            <button
-              key={s.id}
-              onClick={() => { setIdx(i); setCycle((c) => c + 1); }}
-              className={`rounded-md px-3 py-1.5 font-mono text-[10.5px] font-bold tracking-[0.14em] transition-all duration-300 ${
-                i === idx
-                  ? "bg-lime text-ink"
-                  : "text-cream/55 hover:bg-cream/10 hover:text-cream"
-              }`}
-            >
-              0{i + 1} {s.label}
-            </button>
-          ))}
-        </div>
-        <span className="hidden items-center gap-1.5 font-mono text-[10px] font-bold tracking-widest sm:flex">
-          <span className={`h-2 w-2 rounded-full ${paused ? "bg-cream/35" : "blink-dot bg-[#ff5a4e]"}`} />
-          <span className={paused ? "text-cream/45" : "text-[#ff5a4e]"}>{paused ? "HOLD" : "ON AIR"}</span>
-        </span>
-      </div>
-
-      {/* cycle timer */}
-      <div className="h-1 w-full bg-cream/10">
-        <div
-          key={`${idx}-${cycle}-${paused}`}
-          className="timer-bar h-full bg-lime"
-          style={{
-            animationPlayState: paused ? "paused" : "running",
-            ["--timer-ms" as string]: `${SLIDE_MS}ms`,
-          } as React.CSSProperties}
-        />
-      </div>
-
-      {/* panels */}
-      <div className="relative h-[468px] sm:h-[478px]">
-        {panels.map((p, i) => (
-          <div
-            key={SLIDES[i].id}
-            className={`absolute inset-0 transition-all duration-500 ${
-              i === idx
-                ? "translate-y-0 opacity-100"
-                : "pointer-events-none translate-y-3 opacity-0"
-            }`}
-            aria-hidden={i !== idx}
-          >
-            {p}
           </div>
         ))}
       </div>
@@ -474,16 +306,16 @@ export default function Hero() {
 
           <Reveal delay={640}>
             <div className="mt-6 flex flex-wrap items-center gap-x-7 gap-y-2 font-mono text-[11px] tracking-wide text-cream/55">
-              <span className="flex items-center gap-1.5"><IconStar className="h-3.5 w-3.5 text-lime" /> 4.9 · 8,200+ reviews</span>
+              <span className="flex items-center gap-1.5"><IconStar className="h-3.5 w-3.5 text-lime" /> 4.9 · 1000+ reviews</span>
               <span className="flex items-center gap-1.5"><IconUser className="h-4 w-4 text-lime" /> Background-verified crew</span>
               <span className="flex items-center gap-1.5"><IconCheck className="h-4 w-4 text-lime" /> Pay after the job</span>
             </div>
           </Reveal>
         </div>
 
-        {/* ---------------- right : on-air showcase ---------------- */}
-        <Reveal dir="right" delay={250} className="relative">
-          <Showcase />
+        {/* ---------------- right : standalone live feed ---------------- */}
+        <Reveal dir="right" delay={250} className="relative h-[480px]">
+          <LiveFeedPanel />
         </Reveal>
       </div>
     </section>

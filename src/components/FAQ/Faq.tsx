@@ -35,7 +35,7 @@ export default function Faq() {
           <Reveal delay={300}>
             <div className="mt-8 overflow-hidden rounded-lg border-2 border-pine bg-pine text-cream shadow-hard-ink">
               <div className="border-b border-cream/12 px-6 py-4">
-                <p className="font-mono text-[10px] font-bold tracking-[0.25em] text-lime">TALK TO A HUMAN</p>
+                <p className="font-mono text-[10px] font-bold tracking-[0.25em] text-lime">TALK TO US</p>
               </div>
               <div className="flex flex-col gap-4 p-6">
                 <a href={`tel:${PHONE_TEL}`} className="group flex items-center gap-4">

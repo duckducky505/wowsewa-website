@@ -62,8 +62,15 @@ export const SERVICES: Service[] = [
     name: "Plumbing",
     tag: "LEAK-FREE GUARANTEE",
     desc: "From dripping taps to full bathroom refits — our plumbers arrive with parts, not promises.",
-    items: ["Tap, mixer & shower repair", "Geyser installation & descaling", "Toilet & drainage unblocking", "Pipe leakage detection"],
-    price: 399,
+    items: [
+      "Water Leakage Detection & Repair",
+      "Tap, Faucet & Sanitary Installation",
+      "Bathroom & Kitchen Plumbing",
+      "Drainage Blockage & Cleaning",
+      "Water Pump Installation & Repair",
+      "New Plumbing Installation & Maintenance",
+    ],
+    price: 1000,
     Icon: IconWrench,
   },
   {
@@ -71,64 +78,112 @@ export const SERVICES: Service[] = [
     name: "Electrical",
     tag: "LICENSED & INSURED",
     desc: "Certified electricians for wiring, switchboards and everything that sparks — done to code.",
-    items: ["Full house wiring & rewiring", "Switchboard & MCB upgrade", "Fan, light & inverter setup", "Short-circuit emergency call"],
-    price: 449,
+    items: [
+      "House & Commercial Wiring",
+      "Electrical Fault Detection & Repair",
+      "Lighting Installation & Repair",
+      "Switch, Socket & Electrical Fittings",
+      "Electrical Panel & Distribution Board",
+      "New Electrical Setup & Maintenance",
+    ],
+    price: 1000,
     Icon: IconBolt,
-  },
-  {
-    id: "appliance",
-    name: "Appliance Installation",
-    tag: "SAME-DAY FIT",
-    desc: "Washing machine to wall-mounted TV — levelled, tested and warrantied on the spot.",
-    items: ["Washing machine & dryer install", "Fridge, microwave & oven setup", "TV wall mounting & bracket", "Water purifier & RO service"],
-    price: 499,
-    Icon: IconWasher,
   },
   {
     id: "it",
     name: "IT & Device Repair",
     tag: "NO-FIX, NO-FEE",
     desc: "Laptops, phones, printers, Wi-Fi dead zones — our bench techs and field IT crew handle it all.",
-    items: ["Laptop & PC repair / upgrades", "Phone screen & battery swap", "Printer & CCTV servicing", "Router, mesh & NAS setup"],
-    price: 549,
+    items: [
+      "Laptop, MacBook & Desktop Repair",
+      "Gaming Laptop & PC Servicing",
+      // "Mobile Phone & Tablet Repair",
+      "Printer & Scanner Repair",
+      "Hardware & Software Troubleshooting",
+      "Computer Upgrades & Maintenance",
+      "Toner & Ink Refilling",
+    ],
+    price: 1500,
     Icon: IconChip,
     accent: true,
   },
   {
-    id: "ac",
+    id: "appliance-installation",
+    name: "Appliance Installation",
+    tag: "SAME-DAY FIT",
+    desc: "Washing machine to wall-mounted TV — levelled, tested and warrantied on the spot.",
+    items: [
+      "Home Appliance Installation & Setup",
+      "Kitchen Appliance Installation",
+      "TV Installation & Wall Mounting",
+      "Water Purifier Installation",
+      "Appliance Relocation & Reinstallation",
+    ],
+    price: 1000,
+    Icon: IconWasher,
+  },
+  {
+    id: "ac-heating",
     name: "AC & Heating",
     tag: "GAS-CHECK INCLUDED",
     desc: "Split or window AC, room heaters, air purifiers — serviced with pressure gauges, not guesswork.",
-    items: ["AC service & gas top-up", "AC installation / relocation", "Heater & radiator repair", "Air purifier filter care"],
-    price: 699,
+    items: [
+      "AC Installation, Repair & Servicing",
+      "AC Gas Refilling & Leakage Repair",
+      "Electric & Gas Geyser Services",
+      "Solar Water Heater Services",
+      "Room Heater Repair & Maintenance",
+      "Heating System Installation & Repair",
+    ],
+    price: 1000,
     Icon: IconSnow,
   },
   {
-    id: "painting",
-    name: "Painting & Wall Care",
-    tag: "ZERO-MESS PROMISE",
-    desc: "Interior, exterior and texture work with damp-proofing — floors covered, lines crisp.",
-    items: ["Interior & exterior painting", "Damp proofing & seepage fix", "Wall texture & POP work", "Minor cracks & putty repair"],
-    price: 2999,
-    Icon: IconRoller,
+    id: "cctv-networking",
+    name: "CCTV & Networking",
+    tag: "SECURE & CONNECTED",
+    desc: "Complete surveillance and network infrastructure setup for homes and commercial spaces.",
+    items: [
+      "CCTV Installation, Repair & Maintenance",
+      "DVR & NVR Setup & Configuration",
+      "Wi-Fi Router Installation & Troubleshooting",
+      "LAN & Office Networking",
+      "Network Cabling & Maintenance",
+      "Biometric & Access Control Systems",
+    ],
+    price: 1000,
+    Icon: IconShield,
   },
   {
-    id: "carpentry",
-    name: "Carpentry & Furniture",
-    tag: "MM-PERFECT",
-    desc: "Squeaky hinges to full modular builds — precise joinery from our in-house carpenters.",
-    items: ["Door, lock & hinge repair", "Modular wardrobe & kitchen", "Bed, sofa & table restoration", "Curtain & blind fitting"],
-    price: 449,
-    Icon: IconHammer,
+    id: "solar-ups",
+    name: "Solar & UPS",
+    tag: "UNINTERRUPTED POWER",
+    desc: "Reliable green energy solutions and backup systems to keep your home and office running.",
+    items: [
+      "Solar Panel Installation & Maintenance",
+      "Solar Inverter Installation & Repair",
+      "UPS & Inverter Repair & Maintenance",
+      "Battery Installation & Replacement",
+      "Home & Office Power Backup Solutions",
+    ],
+    price: 999,
+    Icon: IconSwitch,
   },
   {
-    id: "cleaning",
-    name: "Deep Cleaning",
-    tag: "ECO CHEMICALS",
-    desc: "Homes, offices and water tanks — a trained crew with machine scrubbers and eco chemicals.",
-    items: ["Full home / office deep clean", "Kitchen, chimney & exhaust", "Water tank cleaning", "Sofa, carpet & pest control"],
-    price: 1199,
-    Icon: IconSpray,
+    id: "appliance-repair",
+    name: "Home & Kitchen Appliance Repair",
+    tag: "EXPERT REPAIR",
+    desc: "Fast, reliable repair services for all major home and kitchen appliances right at your doorstep.",
+    items: [
+      "Microwave Oven & Induction Cooker Repair",
+      "Washing Machine Repair & Servicing",
+      "Refrigerator & Deep Freezer Repair",
+      "Electric Oven & Kitchen Appliance Repair",
+      "Rice Cooker, Mixer & Grinder Repair",
+      "Vacuum Cleaner & Small Appliance Repair",
+    ],
+    price: 1000,
+    Icon: IconWrench,
   },
 ];
 
@@ -147,43 +202,50 @@ export type Tech = {
 /* ---------------- process ---------------- */
 export const STEPS = [
   { n: "01", title: "Book in 60 seconds", desc: "Pick a service, drop your address and time slot — on the web, the app, or one call to our hotline. No signup wall, no nonsense." },
-  { n: "02", title: "Get matched instantly", desc: "Our dispatcher assigns the nearest verified technician. You see their photo, rating and live location before they knock." },
-  { n: "03", title: "Watch it get fixed", desc: "Upfront pricing shown before work starts. The technician shares before/after photos of every job — you approve each step." },
-  { n: "04", title: "Pay only when satisfied", desc: "Cash, eSewa, Khalti, FonePay or card — after the job passes your check. Every repair carries a 30-day service warranty." },
+  { n: "02", title: "Get matched instantly", desc: "WowSewa assigns the verified technician." },
+  { n: "03", title: "Watch it get fixed", desc: "WowSewa ensures you are fully satisfied with the job our technicians do." },
+  { n: "04", title: "Pay after the job is done.", desc: "Cash, eSewa, Khalti, FonePay or card — after the job passes your check. Every repair carries a 30-day service warranty." },
 ];
 
 /* ---------------- stats ---------------- */
 export const STATS = [
   { value: 12480, suffix: "+", label: "Jobs completed" },
-  { value: 350, suffix: "+", label: "Verified technicians" },
+  { value: 50, suffix: "+", label: "Verified technicians" },
   { value: 45, suffix: " min", label: "Avg. arrival time" },
   { value: 98, suffix: "%", label: "Would rebook" },
 ];
 
 /* ---------------- rates ---------------- */
 export const RATES = [
-  { service: "Tap / mixer repair", includes: "Washer, cartridge or full tap swap incl. testing", price: 399 },
-  { service: "Ceiling fan installation", includes: "Mounting, wiring, capacitor check & balancing", price: 449 },
-  { service: "Washing machine install", includes: "Inlet/drain fitting, levelling & trial wash", price: 499 },
-  { service: "Laptop diagnosis + service", includes: "Deep clean, thermal paste, SSD-ready report", price: 549 },
-  { service: "Split AC full service", includes: "Jet-pump wash, gas pressure check, filter care", price: 699 },
-  { service: "Water tank cleaning (1000 L)", includes: "Desludge, scrub, disinfectant & refill test", price: 1199 },
-  { service: "Room repaint (12×12 ft)", includes: "2-coat emulsion, putty touch-up, floor masking", price: 2999 },
+  { service: "Plumbing Inspection & Diagnosis", includes: "Thorough check and diagnostic report for plumbing issues", price: 1000 },
+  { service: "Water Leakage Repair", includes: "Locating and repairing pipe leaks, valves, or fittings", price: 1500 },
+
+  { service: "Basic Electrical Repair", includes: "Fixing switches, sockets, light fixtures, or minor shorts", price: 1000 },
+
+  { service: "Normal Laptop & Desktop Servicing", includes: "Internal cleaning, thermal paste replacement, and software check", price: 1500 },
+  { service: "Gaming Laptop & PC Servicing", includes: "High-performance rig cleaning, thermal service, and diagnostic test", price: 2500 },
+  { service: "Normal Laptop Motherboard Repair", includes: "Component-level diagnosis and repair for standard laptops", price: 4500 },
+  { service: "Gaming Laptop Motherboard Repair", includes: "Advanced diagnostic and component repair for high-end gaming laptops", price: 8500 },
+
+  // Solar & UPS
+  { service: "Site Visit & Inspection", includes: "On-site assessment for solar, UPS, and backup requirements", price: 1000 },
 ];
 
 /* ---------------- testimonials ---------------- */
 export const TESTIMONIALS = [
-  { quote: "Geyser burst at 7 AM before Dashain guests arrived. Ramesh ji was at my door in 40 minutes, fixed the valve and descaled the whole unit. The before/after photos in the app? Chef's kiss.", name: "Sandhya R.", place: "Lazimpat, Kathmandu", service: "Plumbing", big: true },
-  { quote: "Booked a washing machine install at 11, Sunita did the trial wash by 1 PM. Levelled perfectly, no extra 'bhauda' charges.", name: "Nabin P.", place: "Jhamsikhel, Lalitpur", service: "Appliance", big: false },
-  { quote: "Anisha replaced my laptop screen at my office desk in New Baneshwor. Same-day, genuine panel, 6-month warranty slip.", name: "Pratiksha M.", place: "New Baneshwor, Kathmandu", service: "IT Repair", big: false },
-  { quote: "Full house repaint done in 4 days — crisp lines, zero paint on my parquet, and they even re-hung the frames. The 30-day warranty is real; they came back for one touch-up without arguing.", name: "Kishor & Ritu S.", place: "Budhanilkantha, Kathmandu", service: "Painting", big: false },
+  { quote: "Their technicians fixed my office network issue within just a few hours! The service was fast, efficient, and very affordable. The team was friendly, professional, and clearly knew what they where doing. Truly a trusted handyman service you can count on.", name: "Sutput Official", place: "Gongabu, Kathmandu", service: "Networking", big: true },
+  { quote: "My gaming pc was like a turtle extremely slow i gave it  wow sewa . they did a super clean gaming laptop servicing  clean my software trash and then now my laptop super fast and smooth . than you so much wow sewa. and they also pick and dorp my loptop its really a wow service and they also speak so politely .its amazing to find service provider like them. thank you again", name: "Harish Dhital", place: ",Kathmandu", service: "IT and Repair", big: false },
+  { quote: "Wowsewa ensures the safety and functionality of electrical systems, handling everything from routine maintenance to complex installations with precaution and care. ", name: "Vek Rum Tamang", place: "Jhamsikhel, Lalitpur", service: "Electrical Service", big: false },
+  { quote: "We’ve been using WOW Sewa services for quite some time now for various needs like plumbing, electrical work, TV and washing machine repairs, and more — and the experience has been consistently excellent.", name: "Niranjana Jha ", place: "New Baneshwor, Kathmandu", service: "Plumbing", big: false },
+  { quote: "Had a good experience with Wow Sewa. This was my first time with the company.Repaired my brothers printer with them and the work was satisfactory and prices seems to be reasonable as well. I definitely recommend Wow Sewa .",name: "Niranjana Jha ", service: "IT Repair", big: false },
+  { quote: "I was so stressed out about my laptop as it had some issues with motherboard but fortunately found out about WowSewa and their services through Twitter. Saved me my commute time as they provided pick and drop service as well. As it was urgently needed, they provided prompt service and got it repaired in the same day, took couple of hours. Technician Jiwan Sir was professional, transparent and communicated well about the repair process and provided me full assurance regarding the repair. Krishna Sir was also prompt with the delivery and very professional. Overall, Wow Sewa is a good place to have your laptop promptly serviced and I will surely be using their service again if needed! Thank you, WowSewa!", name: "Law Rijal", service: "IT and Repair", big: false },
 ];
 
 /* ---------------- FAQ ---------------- */
 export const FAQS = [
-  { q: "How fast can a technician actually reach me?", a: "Inside the Kathmandu valley ring-road our average arrival is 45 minutes. Emergency electrical and plumbing calls are prioritised 24/7. For Pokhara, Chitwan and Butwal we offer same-day or next-morning slots depending on zone." },
-  { q: "Are your technicians verified?", a: "Every technician passes a 3-step check: citizenship and background verification, a trade skill test at our Naxal training centre, and a 2-week supervised apprenticeship. Electricians hold NEA-recognised licenses." },
-  { q: "How does pricing work? Any hidden charges?", a: "You see a starting price before booking and a firm quote on the app before work begins. Spare parts are billed at MRP with the bill photo attached. If the final job differs from the quote, you approve the change first — always." },
+  { q: "How fast can a technician actually reach me?", a: "Inside the Kathmandu valley ring-road our average arrival is 45 minutes. Emergency electrical and plumbing calls are prioritised 24/7." },
+  { q: "Are your technicians verified?", a: "Every technician passes a 3-step check: citizenship and background verification, a trade skill test, and a 2-week supervised apprenticeship." },
+  { q: "How does pricing work? Any hidden charges?", a: "You see a starting price before booking and we will provide a firm quote before work begins. If the final job differs from the quote, you approve the change first — always." },
   { q: "What if the problem comes back after repair?", a: "Every job carries a 30-day service warranty. Report the issue from the app and the same technician returns free of cost — usually within 24 hours. Parts carry their own manufacturer warranty on top." },
   { q: "Which payment methods do you accept?", a: "Cash on completion, eSewa, Khalti, FonePay QR, connectIPS and all major cards. For corporate and building contracts we also do monthly invoicing with 13% VAT bills." },
   { q: "Do you handle offices, shops and new-build projects?", a: "Yes. Our projects team handles AMC contracts for offices, hotels and housing colonies — annual electrical audits, plumbing AMCs, IT fleet care and scheduled deep cleaning with a single monthly invoice." },
@@ -285,14 +347,163 @@ export const AMC_MARQUEE = ["Plumbing", "Electrical", "IT & Devices", "Appliance
 
 /* ---------------- training & academy ---------------- */
 export const TRAINING_COURSES = [
-  { id: "plumbing", name: "Plumbing Pro", icon: IconPipe, sub: "Pipes, fittings and leak-free installs.", price: "14,000", weeks: "6 weeks", level: "Beginner → Job-ready", desc: "Master domestic plumbing end-to-end — from reading layouts to pressure-testing a finished bathroom.", modules: ["Tools, materials & safety", "Tap, mixer & sanitaryware fitting", "Leak detection & sealing", "Geyser & pump installation", "Drainage & unclogging", "Live on-site practicals"] },
-  { id: "electrical", name: "Electrical Pro", icon: IconBolt, sub: "Wiring, boards and safe power.", price: "16,500", weeks: "8 weeks", level: "Beginner → Licensed-ready", desc: "Residential wiring and load management with an emphasis on safety codes and certification readiness.", modules: ["Electrical safety & tools", "Circuits, loads & wiring", "Switchboards & DB boxes", "MCBs, fuses & earthing", "Lighting & appliance points", "Live on-site practicals"] },
-  { id: "appliance", name: "Appliance Repair", icon: IconSnow, sub: "AC, fridge & washing machine mastery.", price: "18,000", weeks: "8 weeks", level: "Intermediate", desc: "Diagnose and repair the big machines, including gas handling and brand-specific install procedures.", modules: ["Diagnostics & tools", "Refrigeration & gas handling", "AC install & service", "Washing machine repair", "Brand-specific procedures", "Live on-site practicals"] },
-  { id: "it", name: "IT & Devices", icon: IconChip, sub: "Networks, devices & smart homes.", price: "13,500", weeks: "5 weeks", level: "Beginner", desc: "Set up and troubleshoot the connected home — Wi-Fi, CCTV, printers, smart devices and basic hardware.", modules: ["Networking basics", "Wi-Fi & mesh setup", "CCTV & video doorbells", "Printers & peripherals", "Smart-home devices", "Live on-site practicals"] },
-  { id: "cleaning", name: "Pro Deep-Clean", icon: IconSparkle, sub: "Commercial-grade cleaning craft.", price: "9,500", weeks: "4 weeks", level: "Beginner", desc: "Operate professional equipment and chemicals safely for spotless, repeatable results at speed.", modules: ["Chemicals & safety", "Equipment handling", "Kitchen & bathroom deep-clean", "Floor & surface care", "Sofa & upholstery care", "Live on-site practicals"] },
-  { id: "service", name: "Service Excellence", icon: IconShield, sub: "The WowSewa way with customers.", price: "4,500", weeks: "2 weeks", level: "All tracks", desc: "The soft-skills layer every WowSewa pro completes — communication, pricing transparency and trust.", modules: ["Customer communication", "Pricing transparency", "On-site etiquette", "Handling complaints", "The WowSewa promise", "Final assessment"] },
+  {
+    id: "electrician",
+    name: "Electrician Training (Upto Level 2)",
+    icon: IconBolt,
+    sub: "Wiring, boards and safe power.",
+    price: "15,000",
+    level: "Beginner → Level 2",
+    desc: "Residential and commercial wiring with a heavy focus on electrical safety codes, switchboards, and fault diagnostics.",
+    modules: [
+      "Electrical Safety & Tools",
+      "House & Commercial Wiring",
+      "Switches, Sockets, Lights & Fans",
+      "MCB, MCCB, RCCB & Distribution Boards",
+      "Single-Phase & Three-Phase Systems",
+      "Earthing & Electrical Protection",
+      "Motor Control & Star-Delta Connections",
+      "Electrical Fault Detection & Troubleshooting",
+    ],
+  },
+  {
+    id: "plumbing",
+    name: "Plumbing Training",
+    icon: IconPipe,
+    sub: "Pipes, fittings and leak-free installs.",
+    price: "15,000",
+    level: "Beginner → Job-ready",
+    desc: "Master domestic plumbing end-to-end — from reading layouts to pressure-testing finished bathrooms.",
+    modules: [
+      "Plumbing Tools & Materials",
+      "Water Supply & Drainage Systems",
+      "Pipe Cutting, Joining & Fittings",
+      "Tap, Faucet, Basin & Toilet Installation",
+      "Bathroom & Kitchen Plumbing",
+      "Water Pump & Pressure Systems",
+      "Leakage Detection & Repair",
+      "Plumbing Maintenance & Troubleshooting",
+    ],
+  },
+  {
+    id: "cctv-installation",
+    name: "CCTV Installation & Maintenance Training",
+    icon: IconShield,
+    sub: "Surveillance, NVR setup and remote views.",
+    price: "15,000",
+    level: "Beginner → Technician",
+    desc: "Complete surveillance setup for homes and commercial locations covering analog, IP, and PoE systems.",
+    modules: [
+      "CCTV Camera Types & Components",
+      "Analog & IP Camera Installation",
+      "DVR & NVR Configuration",
+      "CCTV Cabling & Connections",
+      "Remote Viewing & Mobile Access",
+      "Recording & Storage Management",
+      "PoE Camera Systems",
+      "CCTV Fault Detection & Maintenance",
+    ],
+  },
+  {
+    id: "computer-networking",
+    name: "Computer Networking Training",
+    icon: IconChip,
+    sub: "LAN, routers, Wi-Fi and network security.",
+    price: "15,000",
+    level: "Beginner → Pro",
+    desc: "Build network infrastructure from scratch—covering RJ45 crimping, MikroTik routers, VLANs, and Wi-Fi grids.",
+    modules: [
+      "Networking Fundamentals",
+      "LAN Cabling & RJ45 Crimping",
+      "IP Addressing & Subnetting",
+      "Router & Switch Configuration",
+      "Wi-Fi & Access Point Setup",
+      "MikroTik Router Configuration",
+      "VLAN, DHCP & Network Security",
+      "Network Troubleshooting & Maintenance",
+    ],
+  },
+  {
+    id: "computer-hardware",
+    name: "Computer Hardware & Software Training",
+    icon: IconChip,
+    sub: "Assembly, OS install and component servicing.",
+    price: "15,000",
+    level: "Beginner",
+    desc: "Desktop assembly, laptop maintenance, OS installations, and hardware fault diagnostics.",
+    modules: [
+      "Computer Components & Hardware",
+      "Desktop Assembly & Disassembly",
+      "Laptop Hardware Maintenance",
+      "Windows Installation & Configuration",
+      "Drivers & Software Installation",
+      "RAM, SSD & Storage Upgrades",
+      "Hardware Fault Diagnosis",
+      "Computer Servicing & Troubleshooting",
+    ],
+  },
+  // --- Not available yet: uncomment when these courses launch ---
+  // {
+  //   id: "ac-refrigeration",
+  //   name: "AC & Refrigeration Training",
+  //   icon: IconSnow,
+  //   sub: "Split ACs, gas charging and cooling systems.",
+  //   price: "Contact for Details",
+  //   level: "Intermediate",
+  //   desc: "Diagnose, service, and repair air conditioners, refrigerators, and deep freezers with proper gas handling.",
+  //   modules: [
+  //     "AC & Refrigeration Fundamentals",
+  //     "Split AC Installation & Servicing",
+  //     "Refrigeration Cycle & Components",
+  //     "Refrigerant Handling & Charging",
+  //     "Compressor & Electrical Components",
+  //     "Leakage Detection & Troubleshooting",
+  //     "Refrigerator & Deep Freezer Repair",
+  //     "Preventive Maintenance",
+  //   ],
+  // },
+  // {
+  //   id: "washing-machine",
+  //   name: "Washing Machine & Home Appliance Training",
+  //   icon: IconWasher,
+  //   sub: "Front/top loads, PCBs and home appliance care.",
+  //   price: "Contact for Details",
+  //   level: "Intermediate",
+  //   desc: "Master motor diagnostics, error codes, PCB troubleshooting, and general home appliance repairs.",
+  //   modules: [
+  //     "Washing Machine Components",
+  //     "Front Load & Top Load Systems",
+  //     "Motor, Pump & Sensor Diagnosis",
+  //     "Washing Machine Error Codes",
+  //     "PCB & Electrical Troubleshooting",
+  //     "Microwave & Induction Cooker Basics",
+  //     "Geyser & Home Appliance Maintenance",
+  //     "Practical Fault Detection & Repair",
+  //   ],
+  // },
+  {
+    id: "printer-scanner",
+    name: "Printer & Scanner Repair Training",
+    icon: IconBolt,
+    sub: "Cartridges, printheads, and network printing.",
+    price: "15,000",
+    level: "Beginner → Tech",
+    desc: "Inkjet, laser, and multifunction printer servicing, cartridge refilling, and component-level repairs.",
+    modules: [
+      "Printer Types & Working Principles",
+      "Inkjet, Laser & Multifunction Printers",
+      "Printer Assembly & Disassembly",
+      "Ink & Toner Cartridge Refilling",
+      "Printhead Cleaning & Maintenance",
+      "Paper Jam & Roller Repair",
+      "Printer Hardware & Component Diagnosis",
+      "Scanner Repair & Troubleshooting",
+      "Printer Installation & Network Configuration",
+      "Common Printer Errors & Troubleshooting",
+      "Printer Servicing & Preventive Maintenance",
+    ],
+  },
 ];
-
 export const TRAINING_STEPS = [
   { n: "01", h: "Enroll & assess", v: "pine-deep", body: "Pick a trade track, complete a short aptitude check, and we place you at the right level." },
   { n: "02", h: "Learn hands-on", v: "ink", body: "Classroom theory paired with real tools and live job sites — not just slides and videos." },
@@ -306,6 +517,8 @@ export const TRAINING_STEP_STYLES: Record<string, string> = {
   lime: "bg-lime border-ink text-ink hover:-translate-y-1.5",
   pine: "bg-pine border-lime/30 text-cream hover:border-lime",
 };
+
+
 
 /* ---------------- about ---------------- */
 export const ABOUT_TRADES = ["Plumbing", "Electrical", "Appliances", "IT & Devices", "Deep Cleaning", "24×7 Emergency"];
@@ -321,7 +534,7 @@ export const ABOUT_JOURNEY = [
   { year: "2023", t: "WowSewa is born", d: "Launched in Kathmandu with 20 local plumbers and electricians and a single promise: show up on time, price it fairly." },
   { year: "2024", t: "Four trades, one app", d: "Launched our official mobile platform, added appliances and IT & devices to the lineup, and introduced our signature 90-day repair warranty." },
   { year: "2025", t: "Full Valley expansion", d: "Expanded operations seamlessly across Kathmandu, backing up residents with our 24×7 emergency desk." },
-  { year: "2026", t: "38,000 homes & counting", d: "Over 480 vetted local pros, a 4.92-star average, and the launch of annual maintenance packages trusted by families across the capital." },
+  { year: "2026", t: "38,000 homes & counting", d: "Over 50+ vetted local pros, a 4.9-star average, and the launch of annual maintenance packages trusted by families across the capital." },
 ];
 
 /* ---------------- legal ---------------- */
@@ -342,26 +555,25 @@ export const LEGAL_TERMS = [
 ];
 
 /* ---------------- misc ---------------- */
-export const AREAS = ["Kathmandu", "Lalitpur", "Bhaktapur", "Kirtipur", "Pokhara", "Chitwan", "Butwal", "Dharan"];
+export const AREAS = ["Kathmandu", "Lalitpur", "Bhaktapur"];
 
 export const SLOTS = ["Morning · 8–11 AM", "Midday · 11 AM–2 PM", "Afternoon · 2–5 PM", "Evening · 5–8 PM", "Emergency · ASAP"];
 
 export const TICKER_ITEMS = [
   "PLUMBING",
   "ELECTRICAL",
-  "APPLIANCE INSTALL",
-  "IT & DEVICES",
+  "IT & DEVICE REPAIR",
+  "APPLIANCE INSTALLATION",
   "AC & HEATING",
-  "PAINTING",
-  "CARPENTRY",
-  "DEEP CLEANING",
-  "24/7 EMERGENCY",
+  "CCTV AND NETWORKING",
+  "SOLAR & UPS",
+  "HOME & KITCHEN APPLIANCE REPAIR",
 ];
 
-export const PHONE_DISPLAY = "9762-424-318";
-export const PHONE_TEL = "+9779762424318";
-export const PHONE_2_DISPLAY = "9824-232-439";
-export const PHONE_2_TEL = "+9779824232439";
+export const PHONE_DISPLAY = "9762424318";
+export const PHONE_TEL = "+977 9762424318";
+export const PHONE_2_DISPLAY = "9824232439";
+export const PHONE_2_TEL = "+977 9824232439";
 export const EMAIL = "wowsewaa@gmail.com";
 export const ADDRESS = "Machhapokhari, Kathmandu, Nepal";
 
