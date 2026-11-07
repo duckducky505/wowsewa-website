@@ -1,3 +1,5 @@
+/// <reference types="vite/client" />
+
 import type { ComponentType } from "react";
 import {
   IconWrench,
@@ -42,15 +44,79 @@ import {
   IconCalendar,
 } from "../assets/icons/Icons";
 
+import plumbing from "../assets/images/plumbing-main.webp";
+import plumbing1 from "../assets/images/leak-repair.webp";
+import tap from "../assets/images/tap-faucet.webp";
+import waterPump from "../assets/images/water-pump.webp";
+import drainage from "../assets/images/drainage cleaning.webp";
+import kitchenPlumbing from "../assets/images/kitchen-plumbing.webp";
 
+
+import electrical from "../assets/images/electrical.jpg";
+import wiring from "../assets/images/wiring.jpg";
+import homeRewiring from "../assets/images/home-rewiring.webp";
+import networking from "../assets/images/networking.webp";
+import rewiring from "../assets/images/rewiring.webp";
+import switchImg from "../assets/images/switch.webp";
+import riceCooker from "../assets/images/rice-cooker.webp";
+import roomHeater from "../assets/images/room-heater.webp";
+import induction from "../assets/images/induction.webp";
+import homeAppliance from "../assets/images/home-appliance.webp";
+import kitchenAppliance from "../assets/images/kitchen-appliance.webp";
+import software from "../assets/images/software.webp";
+
+import IT from "../assets/images/IT.jpg";
+import laptopRepair from "../assets/images/laptop-repair.jpg";
+import laptopServicing from "../assets/images/laptopservicing.webp";
+import printer from "../assets/images/printer.jpg";
+
+import appliance from "../assets/images/appliances.jpg";
+
+import AC from "../assets/images/ac-repair.webp";
+import acGas from "../assets/images/ac-gas-refill.webp";
+
+import cctv from "../assets/images/cctv.webp";
+import dvr from "../assets/images/dvr.webp";
+import biometric from "../assets/images/biometric.webp";
+import nvr from "../assets/images/nvr.webp";
+import cctvInstallation from "../assets/images/cctv-installation.jpg";
+import waterPurifier from "../assets/images/water-purifier.webp";
+import vacuumCleaner from "../assets/images/vacuum-cleaner.webp";
+
+
+
+import ups from "../assets/images/inverter.webp";
+import oven from "../assets/images/oven.jpg";
+import solar from "../assets/images/solar.webp";
+import fridge from "../assets/images/fridge-maintainence.webp";
+import fridgeRepair from "../assets/images/fridge-repair.jpg";
+import geyser from "../assets/images/geyser-installation.jpg";
+import inverter from "../assets/images/inverter.webp";
+import lighting from "../assets/images/lighting-installation.webp";
+import switchboard from "../assets/images/switchboard.jpg";
+import washingmachine from "../assets/images/washing-machine.jpg";
+import router from "../assets/images/router.webp";
+import toner from "../assets/images/toner.webp";
+import computerUpgrades from "../assets/images/computer-upgrades.webp";
+import tvMount from "../assets/images/tv-mounting.webp";
+import powerBackup from "../assets/images/power-backup.webp";
+import solarPanel from "../assets/images/solar-panel.webp";
+import solarInverter from "../assets/images/solar-inverter.webp";
+import battery from "../assets/images/ups-battery.webp";
 
 /* ---------------- services ---------------- */
+export type ServiceItem = {
+  name: string;
+  image?: string;   // optional: if missing, the page shows an icon tile instead
+};
+
 export type Service = {
   id: string;
   name: string;
   tag: string;
   desc: string;
-  items: string[];
+  image?: string;   // category cover photo
+  items: ServiceItem[];
   price: number;
   Icon: ComponentType<{ className?: string }>;
   accent?: boolean;
@@ -62,13 +128,14 @@ export const SERVICES: Service[] = [
     name: "Plumbing",
     tag: "LEAK-FREE GUARANTEE",
     desc: "From dripping taps to full bathroom refits — our plumbers arrive with parts, not promises.",
+    image: plumbing,
     items: [
-      "Water Leakage Detection & Repair",
-      "Tap, Faucet & Sanitary Installation",
-      "Bathroom & Kitchen Plumbing",
-      "Drainage Blockage & Cleaning",
-      "Water Pump Installation & Repair",
-      "New Plumbing Installation & Maintenance",
+      { name: "Water Leakage Detection & Repair", image: plumbing1 },
+      { name: "Tap, Faucet & Sanitary Installation", image:  tap},
+      { name: "Bathroom & Kitchen Plumbing", image:kitchenPlumbing },
+      { name: "Drainage Blockage & Cleaning", image: drainage},
+      { name: "Water Pump Installation & Repair", image: waterPump },
+      { name: "New Plumbing Installation & Maintenance", image: plumbing1},
     ],
     price: 1000,
     Icon: IconWrench,
@@ -78,13 +145,14 @@ export const SERVICES: Service[] = [
     name: "Electrical",
     tag: "LICENSED & INSURED",
     desc: "Certified electricians for wiring, switchboards and everything that sparks — done to code.",
+    image: electrical,
     items: [
-      "House & Commercial Wiring",
-      "Electrical Fault Detection & Repair",
-      "Lighting Installation & Repair",
-      "Switch, Socket & Electrical Fittings",
-      "Electrical Panel & Distribution Board",
-      "New Electrical Setup & Maintenance",
+      { name: "House & Commercial Wiring", image:  wiring},
+      { name: "Electrical Fault Detection & Repair", image: homeRewiring},
+      { name: "Lighting Installation & Repair", image:  lighting},
+      { name: "Switch, Socket & Electrical Fittings", image: switchImg},
+      { name: "Electrical Panel & Distribution Board", image: rewiring},
+      { name: "New Electrical Setup & Maintenance", image:  switchboard},
     ],
     price: 1000,
     Icon: IconBolt,
@@ -94,14 +162,15 @@ export const SERVICES: Service[] = [
     name: "IT & Device Repair",
     tag: "NO-FIX, NO-FEE",
     desc: "Laptops, phones, printers, Wi-Fi dead zones — our bench techs and field IT crew handle it all.",
+    image: IT,
     items: [
-      "Laptop, MacBook & Desktop Repair",
-      "Gaming Laptop & PC Servicing",
-      // "Mobile Phone & Tablet Repair",
-      "Printer & Scanner Repair",
-      "Hardware & Software Troubleshooting",
-      "Computer Upgrades & Maintenance",
-      "Toner & Ink Refilling",
+      { name: "Laptop, MacBook & Desktop Repair", image: laptopRepair },
+      { name: "Gaming Laptop & PC Servicing", image: laptopServicing },
+      // { name: "Mobile Phone & Tablet Repair", image: "/images/mobile-repair.jpg" },
+      { name: "Printer & Scanner Repair", image: printer },
+      { name: "Hardware & Software Troubleshooting", image: software },
+      { name: "Computer Upgrades & Maintenance", image: computerUpgrades},
+      { name: "Toner & Ink Refilling", image: toner },
     ],
     price: 1500,
     Icon: IconChip,
@@ -112,12 +181,13 @@ export const SERVICES: Service[] = [
     name: "Appliance Installation",
     tag: "SAME-DAY FIT",
     desc: "Washing machine to wall-mounted TV — levelled, tested and warrantied on the spot.",
+    image: appliance,
     items: [
-      "Home Appliance Installation & Setup",
-      "Kitchen Appliance Installation",
-      "TV Installation & Wall Mounting",
-      "Water Purifier Installation",
-      "Appliance Relocation & Reinstallation",
+      { name: "Home Appliance Installation & Setup", image: homeAppliance },
+      { name: "Kitchen Appliance Installation", image: kitchenAppliance },
+      { name: "TV Installation & Wall Mounting", image: tvMount},
+      { name: "Water Purifier Installation", image: waterPurifier },
+      { name: "Appliance Relocation & Reinstallation", image: "/images/appliance-relocation.jpg" },
     ],
     price: 1000,
     Icon: IconWasher,
@@ -127,13 +197,14 @@ export const SERVICES: Service[] = [
     name: "AC & Heating",
     tag: "GAS-CHECK INCLUDED",
     desc: "Split or window AC, room heaters, air purifiers — serviced with pressure gauges, not guesswork.",
+    image: AC,
     items: [
-      "AC Installation, Repair & Servicing",
-      "AC Gas Refilling & Leakage Repair",
-      "Electric & Gas Geyser Services",
-      "Solar Water Heater Services",
-      "Room Heater Repair & Maintenance",
-      "Heating System Installation & Repair",
+      { name: "AC Installation, Repair & Servicing", image: AC },
+      { name: "AC Gas Refilling & Leakage Repair", image: acGas},
+      { name: "Electric & Gas Geyser Services", image: geyser },
+      { name: "Solar Water Heater Services", image: solar },
+      { name: "Room Heater Repair & Maintenance", image: roomHeater},
+      { name: "Heating System Installation & Repair", image: "/images/heating-system.jpg" },
     ],
     price: 1000,
     Icon: IconSnow,
@@ -143,13 +214,14 @@ export const SERVICES: Service[] = [
     name: "CCTV & Networking",
     tag: "SECURE & CONNECTED",
     desc: "Complete surveillance and network infrastructure setup for homes and commercial spaces.",
+    image: cctv,
     items: [
-      "CCTV Installation, Repair & Maintenance",
-      "DVR & NVR Setup & Configuration",
-      "Wi-Fi Router Installation & Troubleshooting",
-      "LAN & Office Networking",
-      "Network Cabling & Maintenance",
-      "Biometric & Access Control Systems",
+      { name: "CCTV Installation, Repair & Maintenance", image: cctvInstallation },
+      { name: "DVR & NVR Setup & Configuration", image: nvr },
+      { name: "Wi-Fi Router Installation & Troubleshooting", image: router},
+      { name: "LAN & Office Networking", image: "/images/office-network.jpg" },
+      { name: "Network Cabling & Maintenance", image: networking },
+      { name: "Biometric & Access Control Systems", image: biometric},
     ],
     price: 1000,
     Icon: IconShield,
@@ -159,12 +231,13 @@ export const SERVICES: Service[] = [
     name: "Solar & UPS",
     tag: "UNINTERRUPTED POWER",
     desc: "Reliable green energy solutions and backup systems to keep your home and office running.",
+    image: ups,
     items: [
-      "Solar Panel Installation & Maintenance",
-      "Solar Inverter Installation & Repair",
-      "UPS & Inverter Repair & Maintenance",
-      "Battery Installation & Replacement",
-      "Home & Office Power Backup Solutions",
+      { name: "Solar Panel Installation & Maintenance", image: solarPanel },
+      { name: "Solar Inverter Installation & Repair", image: solarInverter},
+      { name: "UPS & Inverter Repair & Maintenance", image: ups },
+      { name: "Battery Installation & Replacement", image: battery },
+      { name: "Home & Office Power Backup Solutions", image: powerBackup },
     ],
     price: 999,
     Icon: IconSwitch,
@@ -174,19 +247,19 @@ export const SERVICES: Service[] = [
     name: "Home & Kitchen Appliance Repair",
     tag: "EXPERT REPAIR",
     desc: "Fast, reliable repair services for all major home and kitchen appliances right at your doorstep.",
+    image: appliance,
     items: [
-      "Microwave Oven & Induction Cooker Repair",
-      "Washing Machine Repair & Servicing",
-      "Refrigerator & Deep Freezer Repair",
-      "Electric Oven & Kitchen Appliance Repair",
-      "Rice Cooker, Mixer & Grinder Repair",
-      "Vacuum Cleaner & Small Appliance Repair",
+      { name: "Microwave Oven & Induction Cooker Repair", image: induction },
+      { name: "Washing Machine Repair & Servicing", image: washingmachine },
+      { name: "Refrigerator & Deep Freezer Repair", image: fridgeRepair },
+      { name: "Electric Oven & Kitchen Appliance Repair", image: oven },
+      { name: "Rice Cooker, Mixer & Grinder Repair", image: riceCooker },
+      { name: "Vacuum Cleaner & Small Appliance Repair", image: vacuumCleaner },
     ],
     price: 1000,
     Icon: IconWrench,
   },
 ];
-
 /* ---------------- technicians ---------------- */
 export type Tech = {
   name: string;
@@ -554,8 +627,10 @@ export const LEGAL_TERMS = [
   "Payments are collected after completion, via cash, eSewa, Khalti, FonePay or bank transfer. Never advance, never off-app.",
 ];
 
+
+
 /* ---------------- misc ---------------- */
-export const AREAS = ["Kathmandu", "Lalitpur", "Bhaktapur"];
+export const AREAS = ["Kathmandu", "Lalitpur", "Bhaktapur", "Kirtipur"];
 
 export const SLOTS = ["Morning · 8–11 AM", "Midday · 11 AM–2 PM", "Afternoon · 2–5 PM", "Evening · 5–8 PM", "Emergency · ASAP"];
 
@@ -583,3 +658,5 @@ export const SOCIALS = [
   { name: "LinkedIn", url: "https://www.linkedin.com/company/wowsewaa/" },
   { name: "X", url: "https://x.com/WowSewa" },
 ];
+
+

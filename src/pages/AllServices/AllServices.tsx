@@ -1,15 +1,14 @@
-import { useMemo, useState } from "react";
-import { SERVICES, PHONE_DISPLAY, PHONE_TEL } from "../../data/data"; // or siteContent
+import { useMemo, useState, type ComponentType } from "react";
+import { SERVICES, PHONE_DISPLAY, PHONE_TEL } from "../../data/data";
 import { emitPrefill } from "../../lib/lib";
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
 import {
-  IconArrow, IconCheck, IconClock, IconClose, IconPhone, IconSearch, IconShield, IconCheckCircle,
+  IconArrow, IconClock, IconClose, IconPhone, IconSearch, IconShield, IconCheckCircle,
 } from "../../assets/icons/Icons";
 
-type CatId = "all" | string;
-
 const TOTAL_ITEMS = SERVICES.reduce((n, s) => n + s.items.length, 0);
+const TEL = PHONE_TEL.replace(/\s/g, "");
 
 const TRUST_ITEMS = [
   { Icon: IconShield, text: "30-day workmanship warranty" },
@@ -23,26 +22,61 @@ function book(service: string) {
   document.getElementById("book")?.scrollIntoView({ behavior: "smooth" });
 }
 
+/* Photo with a safe fallback: no image or a wrong file name shows an icon tile */
+function Pic({ src, alt, Icon, className }: {
+  src?: string; alt: string; Icon: ComponentType<{ className?: string }>; className?: string;
+}) {
+  const [failed, setFailed] = useState(false);
+
+  if (!src || failed) {
+    return (
+      <div
+        role="img"
+        aria-label={alt}
+        className={`flex items-center justify-center bg-gradient-to-br from-pine to-pine-deep text-lime/40 ${className ?? ""}`}
+      >
+        <Icon className="h-12 w-12" />
+      </div>
+    );
+  }
+  return (
+    <img
+      src={src}
+      alt={alt}
+      loading="lazy"
+      decoding="async"
+      onError={() => setFailed(true)}
+      className={`object-cover ${className ?? ""}`}
+    />
+  );
+}
+
 export default function AllServicesPage() {
-  const [cat, setCat] = useState<CatId>("all");
+  const [cat, setCat] = useState<string>("all");
   const [q, setQ] = useState("");
   const needle = q.trim().toLowerCase();
 
-  const filtered = useMemo(
+  // categories that match the chip + search; inside each, only the matching services
+  const sections = useMemo(
     () =>
-      SERVICES.filter(
-        (s) =>
-          (cat === "all" || s.id === cat) &&
-          (!needle ||
-            s.name.toLowerCase().includes(needle) ||
-            s.desc.toLowerCase().includes(needle) ||
-            s.tag.toLowerCase().includes(needle) ||
-            s.items.some((it) => it.toLowerCase().includes(needle))),
-      ),
+      SERVICES.filter((s) => cat === "all" || s.id === cat)
+        .map((s) => {
+          const categoryHit =
+            !!needle &&
+            (s.name.toLowerCase().includes(needle) ||
+              s.tag.toLowerCase().includes(needle) ||
+              s.desc.toLowerCase().includes(needle));
+          const items = !needle || categoryHit ? s.items : s.items.filter((it) => it.name.toLowerCase().includes(needle));
+          return { service: s, items };
+        })
+        .filter((x) => x.items.length > 0),
     [cat, needle],
   );
 
-  const chips = [{ id: "all", label: "All services", count: TOTAL_ITEMS }, ...SERVICES.map((s) => ({ id: s.id, label: s.name, count: s.items.length }))];
+  const chips = [
+    { id: "all", label: "All services", count: TOTAL_ITEMS },
+    ...SERVICES.map((s) => ({ id: s.id, label: s.name, count: s.items.length })),
+  ];
 
   return (
     <>
@@ -64,8 +98,8 @@ export default function AllServicesPage() {
               will ever need<span className="text-lime">.</span>
             </h1>
             <p className="mt-5 max-w-2xl text-[15px] leading-relaxed text-fog">
-              From a single dripping tap to a full house rewiring — browse everything we do, with transparent
-              starting prices. Pick a category, search a problem, book in a click.
+              From a single dripping tap to a full house rewiring — browse everything we do, grouped by trade, with
+              transparent starting prices. Pick a category, search a problem, book in a click.
             </p>
 
             {/* search */}
@@ -122,98 +156,97 @@ export default function AllServicesPage() {
           </div>
         </section>
 
-        {/* ---------------- results ---------------- */}
-        <section className="relative bg-pine py-14 text-cream">
-          <div className="pointer-events-none absolute inset-0 bg-dots-dark opacity-40" />
-          <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
-            <div className="mb-8 flex flex-wrap items-end justify-between gap-3">
-              <h2 className="font-display text-2xl font-extrabold text-cream">
-                {needle ? (
-                  <>Results for <span className="text-lime">“{q.trim()}”</span></>
-                ) : cat === "all" ? (
-                  "All categories"
-                ) : (
-                  SERVICES.find((s) => s.id === cat)?.name
-                )}
-                <span className="ml-3 rounded-md bg-lime px-2 py-0.5 align-middle font-mono text-xs font-bold text-ink">
-                  {filtered.length}
-                </span>
-              </h2>
-            </div>
-
-            {filtered.length === 0 ? (
+        {/* ---------------- no results ---------------- */}
+        {sections.length === 0 && (
+          <section className="bg-pine py-14 text-cream">
+            <div className="mx-auto max-w-3xl px-4 sm:px-6">
               <div className="rounded-2xl border-2 border-dashed border-cream/25 p-14 text-center">
                 <p className="font-display text-xl font-bold text-cream">No service matches “{q.trim()}”.</p>
                 <p className="mt-2 text-sm text-fog">We still fix it — call the hotline and describe the problem.</p>
                 <a
-                  href={`tel:${PHONE_TEL}`}
+                  href={`tel:${TEL}`}
                   className="mt-6 inline-flex items-center gap-2 rounded-lg bg-lime px-5 py-3 font-display text-sm font-bold text-ink shadow-[4px_4px_0_0_#03201a] transition-transform hover:-translate-y-0.5"
                 >
                   <IconPhone className="h-4 w-4" /> Call {PHONE_DISPLAY}
                 </a>
               </div>
-            ) : (
-              <div className="grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
-                {filtered.map((s) => (
-                  <article
-                    key={s.id}
-                    className={`group flex flex-col rounded-2xl border-2 p-6 shadow-[6px_6px_0_0_rgba(3,32,26,0.25)] transition-[box-shadow,transform] duration-200 hover:-translate-y-1 hover:shadow-[10px_10px_0_0_#d1fe17] ${
-                      s.accent ? "border-lime bg-lime text-ink" : "border-pine/15 bg-cream text-pine"
-                    }`}
-                  >
-                    <div className="flex items-start gap-4">
-                      <span
-                        className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${
-                          s.accent ? "bg-ink text-lime" : "bg-pine text-lime"
-                        }`}
-                      >
-                        <s.Icon className="h-6 w-6" />
-                      </span>
-                      <div className="min-w-0">
-                        <p className={`font-mono text-[10px] font-bold uppercase tracking-[0.22em] ${s.accent ? "text-ink/60" : "text-pine/50"}`}>
-                          {s.tag}
-                        </p>
-                        <h3 className="mt-1 font-display text-xl font-extrabold leading-tight tracking-tight">{s.name}</h3>
+            </div>
+          </section>
+        )}
+
+        {/* ---------------- one section per category ---------------- */}
+        {sections.map(({ service: s, items }, i) => {
+          const light = i % 2 === 1;
+          return (
+            <section
+              key={s.id}
+              id={s.id}
+              className={`relative scroll-mt-28 overflow-hidden py-14 [content-visibility:auto] [contain-intrinsic-size:auto_900px] ${
+                light ? "bg-cream text-pine" : "bg-pine text-cream"
+              }`}
+            >
+              <div className={`pointer-events-none absolute inset-0 ${light ? "bg-grid-light" : "bg-dots-dark opacity-40"}`} />
+
+              <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
+                {/* category banner */}
+                <div
+                  className={`mb-9 grid overflow-hidden rounded-2xl border-2 md:grid-cols-[280px_1fr] ${
+                    light ? "border-pine/15 bg-white/60" : "border-cream/15 bg-ink/30"
+                  }`}
+                >
+                  <Pic src={s.image} alt={s.name} Icon={s.Icon} className="h-44 w-full md:h-full" />
+                  <div className="flex flex-col justify-center gap-3 p-6">
+                    <p className={`font-mono text-[10.5px] font-bold uppercase tracking-[0.24em] ${light ? "text-pine/55" : "text-lime"}`}>
+                      {s.tag}
+                    </p>
+                    <h2 className={`font-display text-2xl font-extrabold leading-tight tracking-tight sm:text-3xl ${light ? "text-pine" : "text-cream"}`}>
+                      {s.name}
+                    </h2>
+                    <p className={`max-w-2xl text-[14px] leading-relaxed ${light ? "text-pine/75" : "text-cream/70"}`}>{s.desc}</p>
+                    <p className={`font-display text-sm font-extrabold ${light ? "text-pine" : "text-cream"}`}>
+                      Starting at Rs. {s.price.toLocaleString("en-IN")}
+                    </p>
+                  </div>
+                </div>
+
+                {/* every service in this category */}
+                <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                  {items.map((it) => (
+                    <article
+                      key={it.name}
+                      className="group flex flex-col overflow-hidden rounded-xl border-2 border-pine/15 bg-cream text-pine shadow-[5px_5px_0_0_rgba(3,32,26,0.15)] transition-[box-shadow,transform] duration-200 hover:-translate-y-1 hover:border-pine hover:shadow-[8px_8px_0_0_#d1fe17]"
+                    >
+                      <Pic
+                        src={it.image ?? s.image}
+                        alt={it.name}
+                        Icon={s.Icon}
+                        className="h-40 w-full transition-transform duration-500 group-hover:scale-[1.03]"
+                      />
+                      <div className="flex flex-1 flex-col gap-3 p-4">
+                        <h3 className="flex-1 font-display text-[1.2rem] font-extrabold leading-snug">{it.name}</h3>
+                        <div className="flex items-end justify-between border-t-2 border-dashed border-pine/15 pt-3.5">
+                          <div>
+                            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-pine/55">Starts at</p>
+                            <p className="mt-0.5 font-display text-[1.5rem] font-extrabold leading-none tracking-tight text-pine">
+                              Rs. {s.price.toLocaleString("en-IN")}
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => book(it.name)}
+                            className="inline-flex items-center gap-1.5 rounded-lg bg-pine px-3.5 py-2 font-display text-xs font-bold text-lime transition-colors duration-200 hover:bg-lime hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-lime"
+                          >
+                            Book now <IconArrow className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
                       </div>
-                    </div>
-
-                    <p className={`mt-4 text-[13.5px] leading-relaxed ${s.accent ? "text-ink/75" : "text-pine/75"}`}>{s.desc}</p>
-
-                    <ul className="mt-4 flex-1 space-y-2">
-                      {s.items.map((it) => {
-                        const hit = needle && it.toLowerCase().includes(needle);
-                        return (
-                          <li key={it} className="flex items-start gap-2.5 text-[13px] font-medium">
-                            <IconCheck className={`mt-0.5 h-3.5 w-3.5 shrink-0 ${s.accent ? "text-ink" : "text-lime-deep"}`} />
-                            <span className={hit ? "rounded bg-lime px-1 font-bold text-ink" : ""}>{it}</span>
-                          </li>
-                        );
-                      })}
-                    </ul>
-
-                    <div className={`mt-5 flex items-center justify-between border-t-2 border-dashed pt-4 ${s.accent ? "border-ink/25" : "border-pine/15"}`}>
-                      <p className="font-display text-base font-extrabold">
-                        Rs. {s.price.toLocaleString("en-IN")}
-                        <span className={`ml-1 font-mono text-[10px] font-normal uppercase tracking-wider ${s.accent ? "text-ink/60" : "text-pine/50"}`}>
-                          starting
-                        </span>
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => book(s.name)}
-                        className={`inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 font-display text-xs font-bold transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-lime ${
-                          s.accent ? "bg-ink text-lime hover:bg-pine" : "bg-pine text-lime hover:bg-lime hover:text-ink"
-                        }`}
-                      >
-                        Book now <IconArrow className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-                  </article>
-                ))}
+                    </article>
+                  ))}
+                </div>
               </div>
-            )}
-          </div>
-        </section>
+            </section>
+          );
+        })}
 
         {/* ---------------- CTA band ---------------- */}
         <section id="book" className="relative scroll-mt-24 overflow-hidden bg-lime text-ink">
@@ -227,7 +260,7 @@ export default function AllServicesPage() {
             </div>
             <div className="flex flex-wrap items-center gap-4">
               <a
-                href={`tel:${PHONE_TEL}`}
+                href={`tel:${TEL}`}
                 className="inline-flex items-center gap-2 rounded-lg bg-pine px-6 py-4 font-display text-base font-bold text-lime shadow-[4px_4px_0_0_#03201a] transition-transform hover:-translate-y-0.5"
               >
                 <IconPhone className="h-5 w-5" /> Call {PHONE_DISPLAY}

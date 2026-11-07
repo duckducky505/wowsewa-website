@@ -1,9 +1,5 @@
 import { BrowserRouter,Routes,Route } from 'react-router-dom';
-import IT from './pages/IT/IT';
 import { Home } from './pages/HomePage/Home';
-import Plumbing from './pages/Plumbing/Plumbing';
-import Electrical from './pages/Electrical/Electrical';
-import Appliances from './pages/Applicances/Appliances';
 import About from './pages/About/About';
 import Training from './pages/Training/Training';
 import Linktree from './pages/LinkTree/Linktree';
